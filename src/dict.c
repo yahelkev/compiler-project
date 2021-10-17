@@ -2,42 +2,32 @@
 
 struct _dict* Dict() {
     struct _dict* newDict = (struct _dict*)malloc(sizeof(struct _dict));
-    newDict->_keys = (char**)malloc(sizeof(char));
-    newDict->_values = (char**)malloc(sizeof(char));
+    newDict->_keys = (int*)malloc(sizeof(int));
+    newDict->_values = (FUNCTION_EATER_POINTER*)malloc(sizeof(FUNCTION_EATER_POINTER));
     newDict->_size = 0;
     return newDict;
 }
 
-int has(struct _dict* dict, char* key) {
+int has(struct _dict* dict, int key) {
     for (int i = 0; i < dict->_size; i++)
-        if (!strcmp(dict->_keys[i], key)) return 1;
+        if (dict->_keys[i] == key) return 1;
     return 0;
 }
-void add(struct _dict* dict, char* key, char* value) {
-    if (!strcmp(key, "")) {
-        printf("dict error : key empty\n");
-        exit(0);
-    }
+void add(struct _dict* dict, int key, FUNCTION_EATER_POINTER value) {
     if (has(dict, key)) {
         printf("dict error : key exists\n");
         exit(0);
     }
-    dict->_keys = (char**)realloc(dict->_keys, sizeof(char) * (dict->_size + 1));
-    dict->_keys[dict->_size] = (char*)malloc(sizeof(char) * strlen(key));
-    dict->_values = (char**)realloc(dict->_values, sizeof(char) * (dict->_size + 1));
-    dict->_values[dict->_size] = (char*)malloc(sizeof(char) * strlen(value));
-    strcpy(dict->_keys[dict->_size], key);
-    strcpy(dict->_values[dict->_size], value);
+    dict->_keys = (int*)realloc(dict->_keys, sizeof(int) * (dict->_size + 1));
+    dict->_values = (FUNCTION_EATER_POINTER*)realloc(dict->_values, sizeof(FUNCTION_EATER_POINTER) * (dict->_size + 1));
+    dict->_keys[dict->_size] = key;
+    dict->_values[dict->_size] = &value;
     dict->_size++;
-
+    return;
 }
-char* get(struct _dict* dict, char* key) {
+FUNCTION_EATER_POINTER get(struct _dict* dict, int key) {
     if (!dict->_size) {
         printf("dict error : dict empty\n");
-        exit(0);
-    }
-    if (!strcmp(key, "")) {
-        printf("dict error : key empty\n");
         exit(0);
     }
     if (!has(dict, key)) {
@@ -45,7 +35,7 @@ char* get(struct _dict* dict, char* key) {
         exit(0);
     }
     for (int i = 0; i < dict->_size; i++)
-        if (!strcmp(dict->_keys[i], key)) return dict->_values[i];
+        if (dict->_keys[i] == key) return dict->_values[i];
 }
 
 void filedict(struct _dict* dict, char* filepath, char spacer, char del) {
