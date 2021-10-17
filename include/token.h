@@ -2,7 +2,16 @@
 #define TOKEN_H
 #include <stdlib.h>
 #include <string.h>
-
+enum TYPE {
+    i16,
+    i32,
+    f16,
+    f32,
+    identifier,
+    integer_literal
+    assignment_op,
+    semi_colon
+};
 typedef struct TOKEN {
     int line, column, type;
     char* value;
