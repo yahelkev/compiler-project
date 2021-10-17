@@ -8,6 +8,14 @@ struct _dict* Dict() {
     return newDict;
 }
 
+void __FREE_DICT(dict* di) {
+    free(di->_keys);
+    for (size_t i = 0; i < di->_size; i++)
+        free(di->_values[i]);
+    free(di);
+    return;
+}
+
 int has(struct _dict* dict, int key) {
     for (int i = 0; i < dict->_size; i++)
         if (dict->_keys[i] == key) return 1;

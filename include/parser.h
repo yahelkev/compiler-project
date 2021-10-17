@@ -8,9 +8,13 @@
 
 // Might change return type to custom type refering if the parsing was succseful or not
 typedef struct PARSER {
-    dict signatureList; // symCodes and function pointers 
+    dict* signatureList; // symCodes and function pointers
+    void (*destroy)(Parser* par);
 }Parser;
-void begin(Token* tk);
+
+Parser* new_parser();
+void __FREE_PARSER(Parser* par);
+void begin(Token* tk, Parser* par);
 
 
 #endif // !PARSER_H
