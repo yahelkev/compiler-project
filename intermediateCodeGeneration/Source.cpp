@@ -16,6 +16,5 @@ int main()
 
 void initIntAsm(std::string name, std::string value)
 {
-	std::cout<< "sub esp," << INT_VAR_SIZE <<std::endl;
-	std::cout<< "mov DWORD PTR _" + name + "$[ebp]," << value <<std::endl;
+	std::cout<< "mov     dword ptr[rbp - " << INT_VAR_SIZE << "], " << value <<std::endl;
 }
