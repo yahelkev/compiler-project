@@ -16,8 +16,13 @@ void __FREE_PARSER(Parser* par) {
 
 void begin(Token* tk, Parser* par) {
     while (tk) {
-        if(tk->type == i16) {
-            // 
+        switch(tk->type) {
+            case 16: {
+                Token* head = tk;
+                tk = tk->next;
+                
+            }
+
         }
     }
 }

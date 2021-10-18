@@ -8,7 +8,7 @@ enum TYPE {
     f16,
     f32,
     identifier,
-    integer_literal
+    integer_literal,
     assignment_op,
     semi_colon
 };
