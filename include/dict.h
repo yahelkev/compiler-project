@@ -20,15 +20,15 @@
 
 // }
 
-typedef int (*FUNCTION_EATER_POINTER)(Token* tk, Parser* par);
+typedef int (*FUNCTION_EATER_POINTER)(Token* tk, struct PARSER* par);
 
 typedef struct _dict {
     int* _keys;
     FUNCTION_EATER_POINTER* _values;
     int _size;
 
-    void (*destroy)(dict* di);
-} dict;
+    void (*destroy)(struct _dict* di);
+}dict;
 
 
 struct _dict* Dict();
@@ -36,6 +36,5 @@ void __FREE_DICT(dict* di);
 int has(struct _dict* dict, int key);
 void add(struct _dict* dict, int key, FUNCTION_EATER_POINTER value);
 FUNCTION_EATER_POINTER get(struct _dict* dict, int key);
-void filedict(struct _dict* dict, char* filepath, char spacer, char del);
 
 #endif // !DICT_H

@@ -12,7 +12,7 @@ Token* new_token(char* value, int type, int line, int column) {
     return new;
 }
 
-void __FREE_TOKEN(Token* tk) {
+void __FREE_TOKEN__(Token* tk) {
     free(tk->value);
     free(tk);
     return;

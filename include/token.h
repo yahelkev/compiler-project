@@ -17,10 +17,10 @@ typedef struct TOKEN {
     char* value;
     struct TOKEN* next;
 
-    void (*destroy)(Token*);
+    void (*destroy)(struct TOKEN*);
 }Token;
 
-Token* new_token(char*, int, int, int);
+Token* new_token(char* value, int type, int line, int column);
 void __FREE_TOKEN__(Token*);
 
 #endif // !TOKEN_H
