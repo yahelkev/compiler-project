@@ -14,9 +14,9 @@ O_FILES = $(C_FILES:src/%.c=build/%.o)
 .PHONY: all clean
 .DEFAULT: all
 
-all: compi
+all: bot
 
-compi: $(O_FILES)
+bot: $(O_FILES)
 	gcc -o $@ $^
 
 build:
