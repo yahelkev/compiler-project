@@ -4,7 +4,7 @@
 #include <string.h>
 #include <stdio.h>
 #include "types.h"
-
+typedef int CODE;
 typedef struct Exp {
     enum {
         variable_exp, binary_exp, integer_exp
@@ -35,7 +35,7 @@ ast* make_creationvariableExp(char* name, TYPES type, ast* value);
 ast* make_variableExp(char* name, ast* value);
 ast* make_integerExp(int value);
 
-typedef int CODE;
+
 CODE parse(ast* tree);
 
 CODE parse_variableExp(ast* tree);

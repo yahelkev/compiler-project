@@ -32,7 +32,14 @@ ast* make_integerExp(int value) {
     return e;
 }
 
-
+int parse(ast* tree) {
+    switch(tree->tag) {
+        case variable_exp: return parse_variableExp(tree);
+        case binary_exp: return parse_binaryExp(tree->variable_creation.exp);
+        case integer_exp: return parse_integerExp(tree->variable_creation.exp);
+        default: printf("error unknown tag\n"); return 0;
+    }
+}
 
 
 CODE parse_variableExp(ast* tree) {
@@ -55,14 +62,14 @@ CODE parse_binaryExp(ast* tree) {
         default: printf("error unknown tag\n"); return 0;
     }
     switch(tree->binary.right->tag) {
-        case integer_exp: load = load & parse_integerExp(tree->binary.right);
-        case binary_exp: load = load & parse_binaryExp(tree->binary.right);
+        case integer_exp: load = load & parse_integerExp(tree->binary.right); break;
+        case binary_exp: load = load & parse_binaryExp(tree->binary.right); break;
         default: printf("error unknown tag\n"); return 0;
     }
     if(!load) return load;
     if(tree->binary.right->tag == integer_exp &&
         tree->binary.right->integer.value == 0 &&
-        tree->binary.operator_ = "/")
+        tree->binary.operator_ == "/")
             return load ^ load;
     return load;
 }
