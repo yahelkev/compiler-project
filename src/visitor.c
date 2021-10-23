@@ -10,7 +10,7 @@ ast* make_binaryExp ( char* operator_, ast* left, ast* right ) {
 }
 
 ast* make_variableExp(char* name, TYPES type, ast* value) {
-    ast* e (ast*)malloc(sizeof(ast));
+    ast* e = (ast*)malloc(sizeof(ast));
     e->tag = variable_exp;
     e->variable_creation.name = (char*)malloc(sizeof(char)*(strlen(name)+1));
     strcpy(e->variable_creation.name, name);
@@ -18,4 +18,9 @@ ast* make_variableExp(char* name, TYPES type, ast* value) {
     e->variable_creation.exp = value;
     return e;
 }
-ast* make_integerExp(int value);
+ast* make_integerExp(int value) {
+    ast* e = (ast*)malloc(sizeof(ast));
+    e->tag = integer_exp;
+    e->integer.value = value
+    return e;
+}
