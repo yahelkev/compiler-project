@@ -1,8 +1,8 @@
 #ifndef TYPES_H
 #define TYPES_H
 
-enum {
+typedef enum {
     i16
-}TYPES
+}TYPES;
 
 #endif // !TYPES_H

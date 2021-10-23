@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include "types.h"
 
-typedef struct exp {
+typedef struct Exp {
     enum {
         variable_exp, binary_exp, integer_exp
     } tag;
@@ -14,12 +14,12 @@ typedef struct exp {
         struct {
             char* name;
             TYPES type;
-            struct Exp * exp;
+            struct Exp* exp;
         } variable_creation; // makeVariableExp
 
         struct {
             char * operator_;
-            struct Exp * left;
+            struct Exp* left;
             struct Exp * right;
         }binary; // makeBinaryExp
 
