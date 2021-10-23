@@ -15,7 +15,7 @@ typedef struct Exp {
             char* name;
             TYPES type;
             struct Exp* exp;
-        } variable_creation; // makeVariableExp
+        } variable_creation; // makeVariableExp | make_creationvariableExp
 
         struct {
             char * operator_;
@@ -31,6 +31,14 @@ typedef struct Exp {
 
 
 ast* make_binaryExp ( char* operator_, ast* left, ast* right );
-ast* make_variableExp(char* name, TYPES type, ast* value);
+ast* make_creationvariableExp(char* name, TYPES type, ast* value);
+ast* make_variableExp(char* name, ast* value);
 ast* make_integerExp(int value);
+
+typedef int CODE;
+CODE parse(ast* tree);
+
+CODE parse_variableExp(ast* tree);
+CODE parse_binaryExp(ast* tree);
+CODE parse_integerExp(ast* tree);
 #endif // !VISITOR_H
