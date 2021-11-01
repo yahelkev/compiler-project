@@ -25,8 +25,12 @@ char show(Lexer* lex);
   and wheter to move to a new line if '\n' is detected
 **/
 void advance(Lexer* lex, int stringFlag);
-
-
+/*
+    Main start function
+    * Will change return type to a custom token list type
+    * Will probably add a flagging option of some sort
+*/
+void start(Lexer* lex);
 
 
 

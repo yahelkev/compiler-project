@@ -29,3 +29,8 @@ void advance(Lexer* lex, int stringFlag) {
     }
     return;
 }
+
+
+void start(Lexer* lex) {
+    
+}
