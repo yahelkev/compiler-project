@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "*.eclip": "eclip",
+        "*.piv": "Pivot",
+        "token.h": "c",
+        "stdio.h": "c",
+        "visitor.h": "c"
+    },
+    "C_Cpp.errorSquiggles": "Disabled"
+}
