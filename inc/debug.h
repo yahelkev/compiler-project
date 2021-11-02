@@ -3,7 +3,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "keyword_types.h"
+#include "KeywordTypes.h"
+#include "Lexer.h"
 
 void printToken(Token* token);
 

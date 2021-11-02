@@ -1,7 +1,7 @@
 #include "../inc/Lexer.h"
 
-static void cleanLexer(Lexer* lex) {
-        lex->source = NULL;
+void cleanLexer(Lexer* lex) {
+        lex->text = NULL;
         lex->column = lex->line = 1;
         lex->index = lex->start = 0;
 }
@@ -85,7 +85,7 @@ void eatWhiteSpace(Lexer* lex) {
     return;
 }
 
-Token MakeToken(Lexer* lex, TokenType type) {
+Token makeToken(Lexer* lex, TokenType type) {
 
     Token toke;
 
@@ -94,41 +94,43 @@ Token MakeToken(Lexer* lex, TokenType type) {
     toke.lexeme = (char*)malloc( sizeof( char ) * ( toke.length + 1) );
     toke.lexeme[0] = lex->current;
     toke.lexeme[1] = '\0';
-    toke.line = line;
-    toke.column = column;
+    toke.line = lex->line;
+    toke.column = lex->column;
 
     return toke;
 }
 
-void advance(Lexer* lex, int stringFlag) {
-    if((lex->current = peek(lex)) == '\n'  && !stringFlag) {
+char advance(Lexer* lex) {
+    if((lex->current = peek(lex)) == '\n') {
         lex->line += 1;
         lex->column = 1;
         lex->index += 1;
     } else if (lex->current != '\0') {
         lex->column += 1;
         lex->index += 1;
+    } else {
+        return '\0';
     }
-    return;
+    return lex->current;
 }
 
-Token makeErrorToken(Lexer* lexer, char* msg) {
+Token makeErrorToken(Lexer* lex, char* msg) {
 	Token token;
 
 	token.type = TOKEN_ERROR;
 	token.lexeme = msg;
 	token.length = strlen(msg);
-	token.line = lexer->line;
+	token.line = lex->line;
 
 	return token;
 }
 
 Token makeNumber(Lexer* lex) {
-	while(isDigit(lex)) advance(lex);
+	while(isDigit(show(lex))) advance(lex);
 
 	if (peek(lex) == '.') {
 		advance(lex);
-		while(isDigit(lex));
+		while(isDigit(show(lex))) advance(lex);
 	}
 
 	Token toke;
@@ -136,7 +138,7 @@ Token makeNumber(Lexer* lex) {
 	toke.type = TOKEN_NUMBER;
     toke.length = lex->current - lex->start;
     toke.lexeme = (char*)malloc( sizeof( char ) * ( toke.length + 1) );
-    strncpy( toke.lexeme, &lex->source[lex->start], toke.length );
+    strncpy( toke.lexeme, &lex->text[lex->start], toke.length );
 	toke.line = lex->line;
     toke.column = lex->column;
 
@@ -165,7 +167,7 @@ Token makeString(Lexer* lex, char terminator) {
 	toke.type = TOKEN_STRING;
     toke.length = lex->current - lex->start - 2;
     toke.lexeme = (char*)malloc( sizeof( char ) * ( toke.length + 1) );
-    strncpy( toke.lexeme, &lex->source[lex->start + 1], toke.length );
+    strncpy( toke.lexeme, &lex->text[lex->start + 1], toke.length );
 	toke.line = lex->line;
     toke.column = lex->column;
     
@@ -173,7 +175,7 @@ Token makeString(Lexer* lex, char terminator) {
 }
 
 Token scanLexer(Lexer* lex) {
-    eatWhitespace(lex);
+    eatWhiteSpace(lex);
 
 	lex->start = lex->index;
 
@@ -183,33 +185,33 @@ Token scanLexer(Lexer* lex) {
 	// if (isAlpha(show(lex))) return makeKeywordOrIdentifier(lex);
 
     switch( lex->current ) {
-        case '(': return makeToken(lexer, TOKEN_LEFT_PAREN);
-		case ')': return makeToken(lexer, TOKEN_RIGHT_PAREN);
-		case '{': return makeToken(lexer, TOKEN_LEFT_BRACE);
-		case '}': return makeToken(lexer, TOKEN_RIGHT_BRACE);
-		case '[': return makeToken(lexer, TOKEN_LEFT_BRACKET);
-		case ']': return makeToken(lexer, TOKEN_RIGHT_BRACKET);
-		case ';': return makeToken(lexer, TOKEN_SEMICOLON);
-		case ',': return makeToken(lexer, TOKEN_COMMA);
+        case '(': return makeToken(lex, TOKEN_LEFT_PAREN);
+		case ')': return makeToken(lex, TOKEN_RIGHT_PAREN);
+		case '{': return makeToken(lex, TOKEN_LEFT_BRACE);
+		case '}': return makeToken(lex, TOKEN_RIGHT_BRACE);
+		case '[': return makeToken(lex, TOKEN_LEFT_BRACKET);
+		case ']': return makeToken(lex, TOKEN_RIGHT_BRACKET);
+		case ';': return makeToken(lex, TOKEN_SEMICOLON);
+		case ',': return makeToken(lex, TOKEN_COMMA);
 
-		case '+': return makeToken(lexer, match(lexer, '=') ? TOKEN_PLUS_EQUAL : match(lexer, '+') ? TOKEN_PLUS_PLUS: TOKEN_PLUS);
-		case '-': return makeToken(lexer, match(lexer, '=') ? TOKEN_MINUS_EQUAL : match(lexer, '-') ? TOKEN_MINUS_MINUS: TOKEN_MINUS);
-		case '*': return makeToken(lexer, match(lexer, '=') ? TOKEN_STAR_EQUAL : TOKEN_STAR);
-		case '/': return makeToken(lexer, match(lexer, '=') ? TOKEN_SLASH_EQUAL : TOKEN_SLASH);
-		case '%': return makeToken(lexer, match(lexer, '=') ? TOKEN_MODULO_EQUAL : TOKEN_MODULO);
+		case '+': return makeToken(lex, match(lex, '=') ? TOKEN_PLUS_EQUAL : match(lex, '+') ? TOKEN_PLUS_PLUS: TOKEN_PLUS);
+		case '-': return makeToken(lex, match(lex, '=') ? TOKEN_MINUS_EQUAL : match(lex, '-') ? TOKEN_MINUS_MINUS: TOKEN_MINUS);
+		case '*': return makeToken(lex, match(lex, '=') ? TOKEN_STAR_EQUAL : TOKEN_STAR);
+		case '/': return makeToken(lex, match(lex, '=') ? TOKEN_SLASH_EQUAL : TOKEN_SLASH);
+		case '%': return makeToken(lex, match(lex, '=') ? TOKEN_MODULO_EQUAL : TOKEN_MODULO);
 
-		case '!': return makeToken(lexer, match(lexer, '=') ? TOKEN_BANG_EQUAL : TOKEN_BANG);
-		case '=': return makeToken(lexer, match(lexer, '=') ? TOKEN_EQUAL_EQUAL : match(lexer, '>') ? TOKEN_EQUAL_GREATER: TOKEN_EQUAL);
+		case '!': return makeToken(lex, match(lex, '=') ? TOKEN_BANG_EQUAL : TOKEN_BANG);
+		case '=': return makeToken(lex, match(lex, '=') ? TOKEN_EQUAL_EQUAL : match(lex, '>') ? TOKEN_EQUAL_GREATER: TOKEN_EQUAL);
 
-		case '>': return makeToken(lexer, match(lexer, '=') ? TOKEN_GREATER_EQUAL : TOKEN_GREATER);
-		case '<': return makeToken(lexer, match(lexer, '=') ? TOKEN_LESS_EQUAL : match(lexer, '|') ? TOKEN_LESS_OR: TOKEN_LESS);
+		case '>': return makeToken(lex, match(lex, '=') ? TOKEN_GREATER_EQUAL : TOKEN_GREATER);
+		case '<': return makeToken(lex, match(lex, '=') ? TOKEN_LESS_EQUAL : TOKEN_LESS);
 
         case '"':
 		case '\'':
-			return makeString(lexer, c);
+			return makeString(lex, lex->current);
 
 		default:
-			return makeErrorToken(lexer, "Unexpected token");
+			return makeErrorToken(lex, "Unexpected token");
     }
 }
 

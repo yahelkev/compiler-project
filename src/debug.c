@@ -1,7 +1,6 @@
-#include "../inc/debug.h"
+#include "../inc/Debug.h"
 
-#include <stdio.h>
-#include <stdlib.h>
+
 
 void printToken(Token* token) {
 	if (token->type == TOKEN_ERROR) {
@@ -11,7 +10,7 @@ void printToken(Token* token) {
 
 	printf("%d\t%d-%d\t", token->type, token->line, token->column);
 
-	if (token->type == TOKEN_IDENTIFIER || token->type == TOKEN_NUMBER || token->type == TOKEN_STRING || token->type == TOKEN_INTERPOLATED_STRING) {
+	if (token->type == TOKEN_IDENTIFIER || token->type == TOKEN_NUMBER || token->type == TOKEN_STRING) {
 		printf("%.*s\t", token->length, token->lexeme);
 	} else {
 		char* keyword = findKeywordByType(token->type);

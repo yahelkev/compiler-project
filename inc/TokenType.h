@@ -1,8 +1,6 @@
 #ifndef TOY_TOKEN_TYPE_H
 #define TOY_TOKEN_TYPE_H
 
-/* DOCS: Remember to update keyword_names.c, lexer.c and the pratt table
-*/
 
 typedef enum {
 	//single character tokens
@@ -81,4 +79,4 @@ typedef enum {
 
 } TokenType;
 
-#endif
+#endif // !TOKEN_TYPE_H

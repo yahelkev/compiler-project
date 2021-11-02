@@ -1,4 +1,4 @@
-#include "keyword_types.h"
+#include "../inc/KeywordTypes.h"
 
 KeywordType keywordTypes[] = {
 	{"else", TOKEN_ELSE},
@@ -7,7 +7,7 @@ KeywordType keywordTypes[] = {
 	{"if", TOKEN_IF},
 	{"print", TOKEN_PRINT},
 	{"return", TOKEN_RETURN},
-	{"fn", TOKEN_FUNC},
+	{"fn", TOKEN_FUNCTION},
 	{"true", TOKEN_TRUE},
 	{"while", TOKEN_WHILE},
 

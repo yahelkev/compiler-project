@@ -2,12 +2,12 @@
 #define LEXER_H
 #include <string.h>
 #include <stdlib.h>
-#include "token_type.h"
+#include "TokenType.h"
+#include "KeywordTypes.h"
 
-
-typedef int bool
-#define false NULL
-#define true !false
+#define bool int
+#define false 0
+#define true 1
 
 typedef struct Token {
 	TokenType type;
@@ -18,14 +18,15 @@ typedef struct Token {
 
 typedef struct Lexer {
     
-    int line, column, index, size;
+    int line, column, index, size, start;
     char current;
     char* text;
 
 }Lexer;
 
+void cleanLexer(Lexer* lex);
 // Iniatiates a lexer with blank values
-static void newLexer(Lexer* lex, char* text);
+void newLexer(Lexer* lex, char* text);
 bool isAtEnd(Lexer* lex);
 // Peeks next character
 char peek(Lexer* lex);
@@ -38,7 +39,7 @@ char show(Lexer* lex);
  Flag that represents if we are in the middle in a string,
   and wheter to move to a new line if '\n' is detected
 **/
-void advance(Lexer* lex, int stringFlag);
+char advance(Lexer* lex);
 /*
     Main start function
     * Will change return type to a custom token list type
@@ -49,7 +50,7 @@ void start(Lexer* lex);
 bool isDigit(char c);
 bool isAlpha(char c);
 bool isIdentifier(char c);
-Token MakeToken(TokenType type, char* lexeme, int line, int column);
+Token makeToken(Lexer* lex, TokenType type);
 Token scanLexer(Lexer* lex);
 void eatWhiteSpace(Lexer* lex);
 Token makeNumber(Lexer* lexer);
