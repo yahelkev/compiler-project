@@ -72,11 +72,13 @@ typedef enum {
 	TOKEN_RETURN,
 	TOKEN_TRUE,
 	TOKEN_WHILE,
+	TOKEN_FUNCTION,
 
 	//meta
 	TOKEN_PASS, //do nothing
 	TOKEN_ERROR,
 	TOKEN_EOF
+
 } TokenType;
 
 #endif

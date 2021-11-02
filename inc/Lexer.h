@@ -54,5 +54,6 @@ Token scanLexer(Lexer* lex);
 void eatWhiteSpace(Lexer* lex);
 Token makeNumber(Lexer* lexer);
 Token makeString(Lexer* lexer, char terminator);
+Token makeErrorToken(Lexer* lexer, char* msg);
 bool match(Lexer* lexer, char c);
 #endif // !LEXER_H

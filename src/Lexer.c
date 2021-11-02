@@ -111,6 +111,18 @@ void advance(Lexer* lex, int stringFlag) {
     }
     return;
 }
+
+Token makeErrorToken(Lexer* lexer, char* msg) {
+	Token token;
+
+	token.type = TOKEN_ERROR;
+	token.lexeme = msg;
+	token.length = strlen(msg);
+	token.line = lexer->line;
+
+	return token;
+}
+
 Token makeNumber(Lexer* lex) {
 	while(isDigit(lex)) advance(lex);
 
@@ -171,7 +183,33 @@ Token scanLexer(Lexer* lex) {
 	// if (isAlpha(show(lex))) return makeKeywordOrIdentifier(lex);
 
     switch( lex->current ) {
-        case '+':  return peek(lex) == '+' ? MakeToken(lex, TOKEN_PLUS);
+        case '(': return makeToken(lexer, TOKEN_LEFT_PAREN);
+		case ')': return makeToken(lexer, TOKEN_RIGHT_PAREN);
+		case '{': return makeToken(lexer, TOKEN_LEFT_BRACE);
+		case '}': return makeToken(lexer, TOKEN_RIGHT_BRACE);
+		case '[': return makeToken(lexer, TOKEN_LEFT_BRACKET);
+		case ']': return makeToken(lexer, TOKEN_RIGHT_BRACKET);
+		case ';': return makeToken(lexer, TOKEN_SEMICOLON);
+		case ',': return makeToken(lexer, TOKEN_COMMA);
+
+		case '+': return makeToken(lexer, match(lexer, '=') ? TOKEN_PLUS_EQUAL : match(lexer, '+') ? TOKEN_PLUS_PLUS: TOKEN_PLUS);
+		case '-': return makeToken(lexer, match(lexer, '=') ? TOKEN_MINUS_EQUAL : match(lexer, '-') ? TOKEN_MINUS_MINUS: TOKEN_MINUS);
+		case '*': return makeToken(lexer, match(lexer, '=') ? TOKEN_STAR_EQUAL : TOKEN_STAR);
+		case '/': return makeToken(lexer, match(lexer, '=') ? TOKEN_SLASH_EQUAL : TOKEN_SLASH);
+		case '%': return makeToken(lexer, match(lexer, '=') ? TOKEN_MODULO_EQUAL : TOKEN_MODULO);
+
+		case '!': return makeToken(lexer, match(lexer, '=') ? TOKEN_BANG_EQUAL : TOKEN_BANG);
+		case '=': return makeToken(lexer, match(lexer, '=') ? TOKEN_EQUAL_EQUAL : match(lexer, '>') ? TOKEN_EQUAL_GREATER: TOKEN_EQUAL);
+
+		case '>': return makeToken(lexer, match(lexer, '=') ? TOKEN_GREATER_EQUAL : TOKEN_GREATER);
+		case '<': return makeToken(lexer, match(lexer, '=') ? TOKEN_LESS_EQUAL : match(lexer, '|') ? TOKEN_LESS_OR: TOKEN_LESS);
+
+        case '"':
+		case '\'':
+			return makeString(lexer, c);
+
+		default:
+			return makeErrorToken(lexer, "Unexpected token");
     }
 }
 
