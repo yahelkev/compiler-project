@@ -1,6 +1,9 @@
 #ifndef SYMBOL_TABLE_H
 #define SYMBOL_TABLE_H
 
+#include <string.h>
+#include <stdlib.h>
+
 #define bool int
 #define false 0
 #define true 1
