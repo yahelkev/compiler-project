@@ -1,7 +1,6 @@
 ﻿  interface.c
-C:\Magshimim\compiler-project\compiler\interface.c(24,6): warning C4013: 'exit' undefined; assuming extern returning int
-C:\Magshimim\compiler-project\compiler\interface.c(29,13): warning C4013: 'strcmp' undefined; assuming extern returning int
-  main.c
-  Generating Code...
-  LINK : C:\Magshimim\compiler-project\compiler\Debug\compiler.exe not found or not built by the last incremental link; performing full link
+C:\Magshimim\compiler-project\compiler\interface.c(2,1): warning C4005: '_CRT_SECURE_NO_WARNINGS': macro redefinition
+C:\Magshimim\compiler-project\compiler\interface.c : message : see previous definition of '_CRT_SECURE_NO_WARNINGS'
+C:\Magshimim\compiler-project\compiler\interface.c(26,6): warning C4013: 'exit' undefined; assuming extern returning int
+C:\Magshimim\compiler-project\compiler\interface.c(31,13): warning C4013: 'strcmp' undefined; assuming extern returning int
   compiler.vcxproj -> C:\Magshimim\compiler-project\compiler\Debug\compiler.exe

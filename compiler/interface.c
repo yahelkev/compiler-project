@@ -1,4 +1,6 @@
 #include "interface.h"
+#define _CRT_SECURE_NO_WARNINGS
+
 
 void handleInput(int argc, char* argv[])
 {
@@ -37,5 +39,12 @@ void handleFlags(char* flag)
 
 void checkSrcFile(char* srcfileName)
 {
-	printf("srting compiling...");
+	FILE* file;
+	if (file = fopen(srcfileName, "r"))
+	{
+		fclose(file);
+		printf("start compiling...");
+		return;
+	}
+	printf("make sure src file exists!\n");
 }
