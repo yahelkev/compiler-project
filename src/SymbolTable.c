@@ -30,9 +30,14 @@ TABLE_VALUE getValue(Table* table, char* key) {
 bool insertValue(Table* table, char* key, TABLE_VALUE value) {
     if (!isDefined(table,key)) {
             table->keys = (char**)realloc(sizeof(char*) * ( table->size + 1 ));
-            table->keys[i] = (char*)malloc(sizeof(char) * ( strlen(key) + 1 ));
+            table->keys[table->size] = (char*)malloc(sizeof(char) * ( strlen(key) + 1 ));
             strcpy(table->keys[i], key);
-        return true;
-    } else
-        return false;
+            table->values = (TABLE_VALUE*)malloc(sizeof(TABLE_VALUE) * ( table->size + 1 ));
+            table->values[table->size] = value;
+            table->size++;
+
+            return true;
+    }
+    
+    return false;
 }
