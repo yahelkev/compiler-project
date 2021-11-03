@@ -1,0 +1,2 @@
+C:\Magshimim\compiler-project\compiler\Debug\compiler.exe
+C:\Magshimim\compiler-project\compiler\Debug\compiler.pdb
