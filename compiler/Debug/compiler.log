@@ -1,2 +1,7 @@
-﻿  main.c
+﻿  interface.c
+C:\Magshimim\compiler-project\compiler\interface.c(24,6): warning C4013: 'exit' undefined; assuming extern returning int
+C:\Magshimim\compiler-project\compiler\interface.c(29,13): warning C4013: 'strcmp' undefined; assuming extern returning int
+  main.c
+  Generating Code...
+  LINK : C:\Magshimim\compiler-project\compiler\Debug\compiler.exe not found or not built by the last incremental link; performing full link
   compiler.vcxproj -> C:\Magshimim\compiler-project\compiler\Debug\compiler.exe

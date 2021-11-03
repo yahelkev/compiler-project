@@ -1,8 +1,7 @@
 #include <stdio.h>
+#include "interface.h"
 
 void  main(int argc, char* argv[]) {
 
-    if (argc == 2) {
-
-    }
+    handleInput(argc, argv);
 }

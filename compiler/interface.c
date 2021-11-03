@@ -23,7 +23,7 @@ void error(char* msg)
 	printf("%s", msg);
 	exit(0);
 }
-		
+
 void handleFlags(char* flag)
 {
 	if (!strcmp(flag, "-h") || !strcmp(flag, "--help"))
