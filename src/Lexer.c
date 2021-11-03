@@ -146,6 +146,44 @@ Token makeNumber(Lexer* lex) {
 	return toke;
 }
 
+Token makeKeywordOrIdentifier(Lexer* lex) {
+	advance(lex); //first letter can only be alpha
+
+	while(isIdentifier(show(lex))) {
+		advance(lex);
+	}
+
+	//scan for a keyword
+	for (int i = 0; keywordTypes[i].keyword; i++) {
+		if (strlen(keywordTypes[i].keyword) == lex->current - lex->start && !strncmp(keywordTypes[i].keyword, &lex->text[lex->start], lex->current - lex->start)) {
+			Token toke;
+
+			toke.type = keywordTypes[i].type;
+			toke.length = lex->index - lex->start;
+			toke.lexeme = (char*)malloc( sizeof( char ) * ( toke.length + 1) );
+			strncpy( toke.lexeme, &lex->text[lex->start], toke.length );
+			toke.lexeme[ toke.length ] = '\0';
+			toke.line = lex->line;
+			toke.column = lex->column - 1;
+
+			return toke;
+		}
+	}
+
+	//return an identifier
+	Token toke;
+
+	toke.type = TOKEN_IDENTIFIER;
+	toke.length = lex->index - lex->start;
+    toke.lexeme = (char*)malloc( sizeof( char ) * ( toke.length + 1) );
+    strncpy( toke.lexeme, &lex->text[lex->start], toke.length );
+    toke.lexeme[ toke.length ] = '\0';
+	toke.line = lex->line;
+    toke.column = lex->column - 1;
+
+	return toke;
+}
+
 Token makeString(Lexer* lex, char terminator) {
 	while (!isAtEnd(lex) && peek(lex) != terminator) {
 		//escaping strings
@@ -176,6 +214,7 @@ Token makeString(Lexer* lex, char terminator) {
 	return toke;
 }
 
+
 Token scanLexer(Lexer* lex) {
     
     eatWhiteSpace(lex);
@@ -183,7 +222,7 @@ Token scanLexer(Lexer* lex) {
 	if (isAtEnd(lex)) return makeToken(lex, TOKEN_EOF);
 
 	if (isDigit(show(lex))) return makeNumber(lex);
-	// if (isAlpha(show(lex))) return makeKeywordOrIdentifier(lex);
+	if (isAlpha(show(lex))) return makeKeywordOrIdentifier(lex);
 
     switch( lex->current ) {
         case '(': return makeToken(lex, TOKEN_LEFT_PAREN);
