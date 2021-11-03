@@ -5,7 +5,8 @@
 int main( void ) {
 
     Lexer lex;
-    newLexer(&lex, "1 + 2");
+    char* text = "13 + 2";
+    newLexer(&lex, text);
     Token token;
     while ((token = scanLexer(&lex)).type != TOKEN_EOF)
     {

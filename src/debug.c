@@ -16,11 +16,11 @@ void printToken(Token* token) {
 		char* keyword = findKeywordByType(token->type);
 
 		if (keyword != NULL) {
-			printf("%s", keyword);
+			printf("%s\t", keyword);
 		} else {
 			printf("-");
 		}
 	}
 
-	printf("\t%d-%d\n", token->line, token->column);
+	printf("\t%d-%d\n", token->line, token->column+token->length);
 }

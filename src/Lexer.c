@@ -11,6 +11,7 @@ void newLexer(Lexer* lex, char* text) {
     lex->size = strlen(text);
     lex->text = (char*)malloc(sizeof( char ) * ( lex->size + 1 ));
     strcpy(lex->text, text);
+    lex->current = lex->text[lex->index];
     return;
 }
 
@@ -95,7 +96,7 @@ Token makeToken(Lexer* lex, TokenType type) {
     toke.lexeme[0] = lex->current;
     toke.lexeme[1] = '\0';
     toke.line = lex->line;
-    toke.column = lex->column;
+    toke.column = lex->column - 1;
 
     return toke;
 }
@@ -105,24 +106,23 @@ char advance(Lexer* lex) {
         lex->line += 1;
         lex->column = 1;
         lex->index += 1;
-    } else if (lex->current != '\0') {
+    } else {
         lex->column += 1;
         lex->index += 1;
-    } else {
-        return '\0';
     }
     return lex->current;
 }
 
 Token makeErrorToken(Lexer* lex, char* msg) {
-	Token token;
+	Token toke;
 
-	token.type = TOKEN_ERROR;
-	token.lexeme = msg;
-	token.length = strlen(msg);
-	token.line = lex->line;
+	toke.type = TOKEN_ERROR;
+	toke.lexeme = msg;
+	toke.length = strlen(msg);
+	toke.line = lex->line;
+    toke.column = lex->column - 1;
 
-	return token;
+	return toke;
 }
 
 Token makeNumber(Lexer* lex) {
@@ -136,11 +136,12 @@ Token makeNumber(Lexer* lex) {
 	Token toke;
 
 	toke.type = TOKEN_NUMBER;
-    toke.length = lex->current - lex->start;
+    toke.length = lex->index - lex->start;
     toke.lexeme = (char*)malloc( sizeof( char ) * ( toke.length + 1) );
     strncpy( toke.lexeme, &lex->text[lex->start], toke.length );
+    toke.lexeme[ toke.length ] = '\0';
 	toke.line = lex->line;
-    toke.column = lex->column;
+    toke.column = lex->column - 1;
 
 	return toke;
 }
@@ -165,20 +166,20 @@ Token makeString(Lexer* lex, char terminator) {
     Token toke;
 
 	toke.type = TOKEN_STRING;
-    toke.length = lex->current - lex->start - 2;
+    toke.length = lex->index - lex->start - 2;
     toke.lexeme = (char*)malloc( sizeof( char ) * ( toke.length + 1) );
     strncpy( toke.lexeme, &lex->text[lex->start + 1], toke.length );
+    toke.lexeme[ toke.length ] = '\0';
 	toke.line = lex->line;
-    toke.column = lex->column;
+    toke.column = lex->column - 1;
     
 	return toke;
 }
 
 Token scanLexer(Lexer* lex) {
+    
     eatWhiteSpace(lex);
-
 	lex->start = lex->index;
-
 	if (isAtEnd(lex)) return makeToken(lex, TOKEN_EOF);
 
 	if (isDigit(show(lex))) return makeNumber(lex);
