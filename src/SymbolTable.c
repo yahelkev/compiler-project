@@ -38,6 +38,34 @@ bool insertValue(Table* table, char* key, TABLE_VALUE value) {
 
             return true;
     }
-    
+
     return false;
+}
+
+
+struct function makeFunction(struct variables* args, char* returnType) {
+    struct function func;
+    func.args = args;
+    func.returnType = (char*)malloc(sizeof(char) * ( strlen(returnType) + 1 ));
+    strcpy(func.returnType, returnType);
+    return func;
+}
+
+struct variable makeVariable(char* type) {
+    struct variable var;
+    var.type = (char*)malloc(sizeof(char) * ( strlen(type) + 1 ));
+    strcpy(var.type, type);
+    return var;
+}
+
+void newValue(TABLE_VALUE* value, ValueTag tag, void* structValuePointer, int line, int column) {
+    value->line = line;
+    value->column = column;
+
+    switch(tag) {
+        FUNCTION_TAG: value->function_ = (struct function*)structValuePointer; return;
+        VARIABLE_TAG: value->variable_ = (struct variable*)structValuePointer; return;
+        ERROR_TAG: value->error_ = (struct error*)structValuePointer; return;
+        default: return;
+    }
 }

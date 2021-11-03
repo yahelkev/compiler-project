@@ -8,12 +8,12 @@
 #define false 0
 #define true 1
 
-
+enum {
+        FUNCTION_TAG, VARIABLE_TAG, ERROR_TAG
+}ValueTag;
 // C Style
 typedef struct TABLE_VALUE {
-    enum {
-        FUNCTION_TAG, VARIABLE_TAG
-    }tag;
+    ValueTag tag;
     int line;
     int column;
 
@@ -21,12 +21,16 @@ typedef struct TABLE_VALUE {
         
         struct varibale {
             char* type;
-        }* varialble_;
+        }* variable_;
 
         struct function {
             struct variable* args;
-            char* returntype;
+            char* returnType;
         }* function_;
+
+        struct error {
+            char* msg;
+        }* error_;
     };
 }TABLE_VALUE;
 
@@ -45,6 +49,11 @@ TABLE_VALUE getValue(Table* table, char* key);
     0 - Insertion Failed
 */
 bool insertValue(Table* table, char* key, TABLE_VALUE value);
+
+struct function makeFunction(struct variables* args, char* returnType);
+struct variable makeVariable(char* type);
+void newValue(TABLE_VALUE* value, ValueTag tag, void* structValuePointer, int line, int column);
+
 
 
 
