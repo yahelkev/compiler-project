@@ -2,22 +2,31 @@
 #define _CRT_SECURE_NO_WARNINGS
 
 
-void handleInput(int argc, char* argv[])
+int handleInput(int argc, char* argv[])
 {
+	int flag = 0;
 	switch (argc)
 	{
 	case MIN_ARGC:
-		handleFlags(argv[1]);
-		checkSrcFile(argv[1]);
+		flag = handleFlags(argv[1]);
+		if (Unknown_Flag == flag){
+			flag = None_Flag;
+			checkSrcFile(argv[1]);
+		}
 		break;
 	case MAX_ARGC:
-		handleFlags(argv[1]);
-		error("invalid flag! try -h for help\n");
+		flag = handleFlags(argv[1]);
+		if (Unknown_Flag == flag)
+		{
+			error("invalid flag! try -h for help\n");
+		}
+		checkSrcFile(argv[2]);
 		break;
 	default:
 		error("make sure you use the form of <flag(optional)> <srcCode.ourLanguage>");
 		break;
 	}
+	return flag;
 }
 
 void error(char* msg)
@@ -26,15 +35,16 @@ void error(char* msg)
 	exit(0);
 }
 
-void handleFlags(char* flag)
+int handleFlags(char* flag)
 {
 	if (!strcmp(flag, "-h") || !strcmp(flag, "--help"))
 	{
 		printf("flag options are:\n");
 		printf("	-h/--help - for help\n");
-		error("	you can enter nothing to use no flag");
+		error("	you can enter nothing to use no flag\n");
+		//no need to return a thing because the program stops
 	}
-	else { return; };
+	else { return Unknown_Flag; };
 }
 
 void checkSrcFile(char* srcfileName)

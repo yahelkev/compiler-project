@@ -6,11 +6,17 @@
 #define MAX_STRING 3
 #define FILE_ENDING "ourLanguage"
 
+enum Flags
+{
+	Unknown_Flag,
+	None_Flag,
+	Help_Flag
+};
 
-//the 'main' of the handler
-void handleInput(int argc, char* argv[]);
+//the 'main' of the handler. returns the flag.
+int handleInput(int argc, char* argv[]);
 
-void handleFlags(char* flag);
+int handleFlags(char* flag);
 void checkSrcFile(char* srcfileName);
 
 void error(char* msg);
