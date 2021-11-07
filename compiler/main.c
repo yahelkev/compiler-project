@@ -3,5 +3,9 @@
 
 void  main(int argc, char* argv[])
 {
-    int flag = handleInput(argc, argv);
+    char* srcFileName = NULL;
+    int flag = handleInput(argc, argv, &srcFileName);
+    printf("flag: %d\n", flag);
+    printf("file: %s\n", srcFileName);
+
 }

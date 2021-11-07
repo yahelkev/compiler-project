@@ -2,7 +2,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 
 
-int handleInput(int argc, char* argv[])
+int handleInput(int argc, char* argv[], char** fileNamePtr)
 {
 	int flag = 0;
 	switch (argc)
@@ -12,6 +12,7 @@ int handleInput(int argc, char* argv[])
 		if (Unknown_Flag == flag){
 			flag = None_Flag;
 			checkSrcFile(argv[1]);
+			*fileNamePtr = argv[1];
 		}
 		break;
 	case MAX_ARGC:
@@ -21,6 +22,7 @@ int handleInput(int argc, char* argv[])
 			error("invalid flag! try -h for help\n");
 		}
 		checkSrcFile(argv[2]);
+		*fileNamePtr = argv[2];
 		break;
 	default:
 		error("make sure you use the form of <flag(optional)> <srcCode.ourLanguage>");

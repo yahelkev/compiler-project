@@ -14,7 +14,7 @@ enum Flags
 };
 
 //the 'main' of the handler. returns the flag.
-int handleInput(int argc, char* argv[]);
+int handleInput(int argc, char* argv[], char** fileNamePtr);
 
 int handleFlags(char* flag);
 void checkSrcFile(char* srcfileName);
