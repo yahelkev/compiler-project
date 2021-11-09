@@ -1,8 +1,0 @@
-﻿  interface.c
-C:\Magshimim\compiler-project\compiler\interface.c(2,1): warning C4005: '_CRT_SECURE_NO_WARNINGS': macro redefinition
-C:\Magshimim\compiler-project\compiler\interface.c : message : see previous definition of '_CRT_SECURE_NO_WARNINGS'
-C:\Magshimim\compiler-project\compiler\interface.c(37,6): warning C4013: 'exit' undefined; assuming extern returning int
-C:\Magshimim\compiler-project\compiler\interface.c(42,13): warning C4013: 'strcmp' undefined; assuming extern returning int
-C:\Magshimim\compiler-project\compiler\interface.c(80,25): warning C4013: 'malloc' undefined; assuming extern returning int
-C:\Magshimim\compiler-project\compiler\interface.c(50): warning C4715: 'handleFlags': not all control paths return a value
-  compiler.vcxproj -> C:\Magshimim\compiler-project\compiler\Debug\compiler.exe
