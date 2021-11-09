@@ -54,9 +54,38 @@ void checkSrcFile(char* srcfileName)
 	FILE* file;
 	if (file = fopen(srcfileName, "r"))
 	{
-		fclose(file);
-		printf("start compiling...");
-		return;
+		int test = getc(file);
+		if (test != EOF) {
+			fclose(file);
+			printf("start compiling...\n");
+			return;
+		}
 	}
 	printf("make sure src file exists!\n");
+}
+
+
+char* getFileContent(char* fileName)
+{
+	int i = 0;
+	char ch = 0;
+	char* buffer = NULL;
+	long length = 0;
+	FILE* file = fopen(fileName, "r");
+	if (file)
+	{
+		fseek(file, 0, SEEK_END);
+		length = ftell(file);
+		fseek(file, 0, SEEK_SET);
+		buffer = (char*)malloc(length);
+		ch = fgetc(file);
+		while (ch != EOF) {
+			buffer[i] = ch;
+			i++;
+			ch = fgetc(file);
+		}
+		buffer[i] = '\0';
+		fclose(file);
+	}
+	return buffer;
 }

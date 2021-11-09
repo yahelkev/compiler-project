@@ -18,5 +18,6 @@ int handleInput(int argc, char* argv[], char** fileNamePtr);
 
 int handleFlags(char* flag);
 void checkSrcFile(char* srcfileName);
+char* getFileContent(char* fileName);
 
 void error(char* msg);

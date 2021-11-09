@@ -8,4 +8,10 @@ void  main(int argc, char* argv[])
     printf("flag: %d\n", flag);
     printf("file: %s\n", srcFileName);
 
+    char* fileContent = getFileContent(srcFileName);
+    printf("\n%s\n", fileContent);
+    if (fileContent) {
+        free(fileContent);
+    }
+
 }
