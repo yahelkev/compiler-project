@@ -121,7 +121,7 @@ Token makeErrorToken(Lexer* lex, char* msg) {
 	toke.length = strlen(msg);
 	toke.line = lex->line;
     toke.column = lex->column - 1;
-
+	advance(lex);
 	return toke;
 }
 
