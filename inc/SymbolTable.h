@@ -3,14 +3,30 @@
 
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #define bool int
 #define false 0
 #define true 1
 
-enum {
+typedef enum {
         FUNCTION_TAG, VARIABLE_TAG, ERROR_TAG
-}ValueTag;
+} ValueTag;
+
+struct variable {
+    char* type;
+};
+
+struct function {
+    struct variable* args;
+    int amount;
+    char* returnType;
+};
+
+struct error {
+    char* msg;
+};
+
 // C Style
 typedef struct TABLE_VALUE {
     ValueTag tag;
@@ -19,18 +35,9 @@ typedef struct TABLE_VALUE {
 
     union {
         
-        struct varibale {
-            char* type;
-        }* variable_;
-
-        struct function {
-            struct variable* args;
-            char* returnType;
-        }* function_;
-
-        struct error {
-            char* msg;
-        }* error_;
+        struct variable * variable;
+        struct function* function;
+        struct error* error;
     };
 }TABLE_VALUE;
 
@@ -50,8 +57,9 @@ TABLE_VALUE getValue(Table* table, char* key);
 */
 bool insertValue(Table* table, char* key, TABLE_VALUE value);
 
-struct function makeFunction(struct variables* args, char* returnType);
+struct function makeFunction(struct variable* args, int amount, char* returnType);
 struct variable makeVariable(char* type);
+struct error makeError(char* msg);
 void newValue(TABLE_VALUE* value, ValueTag tag, void* structValuePointer, int line, int column);
 
 
