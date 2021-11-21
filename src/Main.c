@@ -24,10 +24,14 @@ int main( void ) {
 
     Table tab;
     newTable(&tab);
-    TABLE_VALUE val;
-    struct variable var = makeVariable("int");
+    TABLE_VALUE val, val2;
+    struct arg argnew = makeArg("x", "int");
+    struct variable var = makeVariable("int", "5");
+    struct function func = makeFunction(&argnew, 1, "float");
     newValue(&val, VARIABLE_TAG, &var , 1, 5);
+    newValue(&val2, FUNCTION_TAG, &func, 1, 10);
     printTableValue(&val);
+    printTableValue(&val2);
 
     
     return 0;

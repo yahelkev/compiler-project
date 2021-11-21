@@ -27,23 +27,20 @@ void printToken(Token* token) {
 
 
 void printTableValue(TABLE_VALUE* val) {
-	printf("Fuck yeah\n %d", val->tag);
-	switch (val->tag)
-	{
-	case FUNCTION_TAG:
-		printf("<< %s >>\t", val->function->returnType);
-		for (size_t i = 0; i < val->function->amount; i++) {
-			printf("%s, ", val->function->args[i].type);
-		}
-		break;
-	case VARIABLE_TAG:
-		printf("%d\n",val->variable);
-		printf("<< %c >>\t", (val->variable->type + 1));
-		break;
-	case ERROR_TAG:
-		printf("error << %s >>\t", val->error->msg);
-	default:
-		return;
+	switch (val->tag) {
+		case FUNCTION_TAG:
+			printf("<< %s >>\t", val->function->returnType);
+			for (size_t i = 0; i < val->function->amount; i++) {
+				printf("%s (%s), ", val->function->args[i].type, val->function->args[i].name);
+			}
+			break;
+		case VARIABLE_TAG:
+			printf("<< %s >> [ %s ]\t", val->variable->type, val->variable->value);
+			break;
+		case ERROR_TAG:
+			printf("error << %s >>\t", val->error->msg);
+		default:
+			return;
 	}
 
 	printf("%d-%d\n", val->line, val->column);

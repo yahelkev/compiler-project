@@ -48,7 +48,7 @@ bool insertValue(Table* table, char* key, TABLE_VALUE value) {
 }
 
 
-struct function makeFunction(struct variable* args, int amount, char* returnType) {
+struct function makeFunction(struct arg* args, int amount, char* returnType) {
     struct function func;
     func.args = args;
     func.amount = amount;
@@ -57,10 +57,12 @@ struct function makeFunction(struct variable* args, int amount, char* returnType
     return func;
 }
 
-struct variable makeVariable(char* type) {
+struct variable makeVariable(char* type, char* value) {
     struct variable var;
     var.type = (char*)malloc(sizeof(char) * ( strlen(type) + 1 ));
+    var.value = (char*)malloc(sizeof(char) * ( strlen(value) + 1 ));
     strcpy(var.type, type);
+    strcpy(var.value, value);
     return var;
 }
 
@@ -71,15 +73,24 @@ struct error makeError(char* msg) {
     return err;
 }
 
+struct arg makeArg(char* name, char* type) {
+    struct arg arg2;
+    arg2.name = (char*)malloc(sizeof(char) * ( strlen(name) + 1 ));
+    arg2.type = (char*)malloc(sizeof(char) * ( strlen(type) + 1 ));
+    strcpy(arg2.name, name);
+    strcpy(arg2.type, type);
+    return arg2;
+}
+
 void newValue(TABLE_VALUE* value, ValueTag tag, void* structValuePointer, int line, int column) {
     value->line = line;
     value->column = column;
     value->tag = tag;
-    printf("Heyyyy %d %d", tag, VARIABLE_TAG);
-    switch(tag) {
-        FUNCTION_TAG: value->function = (struct function*)structValuePointer; printf("YEPPP"); return;
-        VARIABLE_TAG: value->variable = (struct variable*)structValuePointer; printf("YEPPP1111111111") ;printf("[ %s ]\n", value->variable->type); return;
-        ERROR_TAG: value->error = (struct error*)structValuePointer; return;
-        default: return;
+
+    switch(value->tag) {
+        case FUNCTION_TAG: value->function = (struct function*)structValuePointer; return;
+        case VARIABLE_TAG: value->variable = (struct variable*)structValuePointer; return;
+        case ERROR_TAG: value->error = (struct error*)structValuePointer; return;
+        default:return;
     }
 }

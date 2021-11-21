@@ -15,10 +15,16 @@ typedef enum {
 
 struct variable {
     char* type;
+    char* value;
 };
 
+
+struct arg {
+    char* name;
+    char* type;
+};
 struct function {
-    struct variable* args;
+    struct arg* args;
     int amount;
     char* returnType;
 };
@@ -35,8 +41,8 @@ typedef struct TABLE_VALUE {
 
     union {
         
-        struct variable * variable;
         struct function* function;
+        struct variable* variable;
         struct error* error;
     };
 }TABLE_VALUE;
@@ -57,9 +63,10 @@ TABLE_VALUE getValue(Table* table, char* key);
 */
 bool insertValue(Table* table, char* key, TABLE_VALUE value);
 
-struct function makeFunction(struct variable* args, int amount, char* returnType);
-struct variable makeVariable(char* type);
+struct function makeFunction(struct arg* args, int amount, char* returnType);
+struct variable makeVariable(char* type, char* value);
 struct error makeError(char* msg);
+struct arg makeArg(char* name, char* type);
 void newValue(TABLE_VALUE* value, ValueTag tag, void* structValuePointer, int line, int column);
 
 
