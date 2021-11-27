@@ -75,7 +75,13 @@ typedef enum {
 	//meta
 	TOKEN_PASS, //do nothing
 	TOKEN_ERROR,
-	TOKEN_EOF
+	TOKEN_EOF,
+
+	// Variables Primitive Usable Types
+	TOKEN_INT_V,
+	TOKEN_FLOAT_V,
+	TOKEN_CHAR_V,
+	TOKEN_STRING_V
 
 } TokenType;
 

@@ -29,9 +29,9 @@ void testSymbolTable() {
 
 int main( void ) {
 
-    // Lexer lex;
-    // test(&lex, "fn add(int a, int b) -> int {\n\treturn a + b\n}");
-    // test(&lex, "int x = z + 1");
+     Lexer lex;
+     //testLexer(&lex, "fn add(int a, int b) -> int {\n\treturn a + b\n}");
+     testLexer(&lex, "int x = z + 1");
     // test(&lex, "float y = x + 13 * 11");
 
     // testSymbolTable();
