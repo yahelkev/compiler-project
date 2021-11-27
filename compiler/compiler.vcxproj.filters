@@ -31,7 +31,11 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SymbolTable.c">
+<<<<<<< HEAD
       <Filter>Header Files</Filter>
+=======
+      <Filter>Source Files</Filter>
+>>>>>>> 1009f7d6934ea1ee9e69409cbe25d844aae8bcd8
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -51,7 +55,11 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SymbolTable.h">
+<<<<<<< HEAD
       <Filter>Source Files</Filter>
+=======
+      <Filter>Header Files</Filter>
+>>>>>>> 1009f7d6934ea1ee9e69409cbe25d844aae8bcd8
     </ClInclude>
   </ItemGroup>
 </Project>
