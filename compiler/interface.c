@@ -12,7 +12,10 @@ int handleInput(int argc, char* argv[], char** fileNamePtr)
 		if (Unknown_Flag == flag){
 			flag = None_Flag;
 			checkSrcFile(argv[1]);
-			*fileNamePtr = argv[1];
+			*fileNamePtr = (char*)malloc(sizeof(char) * strlen(argv[1]) + sizeof(char));
+			printf("%s\n", argv[1]);
+			strcpy(*fileNamePtr, argv[1]);
+			printf("%s\n", *fileNamePtr);
 		}
 		break;
 	case MAX_ARGC:
@@ -22,7 +25,10 @@ int handleInput(int argc, char* argv[], char** fileNamePtr)
 			error("invalid flag! try -h for help\n");
 		}
 		checkSrcFile(argv[2]);
-		*fileNamePtr = argv[2];
+		*fileNamePtr = (char*)malloc(sizeof(char) * strlen(argv[2]) + sizeof(char));
+		printf("%s\n", argv[2]);
+		strcpy(*fileNamePtr, argv[2]);
+		printf("%s\n", *fileNamePtr);
 		break;
 	default:
 		error("make sure you use the form of <flag(optional)> <srcCode.ourLanguage>");
@@ -57,7 +63,6 @@ void checkSrcFile(char* srcfileName)
 		int test = getc(file);
 		if (test != EOF) {
 			fclose(file);
-			printf("start compiling...\n");
 			return;
 		}
 	}

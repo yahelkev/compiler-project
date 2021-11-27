@@ -1,6 +1,7 @@
 #pragma once
 #include <stdio.h>
-
+#include <string.h>
+#include <stdlib.h>
 #define MIN_ARGC 2
 #define MAX_ARGC 3
 #define MAX_STRING 3

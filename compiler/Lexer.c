@@ -155,7 +155,7 @@ Token makeKeywordOrIdentifier(Lexer* lex) {
 
 	//scan for a keyword
 	for (int i = 0; keywordTypes[i].keyword; i++) {
-		if (strlen(keywordTypes[i].keyword) == lex->current - lex->start && !strncmp(keywordTypes[i].keyword, &lex->text[lex->start], lex->current - lex->start)) {
+		if (strlen(keywordTypes[i].keyword) == lex->index - lex->start && !strncmp(keywordTypes[i].keyword, &lex->text[lex->start], lex->index - lex->start)) {
 			Token toke;
 
 			toke.type = keywordTypes[i].type;
@@ -164,7 +164,7 @@ Token makeKeywordOrIdentifier(Lexer* lex) {
 			strncpy( toke.lexeme, &lex->text[lex->start], toke.length );
 			toke.lexeme[ toke.length ] = '\0';
 			toke.line = lex->line;
-			toke.column = lex->column - 1;
+			toke.column = lex->column - toke.length;
 
 			return toke;
 		}
@@ -179,7 +179,7 @@ Token makeKeywordOrIdentifier(Lexer* lex) {
     strncpy( toke.lexeme, &lex->text[lex->start], toke.length );
     toke.lexeme[ toke.length ] = '\0';
 	toke.line = lex->line;
-    toke.column = lex->column - 1;
+    toke.column = lex->column - toke.length;
 
 	return toke;
 }
