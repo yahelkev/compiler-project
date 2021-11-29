@@ -56,3 +56,59 @@ void printParseTree(ParseTree* tree) {
 		printParseTree(tree->getChild(tree, i));
 	}
 }
+
+
+
+
+void printData(ParseTree* s) {
+	printf(" %d", s->type);
+}
+
+void printAllChildrenData(ParseTree* s) {
+	for (int i = 0; i < s->amountOfChilds; i++)
+		printData(s->childs[i]);
+}
+
+void printBFS(ParseTree* s) {
+	putchar('\n');
+	printAllChildrenData(s);
+	
+	for (int i = 0; i < s->amountOfChilds; i++) {
+		ParseTree* childCurr = s->getChild(s, i);
+		printBFS(childCurr);
+	}
+}
+void printTree(ParseTree* s) {
+	printData(s);
+	printBFS(s);
+	putchar('\n');
+}
+
+/*
+**             1
+**       2        7        8
+**    3    6            9     12
+**   4 5              10 11
+*/
+
+/*static Tree nodes[] =
+{
+	[1] = {  1, 3, { &nodes[2], &nodes[7], &nodes[8] } },
+	[2] = {  2, 2, { &nodes[3], &nodes[6], 0          } },
+	[3] = {  3, 2, { &nodes[4], &nodes[5], 0          } },
+	[4] = {  4, 0, { 0,          0,          0          } },
+	[5] = {  5, 0, { 0,          0,          0          } },
+	[6] = {  6, 0, { 0,          0,          0          } },
+	[7] = {  7, 0, { 0,          0,          0          } },
+	[8] = {  8, 2, { &nodes[9], &nodes[12], 0          } },
+	[9] = {  9, 2, { &nodes[10], &nodes[11], 0          } },
+	[10] = { 10, 0, { 0,          0,          0          } },
+	[11] = { 11, 0, { 0,          0,          0          } },
+	[12] = { 12, 0, { 0,          0,          0          } },
+};
+
+int main(void)
+{
+	printTree(&nodes[1]);
+	return(0);
+}*/

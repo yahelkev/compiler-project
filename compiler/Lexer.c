@@ -97,17 +97,17 @@ void eatWhiteSpace(Lexer* lex) {
     return;
 }
 
-Token makeToken(Lexer* lex, TokenType type) {
+Token* makeToken(Lexer* lex, TokenType type) {
 
-    Token toke;
+    Token* toke = (Token*)malloc(sizeof(Token));
 
-    toke.type = type;
-    toke.length = 1;
-    toke.lexeme = (char*)malloc( sizeof( char ) * ( toke.length + 1 ) );
-    toke.lexeme[0] = lex->current;
-    toke.lexeme[1] = '\0';
-    toke.line = lex->line;
-    toke.column = lex->column - 1;
+    toke->type = type;
+    toke->length = 1;
+    toke->lexeme = (char*)malloc( sizeof( char ) * ( toke->length + 1 ) );
+    toke->lexeme[0] = lex->current;
+    toke->lexeme[1] = '\0';
+    toke->line = lex->line;
+    toke->column = lex->column - 1;
 	advance(lex);
     return toke;
 }
@@ -124,19 +124,19 @@ char advance(Lexer* lex) {
     return lex->current;
 }
 
-Token makeErrorToken(Lexer* lex, char* msg) {
-	Token toke;
+Token* makeErrorToken(Lexer* lex, char* msg) {
+	Token* toke = (Token*)malloc(sizeof(Token));
 
-	toke.type = TOKEN_ERROR;
-	toke.lexeme = msg;
-	toke.length = strlen(msg);
-	toke.line = lex->line;
-    toke.column = lex->column - 1;
+	toke->type = TOKEN_ERROR;
+	toke->lexeme = msg;
+	toke->length = strlen(msg);
+	toke->line = lex->line;
+    toke->column = lex->column - 1;
 	advance(lex);
 	return toke;
 }
 
-Token makeNumber(Lexer* lex) {
+Token* makeNumber(Lexer* lex) {
 	while(isDigit(show(lex))) advance(lex);
 
 	if (peek(lex) == '.') {
@@ -144,20 +144,20 @@ Token makeNumber(Lexer* lex) {
 		while(isDigit(show(lex))) advance(lex);
 	}
 
-	Token toke;
+	Token* toke = (Token*)malloc(sizeof(Token));
 
-	toke.type = TOKEN_NUMBER;
-    toke.length = lex->index - lex->start;
-    toke.lexeme = (char*)malloc( sizeof( char ) * ( toke.length + 1) );
-    strncpy( toke.lexeme, &lex->text[lex->start], toke.length );
-    toke.lexeme[ toke.length ] = '\0';
-	toke.line = lex->line;
-    toke.column = lex->column - toke.length;
+	toke->type = TOKEN_NUMBER;
+    toke->length = lex->index - lex->start;
+    toke->lexeme = (char*)malloc( sizeof( char ) * ( toke->length + 1) );
+    strncpy( toke->lexeme, &lex->text[lex->start], toke->length );
+    toke->lexeme[ toke->length ] = '\0';
+	toke->line = lex->line;
+    toke->column = lex->column - toke->length;
 
 	return toke;
 }
 
-Token makeKeywordOrIdentifier(Lexer* lex) {
+Token* makeKeywordOrIdentifier(Lexer* lex) {
 	advance(lex); //first letter can only be alpha
 
 	while(isIdentifier(show(lex))) {
@@ -167,35 +167,35 @@ Token makeKeywordOrIdentifier(Lexer* lex) {
 	//scan for a keyword
 	for (int i = 0; keywordTypes[i].keyword; i++) {
 		if (strlen(keywordTypes[i].keyword) == lex->index - lex->start && !strncmp(keywordTypes[i].keyword, &lex->text[lex->start], lex->index - lex->start)) {
-			Token toke;
+			Token* toke = (Token*)malloc(sizeof(Token));
 
-			toke.type = keywordTypes[i].type;
-			toke.length = lex->index - lex->start;
-			toke.lexeme = (char*)malloc( sizeof( char ) * ( toke.length + 1) );
-			strncpy( toke.lexeme, &lex->text[lex->start], toke.length );
-			toke.lexeme[ toke.length ] = '\0';
-			toke.line = lex->line;
-			toke.column = lex->column - toke.length;
+			toke->type = keywordTypes[i].type;
+			toke->length = lex->index - lex->start;
+			toke->lexeme = (char*)malloc( sizeof( char ) * ( toke->length + 1) );
+			strncpy( toke->lexeme, &lex->text[lex->start], toke->length );
+			toke->lexeme[ toke->length ] = '\0';
+			toke->line = lex->line;
+			toke->column = lex->column - toke->length;
 
 			return toke;
 		}
 	}
 
 	//return an identifier
-	Token toke;
+	Token* toke = (Token*)malloc(sizeof(Token));
 
-	toke.type = TOKEN_IDENTIFIER;
-	toke.length = lex->index - lex->start;
-    toke.lexeme = (char*)malloc( sizeof( char ) * ( toke.length + 1) );
-    strncpy( toke.lexeme, &lex->text[lex->start], toke.length );
-    toke.lexeme[ toke.length ] = '\0';
-	toke.line = lex->line;
-    toke.column = lex->column - toke.length;
+	toke->type = TOKEN_IDENTIFIER;
+	toke->length = lex->index - lex->start;
+    toke->lexeme = (char*)malloc( sizeof( char ) * ( toke->length + 1) );
+    strncpy( toke->lexeme, &lex->text[lex->start], toke->length );
+    toke->lexeme[ toke->length ] = '\0';
+	toke->line = lex->line;
+    toke->column = lex->column - toke->length;
 
 	return toke;
 }
 
-Token makeString(Lexer* lex, char terminator) {
+Token* makeString(Lexer* lex, char terminator) {
 	advance(lex);
 	while (!isAtEnd(lex) && peek(lex) != terminator) {
 		//escaping strings
@@ -213,22 +213,22 @@ Token makeString(Lexer* lex, char terminator) {
 	}
 
 
-    Token toke;
+	Token* toke = (Token*)malloc(sizeof(Token));
 
-	toke.type = TOKEN_STRING;
-    toke.length = lex->index - lex->start - 1;
-    toke.lexeme = (char*)malloc( sizeof( char ) * ( toke.length + 1) );
-    strncpy( toke.lexeme, &lex->text[lex->start + 1], toke.length );
-    toke.lexeme[ toke.length ] = '\0';
-	toke.line = lex->line;
-    toke.column = lex->column - toke.length;
+	toke->type = TOKEN_STRING;
+    toke->length = lex->index - lex->start - 1;
+    toke->lexeme = (char*)malloc( sizeof( char ) * ( toke->length + 1) );
+    strncpy( toke->lexeme, &lex->text[lex->start + 1], toke->length );
+    toke->lexeme[ toke->length ] = '\0';
+	toke->line = lex->line;
+    toke->column = lex->column - toke->length;
     
 	advance(lex); //prime next
 	return toke;
 }
 
 
-Token scanLexer(Lexer* lex) {
+Token* scanLexer(Lexer* lex) {
     
     eatWhiteSpace(lex);
 	lex->start = lex->index;

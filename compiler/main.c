@@ -7,8 +7,8 @@
 
 void testLexer( Lexer* lex, char* rawCode ) {
     newLexer(lex, rawCode);
-    Token token;
-    while ((token = scanLexer(lex)).type != TOKEN_EOF) {
+    Token* token;
+    while ((token = scanLexer(lex))->type != TOKEN_EOF) {
         printToken(&token);
     }
     for (size_t i = 0; i < 15; i++) putchar('-');
@@ -61,7 +61,9 @@ int main( void ) {
     Parser par;
     newParser(&par, &lex);
     startParsing(&par);
-    printParseTree(par.mainTree);
+    //printParseTree(par.mainTree);
+    printTree(par.mainTree);
+
 
 
     

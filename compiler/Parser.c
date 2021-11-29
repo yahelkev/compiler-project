@@ -8,7 +8,7 @@ void newParser(Parser* par, Lexer* lex) {
 }
 
 void startParsing(Parser* par) {
-	while(par->current != TOKEN_EOF) {
+	while(par->current->type != TOKEN_EOF) {
 		scanParser(par, par->mainTree);
 	}
 }
@@ -20,7 +20,7 @@ void statement(Parser* par, ParseTree* current) {
 	case TOKEN_FLOAT_V:
 	case TOKEN_CHAR_V:
 	case TOKEN_STRING_V:
-		advance(par);
+		parserAdvance(par);
 		parseVariableCreation(par, current);
 	}
 }
@@ -49,6 +49,7 @@ void synchronize(Parser* parser) {
 
 void scanParser(Parser* par, ParseTree* current) {
 	statement(par, current);
+	// expression(par, current);
 	// int x = 5
 }
 
@@ -75,9 +76,9 @@ void error(Parser* parser, Token* token, const char* message) {
 }
 
 void parserAdvance(Parser* par) {
-	Token temp = scanLexer(par->lex);
+	//freeToken(par->pre);
 	par->pre = par->current;
-	par->current = &temp;
+	par->current = scanLexer(par->lex);
 
 	if (par->current->type == TOKEN_ERROR) {
 		error(par, par->current, "Lexer error");
@@ -101,5 +102,6 @@ void parseVariableCreation(Parser* par, ParseTree* current) {
 	mainTree->addChild(mainTree, tree3);
 	
 	current->addChild(current, mainTree);
+	parserAdvance(par);
 	return;
 }
