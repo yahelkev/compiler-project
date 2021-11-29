@@ -58,4 +58,6 @@ Token makeString(Lexer* lexer, char terminator);
 Token makeKeywordOrIdentifier(Lexer* lexer);
 Token makeErrorToken(Lexer* lexer, char* msg);
 bool match(Lexer* lexer, char c);
+void freeToken(Token* toke);
+void freeLexer(Lexer* lex);
 #endif // !LEXER_H

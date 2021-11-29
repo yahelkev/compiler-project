@@ -7,7 +7,7 @@
 typedef enum {
 	FUNCTION,
 	VARIABLE,
-	EXPRE,
+	EXPRESSION, // expression
 	ATOMIC,
 	IDENTIFIER,
 } ParseTreeType;

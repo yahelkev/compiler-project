@@ -1,5 +1,16 @@
 #include "Lexer.h"
 
+void freeToken(Token* toke) {
+	if (!toke) return;
+	free(toke->lexeme);
+	free(toke);
+}
+void freeLexer(Lexer* lex) {
+	if (!lex) return;
+	free(lex->text);
+	free(lex);
+}
+
 void cleanLexer(Lexer* lex) {
         lex->text = NULL;
         lex->column = lex->line = 1;
