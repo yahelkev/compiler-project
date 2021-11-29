@@ -19,19 +19,19 @@ int handleInput(int argc, char* argv[], char** fileNamePtr)
 		flag = handleFlags(argv[1]);
 		if (Unknown_Flag == flag)
 		{
-			error("invalid flag! try -h for help\n");
+			errorInterface("invalid flag! try -h for help\n");
 		}
 		checkSrcFile(argv[2]);
 		*fileNamePtr = argv[2];
 		break;
 	default:
-		error("make sure you use the form of <flag(optional)> <srcCode.ourLanguage>");
+		errorInterface("make sure you use the form of <flag(optional)> <srcCode.ourLanguage>");
 		break;
 	}
 	return flag;
 }
 
-void error(char* msg)
+void errorInterface(char* msg)
 {
 	printf("%s", msg);
 	exit(0);
@@ -43,7 +43,7 @@ int handleFlags(char* flag)
 	{
 		printf("flag options are:\n");
 		printf("	-h/--help - for help\n");
-		error("	you can enter nothing to use no flag\n");
+		errorInterface("	you can enter nothing to use no flag\n");
 		//no need to return a thing because the program stops
 	}
 	else { return Unknown_Flag; };
@@ -57,11 +57,11 @@ void checkSrcFile(char* srcfileName)
 		int test = getc(file);
 		if (test != EOF) {
 			fclose(file);
-			printf("start compiling...\n");
 			return;
 		}
+		fclose(file);
 	}
-	printf("make sure src file exists!\n");
+	errorInterface("make sure src file exists!\n");
 }
 
 
