@@ -11,6 +11,12 @@ KeywordType keywordTypes[] = {
 	{"true", TOKEN_TRUE},
 	{"while", TOKEN_WHILE},
 
+	// Variables Primitive Usable Types
+	{"int", TOKEN_INT_V},
+	{"float", TOKEN_FLOAT_V},
+	{"char", TOKEN_CHAR_V},
+	{"string", TOKEN_STRING_V},
+
 	{NULL, TOKEN_EOF}
 };
 

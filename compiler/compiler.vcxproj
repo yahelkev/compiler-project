@@ -144,12 +144,18 @@
     <ClCompile Include="KeywordTypes.c" />
     <ClCompile Include="Lexer.c" />
     <ClCompile Include="main.c" />
+    <ClCompile Include="Parser.c" />
+    <ClCompile Include="SymbolTable.c" />
+    <ClCompile Include="TokenTree.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="debug.h" />
     <ClInclude Include="interface.h" />
     <ClInclude Include="KeywordTypes.h" />
     <ClInclude Include="Lexer.h" />
+    <ClInclude Include="Parser.h" />
+    <ClInclude Include="SymbolTable.h" />
+    <ClInclude Include="TokenTree.h" />
     <ClInclude Include="TokenType.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
