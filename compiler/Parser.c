@@ -60,7 +60,7 @@ void synchronize(Parser* parser) {
 		case TOKEN_CHAR_V:
 		case TOKEN_STRING_V:
 		case TOKEN_WHILE:
-			parser->panic = false;
+			parser->panic = 0;
 			return;
 
 		default:
@@ -134,7 +134,8 @@ int parseVariableCreation(Parser* par, ParseTree* current) {
 		break;
 	default:
 		error(par, par->current, "Invalid Syntax");
-
+		synchronize(par);
+		return 1;
 	}
 	parserAdvance(par);
 	ParseTree* treeExpression = newTree(EXPRESSION_PARSE, NULL);

@@ -57,7 +57,7 @@ bool isIdentifier(char c) {
 }
 
 bool match(Lexer* lex, char c) {
-	if (show(lex) == c) {
+	if (peek(lex) == c) {
 		advance(lex);
 		return true;
 	}

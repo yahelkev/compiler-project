@@ -8,8 +8,8 @@ typedef struct Parser {
 	Token* current;
 	Token* pre;
 
-	unsigned char error;
-	unsigned char panic;
+	int error;
+	int panic;
 
 	ParseTree* mainTree;
 }Parser;
