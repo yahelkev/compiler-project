@@ -92,7 +92,7 @@ Token makeToken(Lexer* lex, TokenType type) {
 
     toke.type = type;
     toke.length = 1;
-    toke.lexeme = (char*)malloc( sizeof( char ) * ( toke.length + 1) );
+    toke.lexeme = (char*)malloc( sizeof( char ) * ( toke.length + 1 ) );
     toke.lexeme[0] = lex->current;
     toke.lexeme[1] = '\0';
     toke.line = lex->line;
