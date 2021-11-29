@@ -152,7 +152,7 @@ Token makeNumber(Lexer* lex) {
     strncpy( toke.lexeme, &lex->text[lex->start], toke.length );
     toke.lexeme[ toke.length ] = '\0';
 	toke.line = lex->line;
-    toke.column = lex->column - 1;
+    toke.column = lex->column - toke.length;
 
 	return toke;
 }
@@ -166,7 +166,7 @@ Token makeKeywordOrIdentifier(Lexer* lex) {
 
 	//scan for a keyword
 	for (int i = 0; keywordTypes[i].keyword; i++) {
-		if (strlen(keywordTypes[i].keyword) == lex->current - lex->start && !strncmp(keywordTypes[i].keyword, &lex->text[lex->start], lex->current - lex->start)) {
+		if (strlen(keywordTypes[i].keyword) == lex->index - lex->start && !strncmp(keywordTypes[i].keyword, &lex->text[lex->start], lex->index - lex->start)) {
 			Token toke;
 
 			toke.type = keywordTypes[i].type;
@@ -175,7 +175,7 @@ Token makeKeywordOrIdentifier(Lexer* lex) {
 			strncpy( toke.lexeme, &lex->text[lex->start], toke.length );
 			toke.lexeme[ toke.length ] = '\0';
 			toke.line = lex->line;
-			toke.column = lex->column - 1;
+			toke.column = lex->column - toke.length;
 
 			return toke;
 		}
@@ -190,12 +190,13 @@ Token makeKeywordOrIdentifier(Lexer* lex) {
     strncpy( toke.lexeme, &lex->text[lex->start], toke.length );
     toke.lexeme[ toke.length ] = '\0';
 	toke.line = lex->line;
-    toke.column = lex->column - 1;
+    toke.column = lex->column - toke.length;
 
 	return toke;
 }
 
 Token makeString(Lexer* lex, char terminator) {
+	advance(lex);
 	while (!isAtEnd(lex) && peek(lex) != terminator) {
 		//escaping strings
 		if (peek(lex) == '\\') {
@@ -215,13 +216,14 @@ Token makeString(Lexer* lex, char terminator) {
     Token toke;
 
 	toke.type = TOKEN_STRING;
-    toke.length = lex->index - lex->start - 2;
+    toke.length = lex->index - lex->start - 1;
     toke.lexeme = (char*)malloc( sizeof( char ) * ( toke.length + 1) );
     strncpy( toke.lexeme, &lex->text[lex->start + 1], toke.length );
     toke.lexeme[ toke.length ] = '\0';
 	toke.line = lex->line;
-    toke.column = lex->column - 1;
+    toke.column = lex->column - toke.length;
     
+	advance(lex); //prime next
 	return toke;
 }
 

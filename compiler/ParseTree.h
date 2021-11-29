@@ -10,6 +10,9 @@ typedef enum {
 	EXPRESSION_PARSE, // expression
 	ATOMIC_PARSE,
 	IDENTIFIER_PARSE,
+	MAIN_PARSE,
+	INT_PARSE,
+	ASSIGN_PARSE
 } ParseTreeType;
 //// int x
 //// float y

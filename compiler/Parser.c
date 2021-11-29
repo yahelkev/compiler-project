@@ -3,9 +3,17 @@
 void newParser(Parser* par, Lexer* lex) {
 	par->lex = lex;
 	par->pre = par->current = NULL;
+	par->mainTree = newTree(MAIN_PARSE, NULL);
+	parserAdvance(par);
 }
 
-void statement(Parser* par) {
+void startParsing(Parser* par) {
+	while(par->current != TOKEN_EOF) {
+		scanParser(par, par->mainTree);
+	}
+}
+
+void statement(Parser* par, ParseTree* current) {
 	// Grammer rules and possiblities
 	switch (par->current->type) {
 	case TOKEN_INT_V:
@@ -13,7 +21,7 @@ void statement(Parser* par) {
 	case TOKEN_CHAR_V:
 	case TOKEN_STRING_V:
 		advance(par);
-		parseVariableCreation(par);
+		parseVariableCreation(par, current);
 	}
 }
 
@@ -34,16 +42,14 @@ void synchronize(Parser* parser) {
 			return;
 
 		default:
-			advance(parser);
+			parserAdvance(parser);
 		}
 	}
 }
 
-void scanParser(Parser* par) {
-	if (!par->current && !par->pre) {
-		parserAdvance(par);
-	}
-	statement(par);
+void scanParser(Parser* par, ParseTree* current) {
+	statement(par, current);
+	// int x = 5
 }
 
 //parsing utilities
@@ -79,6 +85,21 @@ void parserAdvance(Parser* par) {
 
 }
 
-void parseVariableCreation(Parser* par) {
-
+void parseVariableCreation(Parser* par, ParseTree* current) {
+	ParseTree* mainTree = newTree(VARIABLE_PARSE, NULL);
+	ParseTree* tree = newTree(INT_PARSE, par->pre);
+	ParseTree* tree1 = newTree(IDENTIFIER_PARSE, par->current);
+	parserAdvance(par);
+	ParseTree* tree2 = newTree(ASSIGN_PARSE, par->current);
+	parserAdvance(par);
+	ParseTree* tree3 = newTree(EXPRESSION_PARSE, NULL);
+	ParseTree* tree4 = newTree(ATOMIC_PARSE, par->current);
+	tree3->addChild(tree3, tree4);
+	mainTree->addChild(mainTree, tree);
+	mainTree->addChild(mainTree, tree1);
+	mainTree->addChild(mainTree, tree2);
+	mainTree->addChild(mainTree, tree3);
+	
+	current->addChild(current, mainTree);
+	return;
 }

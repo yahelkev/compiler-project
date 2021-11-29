@@ -3,6 +3,7 @@
 #include "Debug.h"
 #include "SymbolTable.h"
 #include "ParseTree.h"
+#include "Parser.h"
 
 void testLexer( Lexer* lex, char* rawCode ) {
     newLexer(lex, rawCode);
@@ -54,7 +55,14 @@ int main( void ) {
     // test(&lex, "float y = x + 13 * 11");
 
     // testSymbolTable();
-    testParseTree();
+    //testParseTree();
+    Lexer lex;
+    newLexer(&lex, "int x = 1");
+    Parser par;
+    newParser(&par, &lex);
+    startParsing(&par);
+    printParseTree(par.mainTree);
+
 
     
     return 0;

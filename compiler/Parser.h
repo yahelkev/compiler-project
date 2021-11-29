@@ -2,7 +2,7 @@
 #define PARSER_H
 
 #include "Lexer.h"
-
+#include "ParseTree.h"
 typedef struct Parser {
 	Lexer* lex;
 	Token* current;
@@ -10,6 +10,8 @@ typedef struct Parser {
 
 	unsigned char error;
 	unsigned char panic;
+
+	ParseTree* mainTree;
 }Parser;
 
 //forward declare the precedent rules, from low to high
@@ -30,10 +32,13 @@ typedef enum {
 
 
 void newParser(Parser* par, Lexer* lex);
-void scanParser(Parser* par);
+void startParsing(Parser* par);
+void scanParser(Parser* par, ParseTree* current);
 void parserAdvance(Parser* par);
-void statement(Parser* par);
-void parseVariableCreation(Parser* par);
+void statement(Parser* par, ParseTree* current);
 void error(Parser* parser, Token* token, const char* message);
 void synchronize(Parser* parser);
+
+// Templates
+void parseVariableCreation(Parser* par, ParseTree* current);
 #endif // !PARSER_H
