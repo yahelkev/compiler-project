@@ -2,6 +2,7 @@
 #include "Lexer.h"
 #include "Debug.h"
 #include "SymbolTable.h"
+#include "ParseTree.h"
 
 void testLexer( Lexer* lex, char* rawCode ) {
     newLexer(lex, rawCode);
@@ -27,15 +28,33 @@ void testSymbolTable() {
     printTableValue(&val2);
 }
 
+void testParseTree() {
+    ParseTree* tree = newTree(FUNCTION_PARSE, NULL);
+    Token* toke = (Token*)malloc(sizeof(Token));
+    toke->column = 3;
+    toke->line = 1;
+    toke->length = 3;
+    toke->type = TOKEN_IDENTIFIER;
+    toke->lexeme = (char*)malloc(sizeof(char) * 4);
+    strcpy(toke->lexeme, "add");
+    ParseTree* iden = newTree(IDENTIFIER_PARSE, toke);
+    tree->addChild(tree, iden);
+    printParseTree(tree);
+    printf("\n==========\n");
+    printParseTree(iden);
+    tree->freeParseTree(tree);
+
+}
+
 int main( void ) {
 
-     Lexer lex;
+     //Lexer lex;
      //testLexer(&lex, "fn add(int a, int b) -> int {\n\treturn a + b\n}");
-     testLexer(&lex, "int x = z + 1");
+     //testLexer(&lex, "int x = z + 1");
     // test(&lex, "float y = x + 13 * 11");
 
     // testSymbolTable();
-    
+    testParseTree();
 
     
     return 0;

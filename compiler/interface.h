@@ -6,8 +6,7 @@
 #define MAX_STRING 3
 #define FILE_ENDING "ourLanguage"
 
-enum Flags
-{
+enum Flags {
 	Unknown_Flag,
 	None_Flag,
 	Help_Flag
@@ -20,4 +19,4 @@ int handleFlags(char* flag);
 void checkSrcFile(char* srcfileName);
 char* getFileContent(char* fileName);
 
-void error(char* msg);
+void errorInterface(char* msg);

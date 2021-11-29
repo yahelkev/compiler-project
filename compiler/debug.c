@@ -50,7 +50,7 @@ void printTableValue(TABLE_VALUE* val) {
 void printParseTree(ParseTree* tree) {
 	if (!tree) return;
 	printf("Type: %d\n", tree->type);
-	if (!tree->token) printToken(tree->token);
+	if (tree->token) printToken(tree->token);
 	printf("=> ");
 	for (size_t i = 0; i < tree->amountOfChilds; i++) {
 		printParseTree(tree->getChild(tree, i));

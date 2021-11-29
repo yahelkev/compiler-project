@@ -7,7 +7,7 @@ ParseTree* newTree(ParseTreeType type, Token* toke) {
 	tree->token = toke;
 
 	// Setup childs
-	tree->childs = (ParseTree**)realloc(tree->childs, sizeof(ParseTree*));
+	tree->childs = (ParseTree**)malloc(sizeof(ParseTree*));
 	tree->amountOfChilds = 0;
 
 	// Setup methods
@@ -33,7 +33,7 @@ void __FREEPARSETREE__(ParseTree* tree) {
 	if (!tree) return;
 	if (tree->amountOfChilds) {
 		for (size_t i = 0; i < tree->amountOfChilds; i++) {
-			tree->childs[tree->amountOfChilds]->freeParseTree(tree->childs[tree->amountOfChilds]);
+			tree->getChild(tree, i)->freeParseTree(tree->getChild(tree, i));
 		}
 	}
 	

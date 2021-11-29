@@ -5,11 +5,11 @@
 #include <string.h>
 
 typedef enum {
-	FUNCTION,
-	VARIABLE,
-	EXPRESSION, // expression
-	ATOMIC,
-	IDENTIFIER,
+	FUNCTION_PARSE,
+	VARIABLE_PARSE,
+	EXPRESSION_PARSE, // expression
+	ATOMIC_PARSE,
+	IDENTIFIER_PARSE,
 } ParseTreeType;
 //// int x
 //// float y
@@ -31,9 +31,9 @@ typedef struct ParseTree {
 	int amountOfChilds;
 	struct ParseTree** childs;
 
-	void (*addChild)(ParseTree* tree, ParseTree* child);
-	ParseTree* (*getChild)(ParseTree* tree, int index);
-	void (*freeParseTree)(ParseTree* tree);
+	void (*addChild)(struct ParseTree* tree, struct ParseTree* child);
+	struct ParseTree* (*getChild)(struct ParseTree* tree, int index);
+	void (*freeParseTree)(struct ParseTree* tree);
 
 }ParseTree;
 
