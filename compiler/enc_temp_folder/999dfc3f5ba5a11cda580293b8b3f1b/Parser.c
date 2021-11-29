@@ -3,7 +3,6 @@
 void newParser(Parser* par, Lexer* lex) {
 	par->lex = lex;
 	par->pre = par->current = NULL;
-	par->error = par->panic = 0;
 	par->mainTree = newTree(MAIN_PARSE, NULL);
 	parserAdvance(par);
 }

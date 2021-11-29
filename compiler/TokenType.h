@@ -21,7 +21,7 @@ typedef enum {
 	TOKEN_MINUS,
 	TOKEN_MINUS_EQUAL,
 	TOKEN_MINUS_MINUS,
-	TOKEN_MINUS_LESS, //MINUS_LESS is for function syntax
+	TOKEN_MINUS_MORE, //MINUS_LESS is for function syntax
 	TOKEN_STAR,
 	TOKEN_STAR_EQUAL,
 

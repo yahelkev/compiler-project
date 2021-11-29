@@ -35,10 +35,11 @@ void newParser(Parser* par, Lexer* lex);
 void startParsing(Parser* par);
 void scanParser(Parser* par, ParseTree* current);
 void parserAdvance(Parser* par);
-void statement(Parser* par, ParseTree* current);
+int statement(Parser* par, ParseTree* current);
+int expression(Parser* par, ParseTree* current);
 void error(Parser* parser, Token* token, const char* message);
 void synchronize(Parser* parser);
 
 // Templates
-void parseVariableCreation(Parser* par, ParseTree* current);
+int parseVariableCreation(Parser* par, ParseTree* current);
 #endif // !PARSER_H
