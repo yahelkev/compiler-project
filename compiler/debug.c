@@ -22,7 +22,7 @@ void printToken(Token* token) {
 		}
 	}
 
-	printf("\t%d-%d\n", token->line, token->column+token->length);
+	printf("\t%d-%d\n", token->line, token->column+token->length-1);
 }
 
 

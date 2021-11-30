@@ -145,9 +145,9 @@ Token* makeErrorToken(Lexer* lex, char* msg) {
 }
 
 Token* makeNumber(Lexer* lex) {
-	while(isDigit(show(lex))) advance(lex);
+	while(isDigit(peek(lex))) advance(lex);
 
-	if (peek(lex) == '.') {
+	if (show(lex) == '.') {
 		advance(lex);
 		while(isDigit(show(lex))) advance(lex);
 	}
@@ -155,13 +155,14 @@ Token* makeNumber(Lexer* lex) {
 	Token* toke = (Token*)malloc(sizeof(Token));
 
 	toke->type = TOKEN_NUMBER;
-    toke->length = lex->index - lex->start;
+    toke->length = lex->index - lex->start + 1;
     toke->lexeme = (char*)malloc( sizeof( char ) * ( toke->length + 1) );
     strncpy( toke->lexeme, &lex->text[lex->start], toke->length );
     toke->lexeme[ toke->length ] = '\0';
 	toke->line = lex->line;
-    toke->column = lex->column - toke->length;
+    toke->column = lex->column - toke->length + 1;
 
+	advance(lex); //prime next
 	return toke;
 }
 
@@ -183,7 +184,7 @@ Token* makeKeywordOrIdentifier(Lexer* lex) {
 			strncpy( toke->lexeme, &lex->text[lex->start], toke->length );
 			toke->lexeme[ toke->length ] = '\0';
 			toke->line = lex->line;
-			toke->column = lex->column - toke->length;
+			toke->column = lex->column - toke->length - 1;
 
 			return toke;
 		}
@@ -198,7 +199,7 @@ Token* makeKeywordOrIdentifier(Lexer* lex) {
     strncpy( toke->lexeme, &lex->text[lex->start], toke->length );
     toke->lexeme[ toke->length ] = '\0';
 	toke->line = lex->line;
-    toke->column = lex->column - toke->length;
+    toke->column = lex->column - toke->length - 1;
 
 	return toke;
 }
