@@ -57,7 +57,7 @@ int main( void ) {
     // testSymbolTable();
     //testParseTree();
     Lexer lex;
-    newLexer(&lex, "int x = 1\nstring z = \"Hello world\"\nint y 5");
+    newLexer(&lex, "int x 1\n= 3 + 2\n\nint y = 11\n");
     Parser par;
     newParser(&par, &lex);
     startParsing(&par);

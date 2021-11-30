@@ -69,18 +69,19 @@ typedef enum {
 	TOKEN_PRINT,
 	TOKEN_RETURN,
 	TOKEN_TRUE,
-	TOKEN_WHILE,
+	TOKEN_LOOP,
 	TOKEN_FUNCTION,
 
 	//meta
 	TOKEN_PASS, //do nothing
 	TOKEN_ERROR,
 	TOKEN_EOF,
+	TOKEN_END_LINE,
+
 
 	// Variables Primitive Usable Types
 	TOKEN_INT_V,
 	TOKEN_FLOAT_V,
-	TOKEN_CHAR_V,
 	TOKEN_STRING_V
 
 } TokenType;

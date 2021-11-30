@@ -19,10 +19,12 @@ int statement(Parser* par, ParseTree* current) {
 	switch (par->current->type) {
 	case TOKEN_INT_V:
 	case TOKEN_FLOAT_V:
-	case TOKEN_CHAR_V:
 	case TOKEN_STRING_V:
 		parserAdvance(par);
 		return parseVariableCreation(par, current);
+	default:
+		error(par, par->current, "Invalid Syntax");
+		synchronize(par);
 	}
 	return 0;
 }
@@ -31,6 +33,7 @@ int expression(Parser* par, ParseTree* current) {
 	// In the future will create a branch to explore this path
 	// As of right now this will be very basic without arithmetic
 	// Also will add function calls here when we get to that template
+	
 	switch (par->current->type) {
 		case TOKEN_IDENTIFIER: {
 			ParseTree* iden = newTree(IDENTIFIER_PARSE, par->current);
@@ -46,7 +49,9 @@ int expression(Parser* par, ParseTree* current) {
 	}
 	return 0;
 }
-
+// int x 5
+// = 3 + 2
+// int y = 10
 void synchronize(Parser* parser) {
 	while (parser->current->type != TOKEN_EOF) {
 		switch (parser->current->type) {
@@ -57,21 +62,25 @@ void synchronize(Parser* parser) {
 		case TOKEN_RETURN:
 		case TOKEN_INT_V:
 		case TOKEN_FLOAT_V:
-		case TOKEN_CHAR_V:
 		case TOKEN_STRING_V:
-		case TOKEN_WHILE:
+		case TOKEN_LOOP:
+		case TOKEN_FUNCTION:
 			parser->panic = 0;
 			return;
-
+		case TOKEN_END_LINE:
+			parser->panic = 0;
+			parserAdvance(parser);
+			return;
 		default:
 			parserAdvance(parser);
 		}
 	}
 }
-
 void scanParser(Parser* par, ParseTree* current) {
-	if(!statement(par, current)) 
-		expression(par, current);
+
+	if (statement(par, current) && par->current->type == TOKEN_END_LINE) 
+		parserAdvance(par);
+		
 	// int x = 5
 }
 
@@ -88,7 +97,7 @@ void error(Parser* parser, Token* token, const char* message) {
 	}
 
 	else {
-		fprintf(stderr, " at '%.*s'", token->length, token->lexeme);
+		fprintf(stderr, " near '%.*s'", token->length, token->lexeme);
 	}
 
 	//finally
@@ -110,36 +119,42 @@ void parserAdvance(Parser* par) {
 
 int parseVariableCreation(Parser* par, ParseTree* current) {
 	ParseTree* mainTree = newTree(VARIABLE_PARSE, NULL);
-	mainTree->addChild(mainTree, newTree(PARSE_INT_V, par->pre));
+	switch (par->pre->type) {
+	case TOKEN_INT_V: {
+		mainTree->addChild(mainTree, newTree(PARSE_INT_V, par->pre));
+		break;
+	}
+	case TOKEN_STRING_V: {
+		mainTree->addChild(mainTree, newTree(PARSE_STRING_V, par->pre));
+		break;
+	}
+	case TOKEN_FLOAT_V: {
+		mainTree->addChild(mainTree, newTree(PARSE_FLOAT_V, par->pre));
+		break;
+	}
+	default:
+		error(par, par->current, "Unknown type");
+		synchronize(par);
+		return 0;
+	}
 	mainTree->addChild(mainTree, newTree(IDENTIFIER_PARSE, par->current));
+	// int x = 5
+	// int y += 10
+	// int y = y + 10
+	// y = 15
 	parserAdvance(par);
 	switch (par->current->type) {
-	case TOKEN_PLUS_EQUAL:
-		mainTree->addChild(mainTree, newTree(PARSE_PLUS_EQUAL, par->current));
-		break;
 	case TOKEN_EQUAL:
 		mainTree->addChild(mainTree, newTree(PARSE_EQUAL, par->current));
-		break;
-	case TOKEN_MINUS_EQUAL:
-		mainTree->addChild(mainTree, newTree(PARSE_MINUS_EQUAL, par->current));
-		break;
-	case TOKEN_STAR_EQUAL:
-		mainTree->addChild(mainTree, newTree(PARSE_STAR_EQUAL, par->current));
-		break;
-	case TOKEN_SLASH_EQUAL:
-		mainTree->addChild(mainTree, newTree(PARSE_SLASH_EQUAL, par->current));
-		break;
-	case TOKEN_MODULO_EQUAL:
-		mainTree->addChild(mainTree, newTree(PARSE_MODULO_EQUAL, par->current));
 		break;
 	default:
 		error(par, par->current, "Invalid Syntax");
 		synchronize(par);
-		return 1;
+		return 0;
 	}
 	parserAdvance(par);
 	ParseTree* treeExpression = newTree(EXPRESSION_PARSE, NULL);
-	scanParser(par, treeExpression);
+	expression(par, treeExpression);
 	mainTree->addChild(mainTree, treeExpression);
 	
 	current->addChild(current, mainTree);

@@ -69,22 +69,30 @@ void eatWhiteSpace(Lexer* lex) {
     switch( lex->current ) {
 		case ' ':
 		case '\r':
-		case '\n':
 		case '\t':
 			advance(lex);
 			break;
+		case '\n':
+			if (peek(lex) == '\n') {
+				advance(lex);
+				break;
+			}
+			else {
+				return;
+			}
+				
 
 		//comments
 		case '/':
-			if (show(lex) == '/') {
+			if (peek(lex) == '/') {
 				while (advance(lex) != '\n' && !isAtEnd(lex));
 				break;
 			}
 
-			if (show(lex) == '*') {
+			if (peek(lex) == '*') {
 				advance(lex);
 				advance(lex);
-				while(show(lex) != '*' && show(lex) != '/') advance(lex);
+				while(show(lex) != '*' && peek(lex) != '/') advance(lex);
 				advance(lex);
 				advance(lex);
 				break;
@@ -262,7 +270,8 @@ Token* scanLexer(Lexer* lex) {
         case '"':
 		case '\'':
 			return makeString(lex, lex->current);
-
+		case '\n':
+			return makeToken(lex, TOKEN_END_LINE);
 		default:
 			return makeErrorToken(lex, "Unexpected token");
     }
