@@ -147,9 +147,9 @@ Token* makeErrorToken(Lexer* lex, char* msg) {
 Token* makeNumber(Lexer* lex) {
 	while(isDigit(peek(lex))) advance(lex);
 
-	if (show(lex) == '.') {
+	if (peek(lex) == '.') {
 		advance(lex);
-		while(isDigit(show(lex))) advance(lex);
+		while(isDigit(peek(lex))) advance(lex);
 	}
 
 	Token* toke = (Token*)malloc(sizeof(Token));
@@ -206,7 +206,8 @@ Token* makeKeywordOrIdentifier(Lexer* lex) {
 
 Token* makeString(Lexer* lex, char terminator) {
 	advance(lex);
-	while (!isAtEnd(lex) && peek(lex) != terminator) {
+
+	while (peek(lex) && peek(lex) != terminator) {
 		//escaping strings
 		if (peek(lex) == '\\') {
 			advance(lex);
@@ -229,7 +230,7 @@ Token* makeString(Lexer* lex, char terminator) {
     toke->lexeme = (char*)malloc( sizeof( char ) * ( toke->length + 1) );
     strncpy( toke->lexeme, &lex->text[lex->start + 1], toke->length );
     toke->lexeme[ toke->length ] = '\0';
-	toke->line = lex->line;
+	toke->line = startStringLine;
     toke->column = lex->column - toke->length;
     
 	advance(lex); //prime next
