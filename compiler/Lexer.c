@@ -132,13 +132,13 @@ char advance(Lexer* lex) {
     return lex->current;
 }
 
-Token* makeErrorToken(Lexer* lex, char* msg) {
+Token* makeErrorToken(Lexer* lex, char* msg, int startLine) {
 	Token* toke = (Token*)malloc(sizeof(Token));
 
 	toke->type = TOKEN_ERROR;
 	toke->lexeme = msg;
 	toke->length = strlen(msg);
-	toke->line = lex->line;
+	toke->line = startLine != -1 ? startLine : lex->line;
     toke->column = lex->column - 1;
 	advance(lex);
 	return toke;
@@ -206,7 +206,7 @@ Token* makeKeywordOrIdentifier(Lexer* lex) {
 
 Token* makeString(Lexer* lex, char terminator) {
 	advance(lex);
-
+	int startLine = lex->line;
 	while (peek(lex) && peek(lex) != terminator) {
 		//escaping strings
 		if (peek(lex) == '\\') {
@@ -219,7 +219,7 @@ Token* makeString(Lexer* lex, char terminator) {
 	advance(lex); //eat terminator
 
 	if (isAtEnd(lex)) {
-		return makeErrorToken(lex, "Unterminated string");
+		return makeErrorToken(lex, "Unterminated string", startLine);
 	}
 
 
@@ -230,7 +230,7 @@ Token* makeString(Lexer* lex, char terminator) {
     toke->lexeme = (char*)malloc( sizeof( char ) * ( toke->length + 1) );
     strncpy( toke->lexeme, &lex->text[lex->start + 1], toke->length );
     toke->lexeme[ toke->length ] = '\0';
-	toke->line = startStringLine;
+	toke->line = lex->line;
     toke->column = lex->column - toke->length;
     
 	advance(lex); //prime next
@@ -275,7 +275,7 @@ Token* scanLexer(Lexer* lex) {
 		case '\n':
 			return makeToken(lex, TOKEN_END_LINE);
 		default:
-			return makeErrorToken(lex, "Unexpected token");
+			return makeErrorToken(lex, "Unexpected token", -1);
     }
 }
 
