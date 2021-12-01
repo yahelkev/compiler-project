@@ -33,8 +33,34 @@ int expression(Parser* par, ParseTree* current) {
 	// In the future will create a branch to explore this path
 	// As of right now this will be very basic without arithmetic
 	// Also will add function calls here when we get to that template
-	
-	switch (par->current->type) {
+	while (par->current->type != TOKEN_END_LINE && par->current->type != TOKEN_EOF)
+	{
+		switch (par->current->type) {
+		case TOKEN_IDENTIFIER: {
+			ParseTree* iden = newTree(IDENTIFIER_PARSE, par->current);
+			current->addChild(current, iden);
+			break;
+		}
+		case TOKEN_NUMBER:
+		case TOKEN_STRING: {
+			ParseTree* iden = newTree(ATOMIC_PARSE, par->current);
+			current->addChild(current, iden);
+			break;
+		}
+		case MATH:{
+			ParseTree* iden = newTree(ATOMIC_PARSE, par->current);
+			current->addChild(current, iden);
+			break;
+		}
+		case TOKEN_LEFT_PAREN:
+		case TOKEN_RIGHT_PAREN: {
+			ParseTree* iden = newTree(TOKEN_RIGHT_PAREN, par->current);
+			current->addChild(current, iden);
+			break;
+		}
+		parserAdvance(par);
+	}
+	/*switch (par->current->type) {
 		case TOKEN_IDENTIFIER: {
 			ParseTree* iden = newTree(IDENTIFIER_PARSE, par->current);
 			current->addChild(current, iden);
@@ -46,7 +72,9 @@ int expression(Parser* par, ParseTree* current) {
 			current->addChild(current, iden);
 			return 1;
 		}
-	}
+						 error(par, par->current, "Invalid Syntax");
+						 synchronize(par);
+	}*/
 	return 0;
 }
 // int x 5
@@ -158,6 +186,5 @@ int parseVariableCreation(Parser* par, ParseTree* current) {
 	mainTree->addChild(mainTree, treeExpression);
 	
 	current->addChild(current, mainTree);
-	parserAdvance(par);
 	return 1;
 }

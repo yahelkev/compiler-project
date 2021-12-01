@@ -78,10 +78,12 @@ void testParseTree() {
 
 int main( int argc, char** argv ) {
 
-    testInterface(argc, argv);
-
-
-
+    Lexer lex;
+    newLexer(&lex, "int x = 2 + xsjl");
+    Parser par;
+    newParser(&par, &lex);
+    startParsing(&par);
+    printParseTree(par.mainTree);
     
     return 0;
 }
