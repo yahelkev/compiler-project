@@ -79,7 +79,7 @@ void testParseTree() {
 int main( int argc, char** argv ) {
 
     Lexer lex;
-    newLexer(&lex, "int x = 2 + xsjl");
+    newLexer(&lex, "int x = 2 +-)*/( + xsjl");
     Parser par;
     newParser(&par, &lex);
     startParsing(&par);

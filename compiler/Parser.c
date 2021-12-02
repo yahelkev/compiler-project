@@ -42,21 +42,35 @@ int expression(Parser* par, ParseTree* current) {
 			break;
 		}
 		case TOKEN_NUMBER:
-		case TOKEN_STRING: {
-			ParseTree* iden = newTree(ATOMIC_PARSE, par->current);
-			current->addChild(current, iden);
+		case TOKEN_STRING:
+		case TOKEN_TRUE:
+		case TOKEN_FALSE: {
+			ParseTree* value = newTree(ATOMIC_PARSE, par->current);
+			current->addChild(current, value);
 			break;
 		}
-		case MATH:{
-			ParseTree* iden = newTree(ATOMIC_PARSE, par->current);
-			current->addChild(current, iden);
+		case TOKEN_PLUS:
+		case TOKEN_MINUS:
+		case TOKEN_STAR:
+		case TOKEN_SLASH:
+		case TOKEN_MODULO: {
+			ParseTree* math = newTree(par->current->type, par->current);
+			current->addChild(current, math);
 			break;
 		}
-		case TOKEN_LEFT_PAREN:
+		case TOKEN_LEFT_PAREN: {
+			ParseTree* paren = newTree(TOKEN_RIGHT_PAREN, par->current);
+			current->addChild(current, paren);
+			break;
+		}
 		case TOKEN_RIGHT_PAREN: {
-			ParseTree* iden = newTree(TOKEN_RIGHT_PAREN, par->current);
-			current->addChild(current, iden);
+			ParseTree* paren = newTree(TOKEN_RIGHT_PAREN, par->current);
+			current->addChild(current, paren);
 			break;
+		}
+		default:
+			error(par, par->current, "Invalid Syntax");
+			synchronize(par);
 		}
 		parserAdvance(par);
 	}
