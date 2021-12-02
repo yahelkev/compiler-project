@@ -29,67 +29,134 @@ int statement(Parser* par, ParseTree* current) {
 	return 0;
 }
 
-int expression(Parser* par, ParseTree* current) {
-	// In the future will create a branch to explore this path
-	// As of right now this will be very basic without arithmetic
-	// Also will add function calls here when we get to that template
+void expression(Parser* par, ParseTree* current) {
+	// checking if a token is place legaly by checking that there are no tokens
+	//that should'nt be before it
+	int openParenthesis = 0;
 	while (par->current->type != TOKEN_END_LINE && par->current->type != TOKEN_EOF)
 	{
 		switch (par->current->type) {
-		case TOKEN_IDENTIFIER: {
-			ParseTree* iden = newTree(IDENTIFIER_PARSE, par->current);
-			current->addChild(current, iden);
+		case TOKEN_IDENTIFIER:
+			switch (par->pre->type)
+			{
+			case TOKEN_RIGHT_PAREN:
+			case TOKEN_IDENTIFIER:
+			case TOKEN_NUMBER:
+			case TOKEN_STRING:
+			case TOKEN_TRUE:
+			case TOKEN_FALSE:
+				error(par, par->current, "Invalid Syntax");
+				synchronize(par);
+				break;
+			default: {
+				ParseTree* iden = newTree(IDENTIFIER_PARSE, par->current);
+				current->addChild(current, iden);
+				break;
+			}
+			}
 			break;
-		}
 		case TOKEN_NUMBER:
 		case TOKEN_STRING:
 		case TOKEN_TRUE:
-		case TOKEN_FALSE: {
-			ParseTree* value = newTree(ATOMIC_PARSE, par->current);
-			current->addChild(current, value);
+		case TOKEN_FALSE:
+			switch (par->pre->type)
+			{
+			case TOKEN_RIGHT_PAREN:
+			case TOKEN_IDENTIFIER:
+			case TOKEN_NUMBER:
+			case TOKEN_STRING:
+			case TOKEN_TRUE:
+			case TOKEN_FALSE:
+				error(par, par->current, "Invalid Syntax");
+				synchronize(par);
+				break;
+			default: {
+				ParseTree* value = newTree(ATOMIC_PARSE, par->current);
+				current->addChild(current, value);
+				break;
+			}
+			}
 			break;
-		}
+
 		case TOKEN_PLUS:
 		case TOKEN_MINUS:
 		case TOKEN_STAR:
 		case TOKEN_SLASH:
-		case TOKEN_MODULO: {
-			ParseTree* math = newTree(par->current->type, par->current);
-			current->addChild(current, math);
+		case TOKEN_MODULO:
+			switch (par->pre->type)
+			{
+			case TOKEN_LEFT_PAREN:
+			case TOKEN_PLUS:
+			case TOKEN_MINUS:
+			case TOKEN_STAR:
+			case TOKEN_SLASH:
+			case TOKEN_MODULO:
+				error(par, par->current, "Invalid Syntax");
+				synchronize(par);
+				break;
+			default: {
+				ParseTree* math = newTree(par->current->type, par->current);
+				current->addChild(current, math);
+				break;
+			}
+			}
 			break;
-		}
-		case TOKEN_LEFT_PAREN: {
-			ParseTree* paren = newTree(TOKEN_RIGHT_PAREN, par->current);
-			current->addChild(current, paren);
+
+		case TOKEN_LEFT_PAREN:
+			switch (par->pre->type)
+			{
+			case TOKEN_IDENTIFIER:
+			case TOKEN_NUMBER:
+			case TOKEN_STRING:
+			case TOKEN_TRUE:
+			case TOKEN_FALSE:
+				error(par, par->current, "Invalid Syntax");
+				synchronize(par);
+				break;
+			default: {
+				openParenthesis++;
+				ParseTree* paren = newTree(PARSE_LEFT_PAREN, par->current);
+				current->addChild(current, paren);
+				break;
+			}
+			}
 			break;
-		}
-		case TOKEN_RIGHT_PAREN: {
-			ParseTree* paren = newTree(TOKEN_RIGHT_PAREN, par->current);
-			current->addChild(current, paren);
+
+		case TOKEN_RIGHT_PAREN:
+			if (openParenthesis == 0) {
+				error(par, par->current, "Invalid Syntax");
+				synchronize(par);
+			}
+			switch (par->pre->type)
+			{
+			case TOKEN_PLUS:
+			case TOKEN_MINUS:
+			case TOKEN_STAR:
+			case TOKEN_SLASH:
+			case TOKEN_MODULO:
+				error(par, par->current, "Invalid Syntax");
+				synchronize(par);
+				break;
+			default: {
+				openParenthesis--;
+				ParseTree* paren = newTree(PARSE_RIGHT_PAREN, par->current);
+				current->addChild(current, paren);
+				break;
+			}
+			}
 			break;
-		}
+
 		default:
 			error(par, par->current, "Invalid Syntax");
 			synchronize(par);
 		}
 		parserAdvance(par);
 	}
-	/*switch (par->current->type) {
-		case TOKEN_IDENTIFIER: {
-			ParseTree* iden = newTree(IDENTIFIER_PARSE, par->current);
-			current->addChild(current, iden);
-			return 1;
-		}
-		case TOKEN_NUMBER:
-		case TOKEN_STRING: {
-			ParseTree* iden = newTree(ATOMIC_PARSE, par->current);
-			current->addChild(current, iden);
-			return 1;
-		}
-						 error(par, par->current, "Invalid Syntax");
-						 synchronize(par);
-	}*/
-	return 0;
+	if (openParenthesis)
+	{
+		error(par, par->current, "Invalid Syntax");
+		synchronize(par);
+	}
 }
 // int x 5
 // = 3 + 2

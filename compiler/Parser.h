@@ -36,7 +36,7 @@ void startParsing(Parser* par);
 void scanParser(Parser* par, ParseTree* current);
 void parserAdvance(Parser* par);
 int statement(Parser* par, ParseTree* current);
-int expression(Parser* par, ParseTree* current);
+void expression(Parser* par, ParseTree* current);
 void error(Parser* parser, Token* token, const char* message);
 void synchronize(Parser* parser);
 
