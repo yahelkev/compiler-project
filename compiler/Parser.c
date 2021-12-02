@@ -28,7 +28,7 @@ void statement(Parser* par, ParseTree* current) {
 void synchronize(Parser* parser) {
 	while (parser->current->type != TOKEN_EOF) {
 		switch (parser->current->type) {
-			//these tokens can start a line
+		//these tokens can start a line
 		case TOKEN_FOR:
 		case TOKEN_IF:
 		case TOKEN_PRINT:
@@ -49,8 +49,6 @@ void synchronize(Parser* parser) {
 
 void scanParser(Parser* par, ParseTree* current) {
 	statement(par, current);
-	// expression(par, current);
-	// int x = 5
 }
 
 //parsing utilities
@@ -76,7 +74,6 @@ void error(Parser* parser, Token* token, const char* message) {
 }
 
 void parserAdvance(Parser* par) {
-	//freeToken(par->pre);
 	par->pre = par->current;
 	par->current = scanLexer(par->lex);
 

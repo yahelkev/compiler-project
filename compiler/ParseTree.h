@@ -14,20 +14,7 @@ typedef enum {
 	INT_PARSE,
 	ASSIGN_PARSE
 } ParseTreeType;
-//// int x
-//// float y
-//// char letter
-//// string name
-//Different types of arg_list :
-//()
-//(int a)
-//(int a, int b)
-//fn add(int a, int b)...
-//function :
-//	fn
-//	identifier - add
-//	arg_list
-//	body
+
 typedef struct ParseTree {
 	ParseTreeType type; // expression, function, atomic
 	Token* token;
