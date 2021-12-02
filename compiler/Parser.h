@@ -8,8 +8,8 @@ typedef struct Parser {
 	Token* current;
 	Token* pre;
 
-	int error;
-	int panic;
+	int error; // Tells if there was an error in the code, so to figure out if to continue to the visitor stage or not
+	int panic; // Tells if we are in a middle of an error and wheter to ignore new errors or not
 
 	ParseTree* mainTree;
 }Parser;
@@ -35,11 +35,11 @@ void newParser(Parser* par, Lexer* lex);
 void startParsing(Parser* par);
 void scanParser(Parser* par, ParseTree* current);
 void parserAdvance(Parser* par);
-int statement(Parser* par, ParseTree* current);
-int expression(Parser* par, ParseTree* current);
+bool statement(Parser* par, ParseTree* current);
+bool expression(Parser* par, ParseTree* current);
 void error(Parser* parser, Token* token, const char* message);
 void synchronize(Parser* parser);
 
 // Templates
-int parseVariableCreation(Parser* par, ParseTree* current);
+bool parseVariableCreation(Parser* par, ParseTree* current);
 #endif // !PARSER_H

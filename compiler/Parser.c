@@ -26,7 +26,7 @@ int statement(Parser* par, ParseTree* current) {
 		error(par, par->current, "Invalid Syntax");
 		synchronize(par);
 	}
-	return 0;
+	return false;
 }
 
 int expression(Parser* par, ParseTree* current) {
@@ -38,20 +38,18 @@ int expression(Parser* par, ParseTree* current) {
 		case TOKEN_IDENTIFIER: {
 			ParseTree* iden = newTree(IDENTIFIER_PARSE, par->current);
 			current->addChild(current, iden);
-			return 1;
+			return true;
 		}
 		case TOKEN_NUMBER:
 		case TOKEN_STRING: {
 			ParseTree* iden = newTree(ATOMIC_PARSE, par->current);
 			current->addChild(current, iden);
-			return 1;
+			return true;
 		}
 	}
-	return 0;
+	return false;
 }
-// int x 5
-// = 3 + 2
-// int y = 10
+
 void synchronize(Parser* parser) {
 	while (parser->current->type != TOKEN_EOF) {
 		switch (parser->current->type) {
@@ -135,13 +133,9 @@ int parseVariableCreation(Parser* par, ParseTree* current) {
 	default:
 		error(par, par->current, "Unknown type");
 		synchronize(par);
-		return 0;
+		return false;
 	}
 	mainTree->addChild(mainTree, newTree(IDENTIFIER_PARSE, par->current));
-	// int x = 5
-	// int y += 10
-	// int y = y + 10
-	// y = 15
 	parserAdvance(par);
 	switch (par->current->type) {
 	case TOKEN_EQUAL:
@@ -150,7 +144,7 @@ int parseVariableCreation(Parser* par, ParseTree* current) {
 	default:
 		error(par, par->current, "Invalid Syntax");
 		synchronize(par);
-		return 0;
+		return false;
 	}
 	parserAdvance(par);
 	ParseTree* treeExpression = newTree(EXPRESSION_PARSE, NULL);
@@ -159,5 +153,5 @@ int parseVariableCreation(Parser* par, ParseTree* current) {
 	
 	current->addChild(current, mainTree);
 	parserAdvance(par);
-	return 1;
+	return true;
 }

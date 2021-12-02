@@ -275,6 +275,9 @@ Token* scanLexer(Lexer* lex) {
 		case '\n':
 			return makeToken(lex, TOKEN_END_LINE);
 		default:
+			// -1 in the final arg in the `makeErrorToken` function call tells me wheter I should ignore the line given from the lexer itself and use a new line I give it or use the line from the lexer
+			// If -1 is used then I should just used the line from the lexer, if any other number I should use said number instead
+			// This feature is used when I have an error spread on multiple lines and I want to tell the user when did the line begin
 			return makeErrorToken(lex, "Unexpected token", -1);
     }
 }
