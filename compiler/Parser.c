@@ -95,6 +95,7 @@ void expression(Parser* par, ParseTree* current) {
 				synchronize(par);
 				break;
 			default: {
+				//issue that need to be solved (can't switch case on all types (plus, minus...))
 				ParseTree* math = newTree(par->current->type, par->current);
 				current->addChild(current, math);
 				break;
