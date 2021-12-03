@@ -9,6 +9,8 @@
 #define false 0
 #define true 1
 
+
+#define DONT_OVERWRITE_BASELINE -1
 typedef struct Token {
 	TokenType type;
 	char* lexeme;
