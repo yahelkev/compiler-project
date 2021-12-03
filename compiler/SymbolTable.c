@@ -35,7 +35,7 @@ bool insertValue(Table* table, char* key, TABLE_VALUE value) {
     if (!isDefined(table,key)) {
             table->keys = (char**)realloc(table->keys, sizeof(char*) * ( table->size + 1 ));
             table->keys[table->size] = (char*)malloc(sizeof(char) * ( strlen(key) + 1 ));
-            strcpy(table->keys[table->size], key);
+            strncpy(table->keys[table->size], key, strlen(key));
             table->values = (TABLE_VALUE*)realloc(table->values, sizeof(TABLE_VALUE) * ( table->size + 1 ));
             table->values[table->size] = value;
             table->size++;
@@ -52,7 +52,7 @@ struct function makeFunction(struct arg* args, int amount, char* returnType) {
     func.args = args;
     func.amount = amount;
     func.returnType = (char*)malloc(sizeof(char) * ( strlen(returnType) + 1 ));
-    strcpy(func.returnType, returnType);
+    strncpy(func.returnType, returnType, strlen(returnType));
     return func;
 }
 
@@ -60,15 +60,15 @@ struct variable makeVariable(char* type, char* value) {
     struct variable var;
     var.type = (char*)malloc(sizeof(char) * ( strlen(type) + 1 ));
     var.value = (char*)malloc(sizeof(char) * ( strlen(value) + 1 ));
-    strcpy(var.type, type);
-    strcpy(var.value, value);
+    strncpy(var.type, type, strlen(type));
+    strncpy(var.value, value, strlen(value));
     return var;
 }
 
 struct error makeError(char* msg) {
     struct error err;
     err.msg = (char*)malloc(sizeof(char) * ( strlen(msg) + 1 ));
-    strcpy(err.msg, msg);
+    strncpy(err.msg, msg, strlen(msg));
     return err;
 }
 
@@ -76,8 +76,8 @@ struct arg makeArg(char* name, char* type) {
     struct arg arg2;
     arg2.name = (char*)malloc(sizeof(char) * ( strlen(name) + 1 ));
     arg2.type = (char*)malloc(sizeof(char) * ( strlen(type) + 1 ));
-    strcpy(arg2.name, name);
-    strcpy(arg2.type, type);
+    strncpy(arg2.name, name, strlen(name));
+    strncpy(arg2.type, type, strlen(type));
     return arg2;
 }
 

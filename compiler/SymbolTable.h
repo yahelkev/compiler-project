@@ -4,10 +4,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
-
-#define bool int
-#define false 0
-#define true 1
+#include <stdbool.h>
 
 typedef enum {
         FUNCTION_TAG, VARIABLE_TAG, ERROR_TAG

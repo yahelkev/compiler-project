@@ -21,7 +21,7 @@ void newLexer(Lexer* lex, char* text) {
     cleanLexer(lex);
     lex->size = strlen(text);
     lex->text = (char*)malloc(sizeof( char ) * ( lex->size + 1 ));
-    strcpy(lex->text, text);
+    strncpy(lex->text, text, lex->size);
     lex->current = lex->text[lex->index];
     return;
 }
