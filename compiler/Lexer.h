@@ -9,6 +9,8 @@
 #define false 0
 #define true 1
 
+
+#define DONT_OVERWRITE_BASELINE -1
 typedef struct Token {
 	TokenType type;
 	char* lexeme;
@@ -40,23 +42,17 @@ char show(Lexer* lex);
   and wheter to move to a new line if '\n' is detected
 **/
 char advance(Lexer* lex);
-/*
-    Main start function
-    * Will change return type to a custom token list type
-    * Will probably add a flagging option of some sort
-*/
-void start(Lexer* lex);
 
 bool isDigit(char c);
 bool isAlpha(char c);
 bool isIdentifier(char c);
-Token makeToken(Lexer* lex, TokenType type);
-Token scanLexer(Lexer* lex);
+Token* makeToken(Lexer* lex, TokenType type);
+Token* scanLexer(Lexer* lex);
 void eatWhiteSpace(Lexer* lex);
-Token makeNumber(Lexer* lexer);
-Token makeString(Lexer* lexer, char terminator);
-Token makeKeywordOrIdentifier(Lexer* lexer);
-Token makeErrorToken(Lexer* lexer, char* msg);
+Token* makeNumber(Lexer* lexer);
+Token* makeString(Lexer* lexer, char terminator);
+Token* makeKeywordOrIdentifier(Lexer* lexer);
+Token* makeErrorToken(Lexer* lex, char* msg, int startLine);
 bool match(Lexer* lexer, char c);
 void freeToken(Token* toke);
 void freeLexer(Lexer* lex);

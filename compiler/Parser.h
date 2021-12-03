@@ -2,14 +2,16 @@
 #define PARSER_H
 
 #include "Lexer.h"
-
+#include "ParseTree.h"
 typedef struct Parser {
 	Lexer* lex;
 	Token* current;
 	Token* pre;
 
-	unsigned char error;
-	unsigned char panic;
+	int error; // Tells if there was an error in the code, so to figure out if to continue to the visitor stage or not
+	int panic; // Tells if we are in a middle of an error and wheter to ignore new errors or not
+
+	ParseTree* mainTree;
 }Parser;
 
 //forward declare the precedent rules, from low to high
@@ -30,10 +32,14 @@ typedef enum {
 
 
 void newParser(Parser* par, Lexer* lex);
-void scanParser(Parser* par);
+void startParsing(Parser* par);
+void scanParser(Parser* par, ParseTree* current);
 void parserAdvance(Parser* par);
-void statement(Parser* par);
-void parseVariableCreation(Parser* par);
+bool statement(Parser* par, ParseTree* current);
+bool expression(Parser* par, ParseTree* current);
 void error(Parser* parser, Token* token, const char* message);
 void synchronize(Parser* parser);
+
+// Templates
+bool parseVariableCreation(Parser* par, ParseTree* current);
 #endif // !PARSER_H

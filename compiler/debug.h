@@ -11,5 +11,5 @@
 void printToken(Token* token);
 void printTableValue(TABLE_VALUE* val);
 void printParseTree(ParseTree* tree);
-
+void printTree(ParseTree* tree);
 #endif // !DEBUG_H
