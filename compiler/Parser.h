@@ -30,16 +30,22 @@ typedef enum {
 	PREC_PRIMARY,
 } Precedence;
 
-
+// Creates a new parser
 void newParser(Parser* par, Lexer* lex);
+// Starts the parsing proccess on a select parser object
 void startParsing(Parser* par);
+// Lists option of different possible parse trees
 void scanParser(Parser* par, ParseTree* current);
+// Advances the parser to theh next token coming from the lexer
 void parserAdvance(Parser* par);
-bool statement(Parser* par, ParseTree* current);
-bool expression(Parser* par, ParseTree* current);
+// Liists possible creation statements of parse tress
+void statement(Parser* par, ParseTree* current);
+// Prints error to screen ( user )
 void error(Parser* parser, Token* token, const char* message);
+// Comes usually after error function, skips to next possible starting token to start a parse tree
 void synchronize(Parser* parser);
 
 // Templates
-bool parseVariableCreation(Parser* par, ParseTree* current);
+// Function to create a variable creation parse tree
+void parseVariableCreation(Parser* par, ParseTree* current);
 #endif // !PARSER_H

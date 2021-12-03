@@ -33,11 +33,11 @@ char peek(Lexer* lex) {
 }
 
 char show(Lexer* lex) {
-    return lex->current;
+    return lex->currentChar;
 }
 
 bool isAtEnd(Lexer* lex) {
-	return lex->current == '\0';
+	return lex->currentChar == '\0';
 }
 
 bool isDigit(char c) {
@@ -66,7 +66,7 @@ bool match(Lexer* lex, char c) {
 }
 
 void eatWhiteSpace(Lexer* lex) {
-    switch( lex->current ) {
+    switch( lex->currentChar ) {
 		case ' ':
 		case '\r':
 		case '\t':
@@ -112,7 +112,7 @@ Token* makeToken(Lexer* lex, TokenType type) {
     toke->type = type;
     toke->length = 1;
     toke->lexeme = (char*)malloc( sizeof( char ) * ( toke->length + 1 ) );
-    toke->lexeme[0] = lex->current;
+    toke->lexeme[0] = lex->currentChar;
     toke->lexeme[1] = '\0';
     toke->line = lex->line;
     toke->column = lex->column - 1;
@@ -121,7 +121,7 @@ Token* makeToken(Lexer* lex, TokenType type) {
 }
 
 char advance(Lexer* lex) {
-    if((lex->current = peek(lex)) == '\n') {
+    if((lex->currentChar = peek(lex)) == '\n') {
         lex->line += 1;
         lex->column = 1;
         lex->index += 1;
@@ -129,7 +129,7 @@ char advance(Lexer* lex) {
         lex->column += 1;
         lex->index += 1;
     }
-    return lex->current;
+    return lex->currentChar;
 }
 
 Token* makeErrorToken(Lexer* lex, char* msg, int startLine) {
@@ -222,8 +222,12 @@ Token* makeString(Lexer* lex, char terminator) {
 		return makeErrorToken(lex, "Unterminated string", startLine);
 	}
 
+	Token* toke = NULL;
+	do {
+		toke = (Token*)malloc(sizeof(Token));
 
-	Token* toke = (Token*)malloc(sizeof(Token));
+	} while (!toke);
+	
 
 	toke->type = TOKEN_STRING;
     toke->length = lex->index - lex->start - 1;
@@ -247,7 +251,7 @@ Token* scanLexer(Lexer* lex) {
 	if (isDigit(show(lex))) return makeNumber(lex);
 	if (isAlpha(show(lex))) return makeKeywordOrIdentifier(lex);
 
-    switch( lex->current ) {
+    switch( lex->currentChar ) {
         case '(': return makeToken(lex, TOKEN_LEFT_PAREN);
 		case ')': return makeToken(lex, TOKEN_RIGHT_PAREN);
 		case '{': return makeToken(lex, TOKEN_LEFT_BRACE);
@@ -271,9 +275,8 @@ Token* scanLexer(Lexer* lex) {
 
         case '"':
 		case '\'':
-			return makeString(lex, lex->current);
-		case '\n':
-			return makeToken(lex, TOKEN_END_LINE);
+			return makeString(lex, lex->currentChar);
+
 		default:
 			// -1 in the final arg in the `makeErrorToken` function call tells me wheter I should ignore the line given from the lexer itself and use a new line I give it or use the line from the lexer
 			// If -1 is used then I should just used the line from the lexer, if any other number I should use said number instead
