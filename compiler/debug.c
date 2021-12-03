@@ -9,21 +9,23 @@ void printToken(Token* token) {
 	}
 
 	printf("%d\t%d-%d\t", token->type, token->line, token->column);
+	printf("%d-%d\t", token->line, token->column + token->length - 1);
 
 	if (token->type == TOKEN_IDENTIFIER || token->type == TOKEN_NUMBER || token->type == TOKEN_STRING) {
-		printf("%.*s\t", token->length, token->lexeme);
-	} else {
+		printf("%.*s\n", token->length, token->lexeme);
+	}
+	else {
 		char* keyword = findKeywordByType(token->type);
 
 		if (keyword != NULL) {
-			printf("%s\t", keyword);
-		} else {
-			printf("-");
+			printf("%s\n", keyword);
+		}
+		else {
+			printf("-\n");
 		}
 	}
-
-	printf("\t%d-%d\n", token->line, token->column+token->length);
 }
+
 
 
 void printTableValue(TABLE_VALUE* val) {

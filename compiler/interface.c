@@ -1,15 +1,15 @@
 #include "interface.h"
 #define _CRT_SECURE_NO_WARNINGS
 
-
-int handleInput(int argc, char* argv[], char** fileNamePtr)
-{
+void c(int color) {
+	printf("\033[0;%d;%dm", color, 1);
+}
+int handleInput(int argc, char* argv[], char** fileNamePtr) {
 	int flag = 0;
-	switch (argc)
-	{
+	switch (argc) {
 	case MIN_ARGC:
 		flag = handleFlags(argv[1]);
-		if (Unknown_Flag == flag){
+		if (Unknown_Flag == flag) {
 			flag = None_Flag;
 			checkSrcFile(argv[1]);
 			*fileNamePtr = argv[1];
@@ -17,8 +17,7 @@ int handleInput(int argc, char* argv[], char** fileNamePtr)
 		break;
 	case MAX_ARGC:
 		flag = handleFlags(argv[1]);
-		if (Unknown_Flag == flag)
-		{
+		if (Unknown_Flag == flag) {
 			errorInterface("invalid flag! try -h for help\n");
 		}
 		checkSrcFile(argv[2]);
@@ -31,16 +30,15 @@ int handleInput(int argc, char* argv[], char** fileNamePtr)
 	return flag;
 }
 
-void errorInterface(char* msg)
-{
+void errorInterface(char* msg) {
+	c(ERROR);
 	printf("%s", msg);
+	c(NATRUAL);
 	exit(0);
 }
 
-int handleFlags(char* flag)
-{
-	if (!strcmp(flag, "-h") || !strcmp(flag, "--help"))
-	{
+int handleFlags(char* flag) {
+	if (!strcmp(flag, "-h") || !strcmp(flag, "--help")) {
 		printf("flag options are:\n");
 		printf("	-h/--help - for help\n");
 		errorInterface("	you can enter nothing to use no flag\n");
@@ -65,27 +63,16 @@ void checkSrcFile(char* srcfileName)
 }
 
 
-char* getFileContent(char* fileName)
-{
-	int i = 0;
-	char ch = 0;
-	char* buffer = NULL;
-	long length = 0;
-	FILE* file = fopen(fileName, "r");
-	if (file)
-	{
-		fseek(file, 0, SEEK_END);
-		length = ftell(file);
-		fseek(file, 0, SEEK_SET);
-		buffer = (char*)malloc(length);
-		ch = fgetc(file);
-		while (ch != EOF) {
-			buffer[i] = ch;
-			i++;
-			ch = fgetc(file);
-		}
-		buffer[i] = '\0';
-		fclose(file);
-	}
+char* getFileContent(char* filePath) {
+	FILE* filePointer = fopen(filePath, "r");
+	if (!filePointer) errorInterface("can't open file\n");
+	char* buffer = 0;
+	long length;
+	fseek(filePointer, 0, SEEK_END);
+	length = ftell(filePointer);
+	fseek(filePointer, 0, SEEK_SET);
+	buffer = calloc(length, length);
+	if (buffer) fread(buffer, 1, length, filePointer);
+	fclose(filePointer);
 	return buffer;
 }

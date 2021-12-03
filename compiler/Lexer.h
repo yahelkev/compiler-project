@@ -7,6 +7,8 @@
 #include "KeywordTypes.h"
 
 
+
+#define DONT_OVERWRITE_BASELINE -1
 typedef struct Token {
 	TokenType type; // Type of the token object
 	char* lexeme; // String rep of the token itself

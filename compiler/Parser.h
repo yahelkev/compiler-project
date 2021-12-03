@@ -8,8 +8,8 @@ typedef struct Parser {
 	Token* current;
 	Token* pre;
 
-	unsigned char error;
-	unsigned char panic;
+	int error; // Tells if there was an error in the code, so to figure out if to continue to the visitor stage or not
+	int panic; // Tells if we are in a middle of an error and wheter to ignore new errors or not
 
 	ParseTree* mainTree;
 }Parser;
