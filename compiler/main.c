@@ -37,7 +37,7 @@ void testParseTree() {
     toke->length = 3;
     toke->type = TOKEN_IDENTIFIER;
     toke->lexeme = (char*)malloc(sizeof(char) * 4);
-    strcpy(toke->lexeme, "add");
+    strncpy(toke->lexeme, "add", 3);
     ParseTree* iden = newTree(IDENTIFIER_PARSE, toke);
     tree->addChild(tree, iden);
     printParseTree(tree);
