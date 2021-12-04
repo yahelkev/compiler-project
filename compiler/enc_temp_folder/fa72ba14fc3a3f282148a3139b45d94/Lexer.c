@@ -115,7 +115,7 @@ Token* makeToken(Lexer* lex, TokenType type) {
     toke->lexeme[0] = lex->currentChar;
     toke->lexeme[1] = '\0';
     toke->line = lex->line;
-    toke->column = lex->column;
+    toke->column = lex->column - 1;
 	advance(lex);
     return toke;
 }

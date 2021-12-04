@@ -14,7 +14,7 @@ void startParsing(Parser* par) {
 	}
 }
 
-int statement(Parser* par, ParseTree* current) {
+bool statement(Parser* par, ParseTree* current) {
 	// Grammer rules and possiblities
 	switch (par->current->type) {
 	case TOKEN_INT_V:
@@ -29,7 +29,7 @@ int statement(Parser* par, ParseTree* current) {
 	return false;
 }
 
-int expression(Parser* par, ParseTree* current) {
+bool expression(Parser* par, ParseTree* current) {
 	// In the future will create a branch to explore this path
 	// As of right now this will be very basic without arithmetic
 	// Also will add function calls here when we get to that template
@@ -79,7 +79,6 @@ void scanParser(Parser* par, ParseTree* current) {
 	if (statement(par, current) && par->current->type == TOKEN_END_LINE) 
 		parserAdvance(par);
 		
-	// int x = 5
 }
 
 //parsing utilities
@@ -114,7 +113,7 @@ void parserAdvance(Parser* par) {
 
 }
 
-int parseVariableCreation(Parser* par, ParseTree* current) {
+bool parseVariableCreation(Parser* par, ParseTree* current) {
 	ParseTree* mainTree = newTree(VARIABLE_PARSE, NULL);
 	switch (par->pre->type) {
 	case TOKEN_INT_V: {
