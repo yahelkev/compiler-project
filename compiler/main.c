@@ -52,7 +52,7 @@ void testInterface(int argc, char** argv) {
     char* srcFileName = NULL;
     int flag = handleInput(argc, argv, &srcFileName);
     char* fileContent = getFileContent(srcFileName);
-    printf("%s\n", fileContent);
+    //printf("%s\n", fileContent);
     testParser(fileContent);
 }
 

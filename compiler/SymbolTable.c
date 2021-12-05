@@ -33,14 +33,15 @@ TABLE_VALUE getValue(Table* table, char* key) {
 */
 bool insertValue(Table* table, char* key, TABLE_VALUE value) {
     if (!isDefined(table,key)) {
-            table->keys = (char**)realloc(table->keys, sizeof(char*) * ( table->size + 1 ));
-            table->keys[table->size] = (char*)malloc(sizeof(char) * ( strlen(key) + 1 ));
-            strncpy(table->keys[table->size], key, strlen(key));
-            table->values = (TABLE_VALUE*)realloc(table->values, sizeof(TABLE_VALUE) * ( table->size + 1 ));
-            table->values[table->size] = value;
-            table->size++;
+        table->keys = (char**)realloc(table->keys, sizeof(char*) * ( table->size + 1 ));
+        table->keys[table->size] = (char*)malloc(sizeof(char) * ( strlen(key) + 1 ));
+        strncpy(table->keys[table->size], key, strlen(key));
+        table->keys[table->size][strlen(key)] = '\0';
+        table->values = (TABLE_VALUE*)realloc(table->values, sizeof(TABLE_VALUE) * ( table->size + 1 ));
+        table->values[table->size] = value;
+        table->size++;
 
-            return true;
+        return true;
     }
 
     return false;

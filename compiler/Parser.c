@@ -5,10 +5,13 @@ void newParser(Parser* par, Lexer* lex) {
 	par->pre = par->current = NULL;
 	par->error = par->panic = 0;
 	par->mainTree = newTree(MAIN_PARSE, NULL);
+	par->table = (Table*)malloc(sizeof(Table));
+	newTable(par->table);
 	parserAdvance(par);
 }
 
 void startParsing(Parser* par) {
+	synchronize(par);
 	while(par->current->type != TOKEN_EOF) {
 		scanParser(par, par->mainTree);
 	}
@@ -16,7 +19,7 @@ void startParsing(Parser* par) {
 
 bool statement(Parser* par, ParseTree* current) {
 
-	if (isDefined(par->table, par->current->lexeme)) {
+	if (par->current->type == TOKEN_IDENTIFIER) {
 		parserAdvance(par);
 		return parseAssign(par, current);
 	}
@@ -82,7 +85,10 @@ void synchronize(Parser* parser) {
 }
 void scanParser(Parser* par, ParseTree* current) {
 
-	if (statement(par, current) && par->current->type == TOKEN_END_LINE) 
+	//synchronize(par);
+	if (par->current->type != TOKEN_EOF && 
+		statement(par, current) && 
+		par->current->type == TOKEN_END_LINE)
 		parserAdvance(par);
 		
 }
@@ -136,6 +142,7 @@ bool parseVariableCreation(Parser* par, ParseTree* current) {
 	}
 	default:
 		error(par, par->current, "Unknown type");
+		mainTree->freeParseTree(mainTree);
 		synchronize(par);
 		return false;
 	}
@@ -147,6 +154,7 @@ bool parseVariableCreation(Parser* par, ParseTree* current) {
 		break;
 	default:
 		error(par, par->current, "Invalid Syntax");
+		mainTree->freeParseTree(mainTree);
 		synchronize(par);
 		return false;
 	}
@@ -154,9 +162,17 @@ bool parseVariableCreation(Parser* par, ParseTree* current) {
 	ParseTree* treeExpression = newTree(EXPRESSION_PARSE, NULL);
 	expression(par, treeExpression);
 	mainTree->addChild(mainTree, treeExpression);
-	
+	if (isDefined(par->table, mainTree->getChild(mainTree, START_TREE + 1)->token->lexeme)) {
+		error(par, mainTree->getChild(mainTree, START_TREE + 1)->token, "Variable already initialized");
+		mainTree->freeParseTree(mainTree);
+		synchronize(par);
+		return false;
+	}
 	current->addChild(current, mainTree);
-	makeVariable(mainTree->getChild(mainTree, START_TREE), mainTree->getChild(mainTree, END_VARIABLE_TREE))
+	struct variable var = makeVariable(mainTree->getChild(mainTree, START_TREE), mainTree->getChild(mainTree, END_VARIABLE_TREE));
+	TABLE_VALUE* value = (TABLE_VALUE*)malloc(sizeof(TABLE_VALUE));
+	newValue(value, VARIABLE_TAG, &var, mainTree->getChild(mainTree, START_TREE)->token->line, mainTree->getChild(mainTree, START_TREE)->token->column);
+	insertValue(par->table, mainTree->getChild(mainTree, START_TREE + 1)->token->lexeme, *value);
 	parserAdvance(par);
 	return true;
 }
@@ -165,13 +181,15 @@ bool parseVariableCreation(Parser* par, ParseTree* current) {
 bool parseAssign(Parser* par, ParseTree* current) {
 	ParseTree* mainTree = newTree(ASSIGN_PARSE, NULL);
 	if (!isDefined(par->table, par->pre->lexeme)) {
-		error(par, par->pre, "Used but not defined");
+		error(par, par->pre, "Variable used but not defined");
+		mainTree->freeParseTree(mainTree);
 		synchronize(par);
 		return false;
 	}
 	TABLE_VALUE val = getValue(par->table, par->pre->lexeme);
 	if (val.tag == FUNCTION_TAG) {
 		error(par, par->pre, "Function type is unassignable");
+		mainTree->freeParseTree(mainTree);
 		synchronize(par);
 		return false;
 	}
@@ -198,6 +216,7 @@ bool parseAssign(Parser* par, ParseTree* current) {
 		break;
 	default:
 		error(par, par->current, "Invalid Syntax");
+		mainTree->freeParseTree(mainTree);
 		synchronize(par);
 		return false;
 	}
