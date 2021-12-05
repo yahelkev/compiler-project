@@ -3,6 +3,10 @@
 
 #include "Lexer.h"
 #include "ParseTree.h"
+#include "SymbolTable.h"
+
+#define START_TREE 0
+#define END_VARIABLE_TREE 3
 typedef struct Parser {
 	Lexer* lex;
 	Token* current;
@@ -12,6 +16,7 @@ typedef struct Parser {
 	int panic; // Tells if we are in a middle of an error and wheter to ignore new errors or not
 
 	ParseTree* mainTree;
+	Table* table;
 }Parser;
 
 //forward declare the precedent rules, from low to high
@@ -49,4 +54,5 @@ void synchronize(Parser* parser);
 // Function to create a variable creation parse tree
 bool parseVariableCreation(Parser* par, ParseTree* current);
 bool expression(Parser* par, ParseTree* current);
+bool parseAssign(Parser* par, ParseTree* current);
 #endif // !PARSER_H

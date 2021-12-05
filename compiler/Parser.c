@@ -15,6 +15,12 @@ void startParsing(Parser* par) {
 }
 
 bool statement(Parser* par, ParseTree* current) {
+
+	if (isDefined(par->table, par->current->lexeme)) {
+		parserAdvance(par);
+		return parseAssign(par, current);
+	}
+
 	// Grammer rules and possiblities
 	switch (par->current->type) {
 	case TOKEN_INT_V:
@@ -149,6 +155,57 @@ bool parseVariableCreation(Parser* par, ParseTree* current) {
 	expression(par, treeExpression);
 	mainTree->addChild(mainTree, treeExpression);
 	
+	current->addChild(current, mainTree);
+	makeVariable(mainTree->getChild(mainTree, START_TREE), mainTree->getChild(mainTree, END_VARIABLE_TREE))
+	parserAdvance(par);
+	return true;
+}
+
+
+bool parseAssign(Parser* par, ParseTree* current) {
+	ParseTree* mainTree = newTree(ASSIGN_PARSE, NULL);
+	if (!isDefined(par->table, par->pre->lexeme)) {
+		error(par, par->pre, "Used but not defined");
+		synchronize(par);
+		return false;
+	}
+	TABLE_VALUE val = getValue(par->table, par->pre->lexeme);
+	if (val.tag == FUNCTION_TAG) {
+		error(par, par->pre, "Function type is unassignable");
+		synchronize(par);
+		return false;
+	}
+
+	mainTree->addChild(mainTree, newTree(IDENTIFIER_PARSE, par->pre));
+	switch (par->current->type) {
+	case TOKEN_PLUS_EQUAL:
+		mainTree->addChild(mainTree, newTree(PARSE_PLUS_EQUAL, par->current));
+		break;
+	case TOKEN_EQUAL:
+		mainTree->addChild(mainTree, newTree(PARSE_EQUAL, par->current));
+		break;
+	case TOKEN_MINUS_EQUAL:
+		mainTree->addChild(mainTree, newTree(PARSE_MINUS_EQUAL, par->current));
+		break;
+	case TOKEN_STAR_EQUAL:
+		mainTree->addChild(mainTree, newTree(PARSE_STAR_EQUAL, par->current));
+		break;
+	case TOKEN_SLASH_EQUAL:
+		mainTree->addChild(mainTree, newTree(PARSE_SLASH_EQUAL, par->current));
+		break;
+	case TOKEN_MODULO_EQUAL:
+		mainTree->addChild(mainTree, newTree(PARSE_MODULO_EQUAL, par->current));
+		break;
+	default:
+		error(par, par->current, "Invalid Syntax");
+		synchronize(par);
+		return false;
+	}
+	parserAdvance(par);
+	ParseTree* treeExpression = newTree(EXPRESSION_PARSE, NULL);
+	expression(par, treeExpression);
+	mainTree->addChild(mainTree, treeExpression);
+
 	current->addChild(current, mainTree);
 	parserAdvance(par);
 	return true;

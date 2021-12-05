@@ -56,12 +56,11 @@ struct function makeFunction(struct arg* args, int amount, char* returnType) {
     return func;
 }
 
-struct variable makeVariable(char* type, char* value) {
+struct variable makeVariable(char* type, ParseTree* value) {
     struct variable var;
     var.type = (char*)malloc(sizeof(char) * ( strlen(type) + 1 ));
-    var.value = (char*)malloc(sizeof(char) * ( strlen(value) + 1 ));
+    var.value = value;
     strncpy(var.type, type, strlen(type));
-    strncpy(var.value, value, strlen(value));
     return var;
 }
 

@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include "ParseTree.h"
 
 typedef enum {
         FUNCTION_TAG, VARIABLE_TAG, ERROR_TAG
@@ -18,7 +19,7 @@ struct variable {
 
 struct arg {
     char* name;
-    char* type;
+    ParseTree* type;
 };
 struct function {
     struct arg* args;
@@ -61,7 +62,7 @@ TABLE_VALUE getValue(Table* table, char* key);
 bool insertValue(Table* table, char* key, TABLE_VALUE value);
 
 struct function makeFunction(struct arg* args, int amount, char* returnType);
-struct variable makeVariable(char* type, char* value);
+struct variable makeVariable(char* type, ParseTree* value);
 struct error makeError(char* msg);
 struct arg makeArg(char* name, char* type);
 void newValue(TABLE_VALUE* value, ValueTag tag, void* structValuePointer, int line, int column);
