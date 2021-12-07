@@ -39,7 +39,7 @@ void scanParser(Parser* par, ParseTree* current);
 // Advances the parser to theh next token coming from the lexer
 void parserAdvance(Parser* par);
 // Liists possible creation statements of parse tress
-void statement(Parser* par, ParseTree* current);
+bool statement(Parser* par, ParseTree* current);
 // Prints error to screen ( user )
 void error(Parser* parser, Token* token, const char* message);
 // Comes usually after error function, skips to next possible starting token to start a parse tree
@@ -47,5 +47,7 @@ void synchronize(Parser* parser);
 
 // Templates
 // Function to create a variable creation parse tree
-void parseVariableCreation(Parser* par, ParseTree* current);
+bool parseVariableCreation(Parser* par, ParseTree* current);
+bool expression(Parser* par, ParseTree* current, TokenType stopper); // stopper will tell what character is last to come to look for
+bool parseConditional(Parser* par, ParseTree* current);
 #endif // !PARSER_H

@@ -14,7 +14,7 @@ void startParsing(Parser* par) {
 	}
 }
 
-int statement(Parser* par, ParseTree* current) {
+bool statement(Parser* par, ParseTree* current) {
 	// Grammer rules and possiblities
 	switch (par->current->type) {
 	case TOKEN_INT_V:
@@ -22,6 +22,9 @@ int statement(Parser* par, ParseTree* current) {
 	case TOKEN_STRING_V:
 		parserAdvance(par);
 		return parseVariableCreation(par, current);
+	case TOKEN_IF:
+		parserAdvance(par);
+		return parseConditional(par, current);
 	default:
 		error(par, par->current, "Invalid Syntax");
 		synchronize(par);
@@ -29,7 +32,7 @@ int statement(Parser* par, ParseTree* current) {
 	return false;
 }
 
-int expression(Parser* par, ParseTree* current) {
+bool expression(Parser* par, ParseTree* current, TokenType stopper) {
 	// In the future will create a branch to explore this path
 	// As of right now this will be very basic without arithmetic
 	// Also will add function calls here when we get to that template
@@ -114,7 +117,7 @@ void parserAdvance(Parser* par) {
 
 }
 
-int parseVariableCreation(Parser* par, ParseTree* current) {
+bool parseVariableCreation(Parser* par, ParseTree* current) {
 	ParseTree* mainTree = newTree(VARIABLE_PARSE, NULL);
 	switch (par->pre->type) {
 	case TOKEN_INT_V: {
@@ -147,10 +150,52 @@ int parseVariableCreation(Parser* par, ParseTree* current) {
 	}
 	parserAdvance(par);
 	ParseTree* treeExpression = newTree(EXPRESSION_PARSE, NULL);
-	expression(par, treeExpression);
+	expression(par, treeExpression, TOKEN_END_LINE);
 	mainTree->addChild(mainTree, treeExpression);
 	
 	current->addChild(current, mainTree);
 	parserAdvance(par);
+	return true;
+}
+
+
+bool parseConditional(Parser* par, ParseTree* current) {
+	
+	ParseTree* mainTree = newTree(FULL_CONDITIONAL_PARSE, NULL);
+	// Parse Condition
+
+	ParseTree* condition = newTree(CONDITION_PARSE, NULL);
+	ParseTree* treeExpression = newTree(EXPRESSION_PARSE, NULL);
+	expression(par, treeExpression, TOKEN_LEFT_BRACE);
+	condition->addChild(condition, treeExpression);
+	mainTree->addChild(mainTree, condition);
+	parserAdvance(par);
+	ParseTree* ifBody = newTree(IF_PARSE, NULL);
+	if (par->current->type != TOKEN_LEFT_BRACE)
+		if (!statement(par, ifBody)) return false;
+	else {
+		parserAdvance(par);
+		while (par->current->type != TOKEN_RIGHT_BRACE)
+			scanParser(par, ifBody);
+	}
+	mainTree->addChild(mainTree, ifBody);
+	
+	
+	parserAdvance(par);
+	if (par->current->type == TOKEN_ELSE) {
+		parserAdvance(par);
+		ParseTree* elseBody = newTree(ELSE_PARSE, NULL);
+		if (par->current->type != TOKEN_LEFT_BRACE)
+			if (!statement(par, elseBody)) return false;
+		else {
+			parserAdvance(par);
+			while (par->current->type != TOKEN_RIGHT_BRACE)
+				scanParser(par, elseBody);
+		}
+		mainTree->addChild(mainTree, elseBody);
+	}
+
+	current->addChild(current, mainTree);
+
 	return true;
 }
