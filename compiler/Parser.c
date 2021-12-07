@@ -10,7 +10,8 @@ void newParser(Parser* par, Lexer* lex) {
 
 void startParsing(Parser* par) {
 	while(par->current->type != TOKEN_EOF) {
-		scanParser(par, par->mainTree);
+		if (par->current->type != TOKEN_END_LINE) scanParser(par, par->mainTree);
+		else parserAdvance(par);
 	}
 }
 
