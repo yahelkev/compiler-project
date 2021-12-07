@@ -166,13 +166,16 @@ bool parseConditional(Parser* par, ParseTree* current) {
 
 	ParseTree* condition = newTree(CONDITION_PARSE, NULL);
 	ParseTree* treeExpression = newTree(EXPRESSION_PARSE, NULL);
-	expression(par, treeExpression, TOKEN_LEFT_BRACE);
+	parserAdvance(par); // Remove when merged, only for tests
+	if(!expression(par, treeExpression, TOKEN_LEFT_BRACE)) return false; // Make if return
 	condition->addChild(condition, treeExpression);
 	mainTree->addChild(mainTree, condition);
 	parserAdvance(par);
+	parserAdvance(par); // Remove when merged, only for tests
 	ParseTree* ifBody = newTree(IF_PARSE, NULL);
-	if (par->current->type != TOKEN_LEFT_BRACE)
+	if (par->current->type != TOKEN_LEFT_BRACE) {
 		if (!statement(par, ifBody)) return false;
+	}
 	else {
 		parserAdvance(par);
 		while (par->current->type != TOKEN_RIGHT_BRACE)
