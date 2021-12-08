@@ -48,6 +48,7 @@ int convertToPost(Parser* par, ParseTree* current, TokenType EO_Expr)
                 ParseTree* child = newTree(getType(par, token), token);
                 current->addChild(current, child);
                 printf("%s ", token->lexeme);
+                token = pop(stack, &top);
             }
         }
         else
@@ -67,7 +68,10 @@ int convertToPost(Parser* par, ParseTree* current, TokenType EO_Expr)
 
     while (top != -1)
     {
-        printf("----------------------------- %s \n", pop(stack, &top)->lexeme);
+        token = pop(stack, &top);
+        ParseTree* child = newTree(getType(par, token), token);
+        current->addChild(current, child);
+        printf("%s ", token->lexeme);
     }
     return 0;
 }
