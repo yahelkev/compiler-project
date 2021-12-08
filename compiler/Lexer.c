@@ -18,21 +18,12 @@ void cleanLexer(Lexer* lex) {
 }
 
 void newLexer(Lexer* lex, char* text) {
-<<<<<<< HEAD
-	cleanLexer(lex);
-	lex->size = strlen(text);
-	lex->text = (char*)malloc(sizeof(char) * (lex->size + 1));
-	strncpy(lex->text, text, lex->size);
-	lex->currentChar = lex->text[lex->index];
-	return;
-=======
     cleanLexer(lex);
     lex->size = strlen(text);
     lex->text = (char*)malloc(sizeof( char ) * ( lex->size + 1 ));
     strncpy(lex->text, text, lex->size);
     lex->currentChar = lex->text[lex->index];
     return;
->>>>>>> parser/assignment
 }
 
 
@@ -118,15 +109,6 @@ Token* makeToken(Lexer* lex, TokenType type) {
 
 	Token* toke = (Token*)malloc(sizeof(Token));
 
-<<<<<<< HEAD
-	toke->type = type;
-	toke->length = 1;
-	toke->lexeme = (char*)malloc(sizeof(char) * (toke->length + 1));
-	toke->lexeme[0] = lex->currentChar;
-	toke->lexeme[1] = '\0';
-	toke->line = lex->line;
-	toke->column = lex->column;
-=======
     toke->type = type;
     toke->length = 1;
     toke->lexeme = (char*)malloc( sizeof( char ) * ( toke->length + 1 ) );
@@ -134,7 +116,6 @@ Token* makeToken(Lexer* lex, TokenType type) {
     toke->lexeme[1] = '\0';
     toke->line = lex->line;
     toke->column = lex->column;
->>>>>>> parser/assignment
 	advance(lex);
 	return toke;
 }
@@ -267,16 +248,15 @@ Token* scanLexer(Lexer* lex) {
 	if (isDigit(show(lex))) return makeNumber(lex);
 	if (isAlpha(show(lex))) return makeKeywordOrIdentifier(lex);
 
-<<<<<<< HEAD
-	switch (lex->currentChar) {
-	case '(': return makeToken(lex, TOKEN_LEFT_PAREN);
-	case ')': return makeToken(lex, TOKEN_RIGHT_PAREN);
-	case '{': return makeToken(lex, TOKEN_LEFT_BRACE);
-	case '}': return makeToken(lex, TOKEN_RIGHT_BRACE);
-	case '[': return makeToken(lex, TOKEN_LEFT_BRACKET);
-	case ']': return makeToken(lex, TOKEN_RIGHT_BRACKET);
-	case ';': return makeToken(lex, TOKEN_SEMICOLON);
-	case ',': return makeToken(lex, TOKEN_COMMA);
+    switch( lex->currentChar ) {
+        case '(': return makeToken(lex, TOKEN_LEFT_PAREN);
+		case ')': return makeToken(lex, TOKEN_RIGHT_PAREN);
+		case '{': return makeToken(lex, TOKEN_LEFT_BRACE);
+		case '}': return makeToken(lex, TOKEN_RIGHT_BRACE);
+		case '[': return makeToken(lex, TOKEN_LEFT_BRACKET);
+		case ']': return makeToken(lex, TOKEN_RIGHT_BRACKET);
+		case ';': return makeToken(lex, TOKEN_SEMICOLON);
+		case ',': return makeToken(lex, TOKEN_COMMA);
 
 	case '+': return makeToken(lex, match(lex, '=') ? TOKEN_PLUS_EQUAL : match(lex, '+') ? TOKEN_PLUS_PLUS : TOKEN_PLUS);
 	case '-': return makeToken(lex, match(lex, '=') ? TOKEN_MINUS_EQUAL : match(lex, '-') ? TOKEN_MINUS_MINUS : match(lex, '>') ? TOKEN_MINUS_MORE : TOKEN_MINUS);
@@ -290,40 +270,6 @@ Token* scanLexer(Lexer* lex) {
 	case '>': return makeToken(lex, match(lex, '=') ? TOKEN_GREATER_EQUAL : TOKEN_GREATER);
 	case '<': return makeToken(lex, match(lex, '=') ? TOKEN_LESS_EQUAL : TOKEN_LESS);
 
-	case '"':
-	case '\'':
-		return makeString(lex, lex->currentChar);
-	case '\n':
-		return makeToken(lex, TOKEN_END_LINE);
-	default:
-		// -1 in the final arg in the `makeErrorToken` function call tells me wheter I should ignore the line given from the lexer itself and use a new line I give it or use the line from the lexer
-		// If -1 is used then I should just used the line from the lexer, if any other number I should use said number instead
-		// This feature is used when I have an error spread on multiple lines and I want to tell the user when did the line begin
-		return makeErrorToken(lex, "Unexpected token", DONT_OVERWRITE_BASELINE);
-	}
-=======
-    switch( lex->currentChar ) {
-        case '(': return makeToken(lex, TOKEN_LEFT_PAREN);
-		case ')': return makeToken(lex, TOKEN_RIGHT_PAREN);
-		case '{': return makeToken(lex, TOKEN_LEFT_BRACE);
-		case '}': return makeToken(lex, TOKEN_RIGHT_BRACE);
-		case '[': return makeToken(lex, TOKEN_LEFT_BRACKET);
-		case ']': return makeToken(lex, TOKEN_RIGHT_BRACKET);
-		case ';': return makeToken(lex, TOKEN_SEMICOLON);
-		case ',': return makeToken(lex, TOKEN_COMMA);
-
-		case '+': return makeToken(lex, match(lex, '=') ? TOKEN_PLUS_EQUAL : match(lex, '+') ? TOKEN_PLUS_PLUS: TOKEN_PLUS);
-		case '-': return makeToken(lex, match(lex, '=') ? TOKEN_MINUS_EQUAL : match(lex, '-') ? TOKEN_MINUS_MINUS: match(lex,'>') ? TOKEN_MINUS_MORE : TOKEN_MINUS);
-		case '*': return makeToken(lex, match(lex, '=') ? TOKEN_STAR_EQUAL : TOKEN_STAR);
-		case '/': return makeToken(lex, match(lex, '=') ? TOKEN_SLASH_EQUAL : TOKEN_SLASH);
-		case '%': return makeToken(lex, match(lex, '=') ? TOKEN_MODULO_EQUAL : TOKEN_MODULO);
-
-		case '!': return makeToken(lex, match(lex, '=') ? TOKEN_BANG_EQUAL : TOKEN_BANG);
-		case '=': return makeToken(lex, match(lex, '=') ? TOKEN_EQUAL_EQUAL : match(lex, '>') ? TOKEN_EQUAL_GREATER: TOKEN_EQUAL);
-
-		case '>': return makeToken(lex, match(lex, '=') ? TOKEN_GREATER_EQUAL : TOKEN_GREATER);
-		case '<': return makeToken(lex, match(lex, '=') ? TOKEN_LESS_EQUAL : TOKEN_LESS);
-
         case '"':
 		case '\'':
 			return makeString(lex, lex->currentChar);
@@ -335,7 +281,6 @@ Token* scanLexer(Lexer* lex) {
 			// This feature is used when I have an error spread on multiple lines and I want to tell the user when did the line begin
 			return makeErrorToken(lex, "Unexpected token", DONT_OVERWRITE_BASELINE);
     }
->>>>>>> parser/assignment
 }
 
 

@@ -20,10 +20,12 @@ void startParsing(Parser* par) {
 
 bool statement(Parser* par, ParseTree* current) {
 
+
 	if (par->current->type == TOKEN_IDENTIFIER) {
 		parserAdvance(par);
 		return parseAssign(par, current);
 	}
+
 
 	// Grammer rules and possiblities
 	switch (par->current->type) {
@@ -43,7 +45,9 @@ bool statement(Parser* par, ParseTree* current) {
 }
 
 
+
 bool expression(Parser* par, ParseTree* current, TokenType stopper) {
+
 	// In the future will create a branch to explore this path
 	// As of right now this will be very basic without arithmetic
 	// Also will add function calls here when we get to that template
@@ -146,10 +150,12 @@ bool parseVariableCreation(Parser* par, ParseTree* current) {
 	case TOKEN_FLOAT_V: {
 		mainTree->addChild(mainTree, newTree(PARSE_FLOAT_V, par->pre));
 		break;
-	}
+
 	default:
-		error(par, par->current, "Unknown type");
-		mainTree->freeParseTree(mainTree);
+
+
+		error(par, par->pre, "Unknown type");
+
 		synchronize(par);
 		return false;
 	}
@@ -158,10 +164,12 @@ bool parseVariableCreation(Parser* par, ParseTree* current) {
 	switch (par->current->type) {
 	case TOKEN_EQUAL:
 		mainTree->addChild(mainTree, newTree(PARSE_EQUAL, par->current));
-		break;
+
 	default:
-		error(par, par->current, "Invalid Syntax");
-		mainTree->freeParseTree(mainTree);
+
+
+		error(par, par->pre, "Invalid Syntax");
+
 		synchronize(par);
 		return false;
 	}
@@ -183,6 +191,7 @@ bool parseVariableCreation(Parser* par, ParseTree* current) {
 	parserAdvance(par);
 	return true;
 }
+
 
 
 bool parseAssign(Parser* par, ParseTree* current) {
@@ -278,8 +287,9 @@ bool parseConditional(Parser* par, ParseTree* current) {
 		parseBody(par, elseBody);
 		mainTree->addChild(mainTree, elseBody);
 	}
+}
 
-	current->addChild(current, mainTree);
 
 	return true;
 }
+
