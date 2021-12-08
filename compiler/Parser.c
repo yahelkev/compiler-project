@@ -29,135 +29,8 @@ int statement(Parser* par, ParseTree* current) {
 	return 0;
 }
 
-void expression(Parser* par, ParseTree* current) {
-	// checking if a token is place legaly by checking that there are no tokens
-	//that should'nt be before it
-	int openParenthesis = 0;
-	while (par->current->type != TOKEN_END_LINE && par->current->type != TOKEN_EOF)
-	{
-		switch (par->current->type) {
-		case TOKEN_IDENTIFIER:
-			switch (par->pre->type)
-			{
-			case TOKEN_RIGHT_PAREN:
-			case TOKEN_IDENTIFIER:
-			case TOKEN_NUMBER:
-			case TOKEN_STRING:
-			case TOKEN_TRUE:
-			case TOKEN_FALSE:
-				error(par, par->current, "Invalid Syntax");
-				synchronize(par);
-				break;
-			default: {
-				ParseTree* iden = newTree(IDENTIFIER_PARSE, par->current);
-				current->addChild(current, iden);
-				break;
-			}
-			}
-			break;
-		case TOKEN_NUMBER:
-		case TOKEN_STRING:
-		case TOKEN_TRUE:
-		case TOKEN_FALSE:
-			switch (par->pre->type)
-			{
-			case TOKEN_RIGHT_PAREN:
-			case TOKEN_IDENTIFIER:
-			case TOKEN_NUMBER:
-			case TOKEN_STRING:
-			case TOKEN_TRUE:
-			case TOKEN_FALSE:
-				error(par, par->current, "Invalid Syntax");
-				synchronize(par);
-				break;
-			default: {
-				ParseTree* value = newTree(ATOMIC_PARSE, par->current);
-				current->addChild(current, value);
-				break;
-			}
-			}
-			break;
-
-		case TOKEN_PLUS:
-		case TOKEN_MINUS:
-		case TOKEN_STAR:
-		case TOKEN_SLASH:
-		case TOKEN_MODULO:
-			switch (par->pre->type)
-			{
-			case TOKEN_LEFT_PAREN:
-			case TOKEN_PLUS:
-			case TOKEN_MINUS:
-			case TOKEN_STAR:
-			case TOKEN_SLASH:
-			case TOKEN_MODULO:
-				error(par, par->current, "Invalid Syntax");
-				synchronize(par);
-				break;
-			default: {
-				//issue that need to be solved (can't switch case on all types (plus, minus...))
-				ParseTree* math = newTree(par->current->type, par->current);
-				current->addChild(current, math);
-				break;
-			}
-			}
-			break;
-
-		case TOKEN_LEFT_PAREN:
-			switch (par->pre->type)
-			{
-			case TOKEN_IDENTIFIER:
-			case TOKEN_NUMBER:
-			case TOKEN_STRING:
-			case TOKEN_TRUE:
-			case TOKEN_FALSE:
-				error(par, par->current, "Invalid Syntax");
-				synchronize(par);
-				break;
-			default: {
-				openParenthesis++;
-				ParseTree* paren = newTree(PARSE_LEFT_PAREN, par->current);
-				current->addChild(current, paren);
-				break;
-			}
-			}
-			break;
-
-		case TOKEN_RIGHT_PAREN:
-			if (openParenthesis == 0) {
-				error(par, par->current, "Invalid Syntax");
-				synchronize(par);
-			}
-			switch (par->pre->type)
-			{
-			case TOKEN_PLUS:
-			case TOKEN_MINUS:
-			case TOKEN_STAR:
-			case TOKEN_SLASH:
-			case TOKEN_MODULO:
-				error(par, par->current, "Invalid Syntax");
-				synchronize(par);
-				break;
-			default: {
-				openParenthesis--;
-				ParseTree* paren = newTree(PARSE_RIGHT_PAREN, par->current);
-				current->addChild(current, paren);
-				break;
-			}
-			}
-			break;
-
-		default:
-			error(par, par->current, "Invalid Syntax");
-			synchronize(par);
-		}
-		parserAdvance(par);
-	}
-	if (openParenthesis)
-	{
-		error(par, par->current, "Invalid Syntax");
-		synchronize(par);
-	}
+bool expression(Parser* par, ParseTree* current, TokenType EO_Expr) {
+	convertToPost(par, current, EO_Expr);
 }
 // int x 5
 // = 3 + 2
@@ -264,7 +137,7 @@ int parseVariableCreation(Parser* par, ParseTree* current) {
 	}
 	parserAdvance(par);
 	ParseTree* treeExpression = newTree(EXPRESSION_PARSE, NULL);
-	expression(par, treeExpression);
+	expression(par, treeExpression, TOKEN_END_LINE);
 	mainTree->addChild(mainTree, treeExpression);
 	
 	current->addChild(current, mainTree);

@@ -3,6 +3,7 @@
 
 #include "Lexer.h"
 #include "ParseTree.h"
+//#include "Postfix.h"
 typedef struct Parser {
 	Lexer* lex;
 	Token* current;
@@ -36,7 +37,7 @@ void startParsing(Parser* par);
 void scanParser(Parser* par, ParseTree* current);
 void parserAdvance(Parser* par);
 int statement(Parser* par, ParseTree* current);
-void expression(Parser* par, ParseTree* current);
+bool expression(Parser* par, ParseTree* current, TokenType EO_Expr);
 void error(Parser* parser, Token* token, const char* message);
 void synchronize(Parser* parser);
 

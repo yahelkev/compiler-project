@@ -146,6 +146,7 @@
     <ClCompile Include="main.c" />
     <ClCompile Include="Parser.c" />
     <ClCompile Include="ParseTree.c" />
+    <ClCompile Include="Postfix.c" />
     <ClCompile Include="SymbolTable.c" />
   </ItemGroup>
   <ItemGroup>
@@ -155,6 +156,7 @@
     <ClInclude Include="Lexer.h" />
     <ClInclude Include="Parser.h" />
     <ClInclude Include="ParseTree.h" />
+    <ClInclude Include="Postfix.h" />
     <ClInclude Include="SymbolTable.h" />
     <ClInclude Include="TokenType.h" />
   </ItemGroup>
