@@ -19,7 +19,7 @@ struct variable {
 
 struct arg {
     char* name;
-    ParseTree* type;
+    char* type;
 };
 struct function {
     struct arg* args;

@@ -37,6 +37,9 @@ bool statement(Parser* par, ParseTree* current) {
 	case TOKEN_IF:
 		parserAdvance(par);
 		return parseConditional(par, current);
+	case TOKEN_FUNCTION:
+		parserAdvance(par);
+		return parseFunction(par, current);
 	default:
 		error(par, par->current, "Invalid Syntax");
 		synchronize(par);
@@ -152,10 +155,12 @@ bool parseVariableCreation(Parser* par, ParseTree* current) {
 		break;
 	}
 	default:
-
-
 		error(par, par->pre, "Unknown type");
-
+		synchronize(par);
+		return false;
+	}
+	if (par->current->type != TOKEN_IDENTIFIER) {
+		error(par, par->current, "Missing identifier");
 		synchronize(par);
 		return false;
 	}
@@ -277,15 +282,130 @@ bool parseConditional(Parser* par, ParseTree* current) {
 	condition->addChild(condition, treeExpression);
 	mainTree->addChild(mainTree, condition);
 	ParseTree* ifBody = newTree(IF_PARSE, NULL);
-	parseBody(par, ifBody);
+	if(!parseBody(par, ifBody)) return false;
 	mainTree->addChild(mainTree, ifBody);
 	
 	if (par->current->type == TOKEN_ELSE) {
 		ParseTree* elseBody = newTree(ELSE_PARSE, NULL);
-		parseBody(par, elseBody);
+		if (!parseBody(par, elseBody)) return false;
 		mainTree->addChild(mainTree, elseBody);
 	}
 	current->addChild(current, mainTree);
+	return true;
+}
+
+
+bool parseFunction(Parser* par, ParseTree* current) {
+	if (par->current->type != TOKEN_IDENTIFIER) {
+		// Might make this for anonymous function declarations in the future
+		error(par, par->pre, "Missing function name");
+		synchronize(par);
+		return false;
+	}
+	if (isDefined(par->table, par->current->lexeme)) {
+		error(par, par->current, "Function already initialized");
+		synchronize(par);
+		return false;
+	}
+	ParseTree* mainTree = newTree(FULL_FUNCTION_PARSE, NULL);
+	mainTree->addChild(mainTree, newTree(FUNCTION_NAME_PARSE, par->current));
+	parserAdvance(par);
+	ParseTree* args = newTree(FUNCTION_ARGS_PARSE, NULL);
+	if (!parseArgs(par, args)) return false;
+	
+	
+	mainTree->addChild(mainTree, args);
+	switch (par->current->type) {
+		default:
+			error(par, par->pre, "Unknown type or missing type");
+			synchronize(par);
+			return false;
+		case TOKEN_INT_V:
+		case TOKEN_STRING_V:
+		case TOKEN_FLOAT_V:
+			parserAdvance(par);
+			break;
+	}
+	ParseTree* type = newTree(FUNCTION_TYPE_PARSE, par->pre);
+	mainTree->addChild(mainTree, type);
+	ParseTree* body = newTree(FUNCTION_BODY_PARSE, NULL);
+	if(!parseBody(par, body)) return false;
+	mainTree->addChild(mainTree, body);
+	current->addChild(current, mainTree);
+
+	
+	// Add function to symbol table
+	struct arg* args_s = (struct arg*)malloc(sizeof(struct arg));
+	size_t i = 0;
+	ParseTree* argTree = args->getChild(args, i);
+	for (i = 0; i < args->amountOfChilds; i++, argTree = args->getChild(args, i)) {
+		args_s = (struct atg*)realloc(args, sizeof(struct arg) * (i + 1));
+		args_s[i] = makeArg(argTree->getChild(argTree, START_TREE + 1)->token->lexeme, argTree->getChild(argTree, START_TREE)->token->lexeme);
+	}
+	TABLE_VALUE* value = (TABLE_VALUE*)malloc(sizeof(TABLE_VALUE));
+	struct function func = makeFunction(args_s, i, type->token->lexeme);
+	newValue(value, FUNCTION_TAG, &func, argTree->getChild(argTree, START_TREE)->token->line, argTree->getChild(argTree, START_TREE)->token->column);
+	insertValue(par->table, argTree->getChild(argTree, START_TREE + 1)->token->lexeme, *value);
+	return true;
+}
+
+bool parseArgs(Parser* par, ParseTree* current) {
+	/** 3 Types of args
+		()
+		(arg1)
+		(arg1, arg2,...)
+	*/
+	parserAdvance(par);
+	if (par->pre->type != TOKEN_LEFT_PAREN) {
+		error(par, par->pre, "Missing '(' at function declaration");
+		synchronize(par);
+		return false;
+	}
+	if (par->current->type == TOKEN_RIGHT_PAREN) {
+		parserAdvance(par);
+		return true;
+	}
+	
+	do {
+		parserAdvance(par);
+		// TODO : Make args in symbol table
+		ParseTree* argTree = newTree(ARG_PARSE, NULL);
+		switch (par->pre->type) {
+		case TOKEN_INT_V: {
+			argTree->addChild(argTree, newTree(PARSE_INT_V, par->pre));
+			break;
+		}
+		case TOKEN_STRING_V: {
+			argTree->addChild(argTree, newTree(PARSE_STRING_V, par->pre));
+			break;
+		}
+		case TOKEN_FLOAT_V: {
+			argTree->addChild(argTree, newTree(PARSE_FLOAT_V, par->pre));
+			break;
+		}
+		default:
+			error(par, par->pre, "Unknown type");
+			synchronize(par);
+			return false;
+		}
+
+		if (par->current->type != TOKEN_IDENTIFIER) {
+			error(par, par->current, "Missing identifier");
+			synchronize(par);
+			return false;
+		}
+		argTree->addChild(argTree, newTree(IDENTIFIER_PARSE, par->current));
+		
+		current->addChild(current, argTree);
+		parserAdvance(par);
+		parserAdvance(par);
+	} while (par->pre->type == TOKEN_COMMA);
+	if (par->pre->type != TOKEN_RIGHT_PAREN) {
+		error(par, par->pre, "Missing ')'");
+		synchronize(par);
+		return false;
+	}
+	//parserAdvance(par);
 	return true;
 }
 

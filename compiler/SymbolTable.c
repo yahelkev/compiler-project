@@ -61,14 +61,14 @@ struct variable makeVariable(char* type, ParseTree* value) {
     struct variable var;
     var.type = (char*)malloc(sizeof(char) * ( strlen(type) + 1 ));
     var.value = value;
-    strncpy(var.type, type, strlen(type));
+    strncpy(var.type, type, strlen(type) + 1);
     return var;
 }
 
 struct error makeError(char* msg) {
     struct error err;
     err.msg = (char*)malloc(sizeof(char) * ( strlen(msg) + 1 ));
-    strncpy(err.msg, msg, strlen(msg));
+    strncpy(err.msg, msg, strlen(msg) + 1);
     return err;
 }
 
@@ -76,8 +76,8 @@ struct arg makeArg(char* name, char* type) {
     struct arg arg2;
     arg2.name = (char*)malloc(sizeof(char) * ( strlen(name) + 1 ));
     arg2.type = (char*)malloc(sizeof(char) * ( strlen(type) + 1 ));
-    strncpy(arg2.name, name, strlen(name));
-    strncpy(arg2.type, type, strlen(type));
+    strncpy(arg2.name, name, strlen(name)+1);
+    strncpy(arg2.type, type, strlen(type)+1);
     return arg2;
 }
 

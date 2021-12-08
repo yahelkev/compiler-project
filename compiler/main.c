@@ -59,7 +59,7 @@ void testInterface(int argc, char** argv) {
 
 
 void testParseTree() {
-    ParseTree* tree = newTree(FUNCTION_PARSE, NULL);
+    ParseTree* tree = newTree(FULL_FUNCTION_PARSE, NULL);
     Token* toke = (Token*)malloc(sizeof(Token));
     toke->column = 3;
     toke->line = 1;
