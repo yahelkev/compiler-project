@@ -197,37 +197,11 @@ bool parseConditional(Parser* par, ParseTree* current) {
 	ParseTree* ifBody = newTree(IF_PARSE, NULL);
 	parseBody(par, ifBody);
 	mainTree->addChild(mainTree, ifBody);
-	//do { parserAdvance(par); } while (par->current->type == TOKEN_END_LINE);
-	//if (par->current->type != TOKEN_LEFT_BRACE) {
-	//	while (par->current->type == TOKEN_END_LINE) parserAdvance(par);
-	//	if (!statement(par, ifBody)) return false;
-	//} else {
-	//	do { parserAdvance(par); } while (par->current->type == TOKEN_END_LINE);
-	//	while (par->current->type != TOKEN_RIGHT_BRACE && par->current->type != TOKEN_EOF)
-	//		scanParser(par, ifBody);
-	//	if (par->current->type == TOKEN_EOF) {
-	//		error(par, par->pre, "Missing closing brace");
-	//	}
-	//}
 	
-	
-	/*do { parserAdvance(par); } while (par->current->type == TOKEN_END_LINE);*/
 	if (par->current->type == TOKEN_ELSE) {
 		ParseTree* elseBody = newTree(ELSE_PARSE, NULL);
 		parseBody(par, elseBody);
 		mainTree->addChild(mainTree, elseBody);
-		/*do { parserAdvance(par); } while (par->current->type == TOKEN_END_LINE);
-		if (par->current->type != TOKEN_LEFT_BRACE) {
-			while (par->current->type == TOKEN_END_LINE) parserAdvance(par);
-			if (!statement(par, elseBody)) return false;
-		} else {
-			do { parserAdvance(par); } while (par->current->type == TOKEN_END_LINE);
-			while (par->current->type != TOKEN_RIGHT_BRACE && par->current->type != TOKEN_EOF)
-				scanParser(par, elseBody);
-			if (par->current->type == TOKEN_EOF) {
-				error(par, par->pre, "Missing closing brace");
-			}
-		}*/
 	}
 
 	current->addChild(current, mainTree);
