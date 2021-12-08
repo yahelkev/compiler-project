@@ -33,11 +33,14 @@ bool statement(Parser* par, ParseTree* current) {
 	return false;
 }
 
+
 bool expression(Parser* par, ParseTree* current, TokenType stopper) {
 	// In the future will create a branch to explore this path
 	// As of right now this will be very basic without arithmetic
 	// Also will add function calls here when we get to that template
 	
+
+
 	switch (par->current->type) {
 		case TOKEN_IDENTIFIER: {
 			ParseTree* iden = newTree(IDENTIFIER_PARSE, par->current);
@@ -159,6 +162,24 @@ bool parseVariableCreation(Parser* par, ParseTree* current) {
 	return true;
 }
 
+bool parseBody(Parser* par, ParseTree* current) {
+
+	while (par->current->type == TOKEN_END_LINE) parserAdvance(par); // Skip space after closing paren
+	if (par->current->type == TOKEN_LEFT_BRACE) {
+		do { parserAdvance(par); } while (par->current->type == TOKEN_END_LINE);
+		while (par->current->type != TOKEN_RIGHT_BRACE && par->current->type != TOKEN_EOF)
+			scanParser(par, current);
+		if (par->current->type == TOKEN_EOF) {
+			error(par, par->pre, "Missing closing brace");
+			return false;
+		}
+		parserAdvance(par);
+		
+	} else {
+		while (par->current->type == TOKEN_END_LINE) parserAdvance(par);
+		if (!statement(par, current)) return false;
+	}
+}
 
 bool parseConditional(Parser* par, ParseTree* current) {
 	
@@ -168,30 +189,34 @@ bool parseConditional(Parser* par, ParseTree* current) {
 	ParseTree* condition = newTree(CONDITION_PARSE, NULL);
 	ParseTree* treeExpression = newTree(EXPRESSION_PARSE, NULL);
 	parserAdvance(par); // Remove when merged, only for tests
-	if(!expression(par, treeExpression, TOKEN_LEFT_BRACE)) return false; // Make if return
+	if(!expression(par, treeExpression, TOKEN_RIGHT_PAREN)) return false; // Make if return
+	parserAdvance(par); // Remove when merged, only for tests
+	parserAdvance(par); // Remove when merged, only for tests
 	condition->addChild(condition, treeExpression);
 	mainTree->addChild(mainTree, condition);
-	do { parserAdvance(par); } while (par->current->type == TOKEN_END_LINE);
-	parserAdvance(par); // Remove when merged, only for tests
 	ParseTree* ifBody = newTree(IF_PARSE, NULL);
-	if (par->current->type != TOKEN_LEFT_BRACE) {
-		while (par->current->type == TOKEN_END_LINE) parserAdvance(par);
-		if (!statement(par, ifBody)) return false;
-	} else {
-		do { parserAdvance(par); } while (par->current->type == TOKEN_END_LINE);
-		while (par->current->type != TOKEN_RIGHT_BRACE && par->current->type != TOKEN_EOF)
-			scanParser(par, ifBody);
-		if (par->current->type == TOKEN_EOF) {
-			error(par, par->pre, "Missing closing brace");
-		}
-	}
+	parseBody(par, ifBody);
 	mainTree->addChild(mainTree, ifBody);
+	//do { parserAdvance(par); } while (par->current->type == TOKEN_END_LINE);
+	//if (par->current->type != TOKEN_LEFT_BRACE) {
+	//	while (par->current->type == TOKEN_END_LINE) parserAdvance(par);
+	//	if (!statement(par, ifBody)) return false;
+	//} else {
+	//	do { parserAdvance(par); } while (par->current->type == TOKEN_END_LINE);
+	//	while (par->current->type != TOKEN_RIGHT_BRACE && par->current->type != TOKEN_EOF)
+	//		scanParser(par, ifBody);
+	//	if (par->current->type == TOKEN_EOF) {
+	//		error(par, par->pre, "Missing closing brace");
+	//	}
+	//}
 	
 	
-	do { parserAdvance(par); } while (par->current->type == TOKEN_END_LINE);
+	/*do { parserAdvance(par); } while (par->current->type == TOKEN_END_LINE);*/
 	if (par->current->type == TOKEN_ELSE) {
-		do { parserAdvance(par); } while (par->current->type == TOKEN_END_LINE);
 		ParseTree* elseBody = newTree(ELSE_PARSE, NULL);
+		parseBody(par, elseBody);
+		mainTree->addChild(mainTree, elseBody);
+		/*do { parserAdvance(par); } while (par->current->type == TOKEN_END_LINE);
 		if (par->current->type != TOKEN_LEFT_BRACE) {
 			while (par->current->type == TOKEN_END_LINE) parserAdvance(par);
 			if (!statement(par, elseBody)) return false;
@@ -202,8 +227,7 @@ bool parseConditional(Parser* par, ParseTree* current) {
 			if (par->current->type == TOKEN_EOF) {
 				error(par, par->pre, "Missing closing brace");
 			}
-		}
-		mainTree->addChild(mainTree, elseBody);
+		}*/
 	}
 
 	current->addChild(current, mainTree);
