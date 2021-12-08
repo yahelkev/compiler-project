@@ -14,17 +14,19 @@ int priority(Token* x)
     if (x->type == TOKEN_LEFT_PAREN)
         return 0;
     if (x->type == TOKEN_GREATER || x->type == TOKEN_GREATER_EQUAL || x->type == TOKEN_LESS_EQUAL || x->type == TOKEN_LESS)
-        return 1;
+        return CON_PRIORITY;
     if (x->type == TOKEN_PLUS || x->type == TOKEN_MINUS)
-        return 2;
+        return PLUS_MINUS_PRIORITY;
     if (x->type == TOKEN_STAR || x->type == TOKEN_SLASH)
-        return 3;
+        return MUL_DIV_PRIORITY;
     return 0;
 }
 
 int convertToPost(Parser* par, ParseTree* current, TokenType EO_Expr)
 {
     int openParenthesis = 0;
+    int numNiden = 0;
+    int operators = 0;
     Token* token;
     Token* stack[100];
     int top = -1;
@@ -35,6 +37,11 @@ int convertToPost(Parser* par, ParseTree* current, TokenType EO_Expr)
     {
         if (par->current->type == TOKEN_NUMBER || par->current->type == TOKEN_IDENTIFIER)
         {
+            numNiden++;
+            if ((numNiden - operators) >= 2) {
+                error(par, par->current, "Invalid Syntax");
+                synchronize(par);
+            }
             ParseTree* child = newTree(getType(par, par->current), par->current);
             current->addChild(current, child);
             printf("%s ", par->current->lexeme);
@@ -60,6 +67,11 @@ int convertToPost(Parser* par, ParseTree* current, TokenType EO_Expr)
         }
         else
         {
+            operators++;
+            if (operators > numNiden){
+                error(par, par->current, "Invalid Syntax");
+                synchronize(par);
+            }
             while (top != -1 && priority(stack[top]) >= priority(par->current))
             {
                 token = pop(stack, &top);

@@ -79,7 +79,7 @@ void testParseTree() {
 int main( int argc, char** argv ) {
 
     Lexer lex;
-    newLexer(&lex, "int x = (2) * 3 + ((9 - 8))\n");
+    newLexer(&lex, "int x = (2) * 3 ((9 - 8))\n");
     Parser par;
     newParser(&par, &lex);
     startParsing(&par);
