@@ -30,7 +30,7 @@ int statement(Parser* par, ParseTree* current) {
 }
 
 bool expression(Parser* par, ParseTree* current, TokenType EO_Expr) {
-	convertToPost(par, current, EO_Expr);
+	return convertToPost(par, current, EO_Expr);
 }
 // int x 5
 // = 3 + 2

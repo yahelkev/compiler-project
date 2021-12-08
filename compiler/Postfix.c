@@ -41,20 +41,27 @@ int convertToPost(Parser* par, ParseTree* current, TokenType EO_Expr)
             if ((numNiden - operators) >= 2) {
                 error(par, par->current, "Invalid Syntax");
                 synchronize(par);
+                return 0;
             }
             ParseTree* child = newTree(getType(par, par->current), par->current);
             current->addChild(current, child);
             printf("%s ", par->current->lexeme);
         }
         else if (par->current->type == TOKEN_LEFT_PAREN) {
+            if (numNiden > operators) {
+                error(par, par->current, "Invalid Syntax");
+                synchronize(par);
+                return 0;
+            }
             openParenthesis++;
             stack[++top] = par->current;
         }
         else if (par->current->type == TOKEN_RIGHT_PAREN)
         {
-            if (openParenthesis == 0) {
+            if (openParenthesis == 0 || numNiden == operators) {
                 error(par, par->current, "Invalid Syntax");
                 synchronize(par);
+                return 0;
             }
             openParenthesis--;
             token = pop(stack, &top);
@@ -71,6 +78,7 @@ int convertToPost(Parser* par, ParseTree* current, TokenType EO_Expr)
             if (operators > numNiden){
                 error(par, par->current, "Invalid Syntax");
                 synchronize(par);
+                return 0;
             }
             while (top != -1 && priority(stack[top]) >= priority(par->current))
             {
@@ -85,6 +93,12 @@ int convertToPost(Parser* par, ParseTree* current, TokenType EO_Expr)
         parserAdvance(par);
     }
 
+    if (openParenthesis)
+    {
+        error(par, par->current, "Invalid Syntax");
+        synchronize(par);
+        return 0;
+    }
     while (top != -1)
     {
         token = pop(stack, &top);
@@ -92,12 +106,7 @@ int convertToPost(Parser* par, ParseTree* current, TokenType EO_Expr)
         current->addChild(current, child);
         printf("%s ", token->lexeme);
     }
-    if (openParenthesis)
-    {
-        error(par, par->current, "Invalid Syntax");
-        synchronize(par);
-    }
-    return 0;
+    return 1;
 }
 
 ParseTreeType getType(Parser* par, Token* token)
