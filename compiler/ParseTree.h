@@ -3,7 +3,7 @@
 #include "Lexer.h"
 #include <stdlib.h>
 #include <string.h>
-
+#include <stdbool.h>
 typedef enum {
 	// Capsul
 

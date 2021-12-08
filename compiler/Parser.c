@@ -150,7 +150,7 @@ bool parseVariableCreation(Parser* par, ParseTree* current) {
 	case TOKEN_FLOAT_V: {
 		mainTree->addChild(mainTree, newTree(PARSE_FLOAT_V, par->pre));
 		break;
-
+	}
 	default:
 
 
@@ -161,21 +161,19 @@ bool parseVariableCreation(Parser* par, ParseTree* current) {
 	}
 	mainTree->addChild(mainTree, newTree(IDENTIFIER_PARSE, par->current));
 	parserAdvance(par);
+
 	switch (par->current->type) {
 	case TOKEN_EQUAL:
 		mainTree->addChild(mainTree, newTree(PARSE_EQUAL, par->current));
-
+		break;
 	default:
-
-
 		error(par, par->pre, "Invalid Syntax");
-
 		synchronize(par);
 		return false;
 	}
 	parserAdvance(par);
 	ParseTree* treeExpression = newTree(EXPRESSION_PARSE, NULL);
-	expression(par, treeExpression);
+	expression(par, treeExpression, TOKEN_END_LINE);
 	mainTree->addChild(mainTree, treeExpression);
 	if (isDefined(par->table, mainTree->getChild(mainTree, START_TREE + 1)->token->lexeme)) {
 		error(par, mainTree->getChild(mainTree, START_TREE + 1)->token, "Variable already initialized");
@@ -194,7 +192,7 @@ bool parseVariableCreation(Parser* par, ParseTree* current) {
 
 
 
-bool parseAssign(Parser* par, ParseTree* current) {
+bool parseAssign(Parser * par, ParseTree * current) {
 	ParseTree* mainTree = newTree(ASSIGN_PARSE, NULL);
 	if (!isDefined(par->table, par->pre->lexeme)) {
 		error(par, par->pre, "Variable used but not defined");
@@ -212,35 +210,35 @@ bool parseAssign(Parser* par, ParseTree* current) {
 
 	mainTree->addChild(mainTree, newTree(IDENTIFIER_PARSE, par->pre));
 	switch (par->current->type) {
-	case TOKEN_PLUS_EQUAL:
-		mainTree->addChild(mainTree, newTree(PARSE_PLUS_EQUAL, par->current));
-		break;
-	case TOKEN_EQUAL:
-		mainTree->addChild(mainTree, newTree(PARSE_EQUAL, par->current));
-		break;
-	case TOKEN_MINUS_EQUAL:
-		mainTree->addChild(mainTree, newTree(PARSE_MINUS_EQUAL, par->current));
-		break;
-	case TOKEN_STAR_EQUAL:
-		mainTree->addChild(mainTree, newTree(PARSE_STAR_EQUAL, par->current));
-		break;
-	case TOKEN_SLASH_EQUAL:
-		mainTree->addChild(mainTree, newTree(PARSE_SLASH_EQUAL, par->current));
-		break;
-	case TOKEN_MODULO_EQUAL:
-		mainTree->addChild(mainTree, newTree(PARSE_MODULO_EQUAL, par->current));
-		break;
-	default:
-		error(par, par->current, "Invalid Syntax");
-		mainTree->freeParseTree(mainTree);
-		synchronize(par);
-		return false;
+		case TOKEN_PLUS_EQUAL:
+			mainTree->addChild(mainTree, newTree(PARSE_PLUS_EQUAL, par->current));
+			break;
+		case TOKEN_EQUAL:
+			mainTree->addChild(mainTree, newTree(PARSE_EQUAL, par->current));
+			break;
+		case TOKEN_MINUS_EQUAL:
+			mainTree->addChild(mainTree, newTree(PARSE_MINUS_EQUAL, par->current));
+			break;
+		case TOKEN_STAR_EQUAL:
+			mainTree->addChild(mainTree, newTree(PARSE_STAR_EQUAL, par->current));
+			break;
+		case TOKEN_SLASH_EQUAL:
+			mainTree->addChild(mainTree, newTree(PARSE_SLASH_EQUAL, par->current));
+			break;
+		case TOKEN_MODULO_EQUAL:
+			mainTree->addChild(mainTree, newTree(PARSE_MODULO_EQUAL, par->current));
+			break;
+		default:
+			error(par, par->current, "Invalid Syntax");
+			mainTree->freeParseTree(mainTree);
+			synchronize(par);
+			return false;
 	}
 	parserAdvance(par);
 	ParseTree* treeExpression = newTree(EXPRESSION_PARSE, NULL);
 	expression(par, treeExpression, TOKEN_END_LINE);
 	mainTree->addChild(mainTree, treeExpression);
-
+	
 	current->addChild(current, mainTree);
 	parserAdvance(par);
 	return true;
@@ -287,9 +285,8 @@ bool parseConditional(Parser* par, ParseTree* current) {
 		parseBody(par, elseBody);
 		mainTree->addChild(mainTree, elseBody);
 	}
-}
-
-
+	current->addChild(current, mainTree);
 	return true;
 }
+
 

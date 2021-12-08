@@ -4,6 +4,7 @@
 #include "Lexer.h"
 #include "ParseTree.h"
 #include "SymbolTable.h"
+#include <stdbool.h>
 
 #define START_TREE 0
 #define END_VARIABLE_TREE 3
@@ -53,10 +54,7 @@ void synchronize(Parser* parser);
 // Templates
 // Function to create a variable creation parse tree
 bool parseVariableCreation(Parser* par, ParseTree* current);
-
-
 bool parseAssign(Parser* par, ParseTree* current);
-
 bool expression(Parser* par, ParseTree* current, TokenType stopper); // stopper will tell what character is last to come to look for
 bool parseConditional(Parser* par, ParseTree* current);
 bool parseBody(Parser* par, ParseTree* current);
