@@ -13,16 +13,19 @@ void newParser(Parser* par, Lexer* lex) {
 void startParsing(Parser* par) {
 	synchronize(par);
 	while(par->current->type != TOKEN_EOF) {
-		scanParser(par, par->mainTree);
+		if (par->current->type != TOKEN_END_LINE) scanParser(par, par->mainTree);
+		else parserAdvance(par);
 	}
 }
 
 bool statement(Parser* par, ParseTree* current) {
 
+
 	if (par->current->type == TOKEN_IDENTIFIER) {
 		parserAdvance(par);
 		return parseAssign(par, current);
 	}
+
 
 	// Grammer rules and possiblities
 	switch (par->current->type) {
@@ -31,6 +34,9 @@ bool statement(Parser* par, ParseTree* current) {
 	case TOKEN_STRING_V:
 		parserAdvance(par);
 		return parseVariableCreation(par, current);
+	case TOKEN_IF:
+		parserAdvance(par);
+		return parseConditional(par, current);
 	default:
 		error(par, par->current, "Invalid Syntax");
 		synchronize(par);
@@ -38,11 +44,16 @@ bool statement(Parser* par, ParseTree* current) {
 	return false;
 }
 
-bool expression(Parser* par, ParseTree* current) {
+
+
+bool expression(Parser* par, ParseTree* current, TokenType stopper) {
+
 	// In the future will create a branch to explore this path
 	// As of right now this will be very basic without arithmetic
 	// Also will add function calls here when we get to that template
 	
+
+
 	switch (par->current->type) {
 		case TOKEN_IDENTIFIER: {
 			ParseTree* iden = newTree(IDENTIFIER_PARSE, par->current);
@@ -120,7 +131,7 @@ void parserAdvance(Parser* par) {
 	par->current = scanLexer(par->lex);
 
 	if (par->current->type == TOKEN_ERROR) {
-		error(par, par->current, "Lexer error");
+		error(par, par->pre, "Lexer error");
 	}
 
 }
@@ -141,8 +152,10 @@ bool parseVariableCreation(Parser* par, ParseTree* current) {
 		break;
 	}
 	default:
+
 		error(par, par->current, "Unknown type");
 		mainTree->freeParseTree(mainTree);
+
 		synchronize(par);
 		return false;
 	}
@@ -153,14 +166,16 @@ bool parseVariableCreation(Parser* par, ParseTree* current) {
 		mainTree->addChild(mainTree, newTree(PARSE_EQUAL, par->current));
 		break;
 	default:
+
 		error(par, par->current, "Invalid Syntax");
 		mainTree->freeParseTree(mainTree);
+
 		synchronize(par);
 		return false;
 	}
 	parserAdvance(par);
 	ParseTree* treeExpression = newTree(EXPRESSION_PARSE, NULL);
-	expression(par, treeExpression);
+	expression(par, treeExpression, TOKEN_END_LINE);
 	mainTree->addChild(mainTree, treeExpression);
 	if (isDefined(par->table, mainTree->getChild(mainTree, START_TREE + 1)->token->lexeme)) {
 		error(par, mainTree->getChild(mainTree, START_TREE + 1)->token, "Variable already initialized");
@@ -176,6 +191,7 @@ bool parseVariableCreation(Parser* par, ParseTree* current) {
 	parserAdvance(par);
 	return true;
 }
+
 
 
 bool parseAssign(Parser* par, ParseTree* current) {
@@ -229,3 +245,51 @@ bool parseAssign(Parser* par, ParseTree* current) {
 	parserAdvance(par);
 	return true;
 }
+
+bool parseBody(Parser* par, ParseTree* current) {
+
+	while (par->current->type == TOKEN_END_LINE) parserAdvance(par); // Skip space after closing paren
+	if (par->current->type == TOKEN_LEFT_BRACE) {
+		do { parserAdvance(par); } while (par->current->type == TOKEN_END_LINE);
+		while (par->current->type != TOKEN_RIGHT_BRACE && par->current->type != TOKEN_EOF)
+			scanParser(par, current);
+		if (par->current->type == TOKEN_EOF) {
+			error(par, par->pre, "Missing closing brace");
+			return false;
+		}
+		parserAdvance(par);
+		
+	} else {
+		while (par->current->type == TOKEN_END_LINE) parserAdvance(par);
+		if (!statement(par, current)) return false;
+	}
+}
+
+bool parseConditional(Parser* par, ParseTree* current) {
+	
+	ParseTree* mainTree = newTree(FULL_CONDITIONAL_PARSE, NULL);
+	// Parse Condition
+
+	ParseTree* condition = newTree(CONDITION_PARSE, NULL);
+	ParseTree* treeExpression = newTree(EXPRESSION_PARSE, NULL);
+	parserAdvance(par); // Remove when merged, only for tests
+	if(!expression(par, treeExpression, TOKEN_RIGHT_PAREN)) return false; // Make if return
+	parserAdvance(par); // Remove when merged, only for tests
+	parserAdvance(par); // Remove when merged, only for tests
+	condition->addChild(condition, treeExpression);
+	mainTree->addChild(mainTree, condition);
+	ParseTree* ifBody = newTree(IF_PARSE, NULL);
+	parseBody(par, ifBody);
+	mainTree->addChild(mainTree, ifBody);
+	
+	if (par->current->type == TOKEN_ELSE) {
+		ParseTree* elseBody = newTree(ELSE_PARSE, NULL);
+		parseBody(par, elseBody);
+		mainTree->addChild(mainTree, elseBody);
+	}
+
+	current->addChild(current, mainTree);
+
+	return true;
+}
+
