@@ -15,6 +15,7 @@ typedef enum {
 	VARIABLE_PARSE,
 	EXPRESSION_PARSE, // expression
 	MAIN_PARSE,
+	ASSIGN_PARSE,
 
 	// Special
 	ATOMIC_PARSE,
