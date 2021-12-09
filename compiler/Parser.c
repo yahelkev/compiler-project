@@ -190,7 +190,7 @@ bool parseVariableCreation(Parser* par, ParseTree* current) {
 	struct variable var = makeVariable(mainTree->getChild(mainTree, START_TREE), mainTree->getChild(mainTree, END_VARIABLE_TREE));
 	TABLE_VALUE* value = (TABLE_VALUE*)malloc(sizeof(TABLE_VALUE));
 	newValue(value, VARIABLE_TAG, &var, mainTree->getChild(mainTree, START_TREE)->token->line, mainTree->getChild(mainTree, START_TREE)->token->column);
-	insertValue(par->table, mainTree->getChild(mainTree, START_TREE + 1)->token->lexeme, *value);
+	insertValue(par->table, mainTree->getChild(mainTree, START_TREE + 1)->token->lexeme, value);
 	parserAdvance(par);
 	return true;
 }
@@ -336,16 +336,16 @@ bool parseFunction(Parser* par, ParseTree* current) {
 	
 	// Add function to symbol table
 	struct arg* args_s = (struct arg*)malloc(sizeof(struct arg));
-	size_t i = 0;
+	int i = 0;
 	ParseTree* argTree = args->getChild(args, i);
 	for (i = 0; i < args->amountOfChilds; i++, argTree = args->getChild(args, i)) {
-		args_s = (struct atg*)realloc(args, sizeof(struct arg) * (i + 1));
-		args_s[i] = makeArg(argTree->getChild(argTree, START_TREE + 1)->token->lexeme, argTree->getChild(argTree, START_TREE)->token->lexeme);
+		args_s = (struct arg*)realloc(args_s, sizeof(struct arg) * (i + 1));
+		args_s[i] = *makeArg(argTree->getChild(argTree, START_TREE + 1)->token->lexeme, argTree->getChild(argTree, START_TREE)->token->lexeme);
 	}
 	TABLE_VALUE* value = (TABLE_VALUE*)malloc(sizeof(TABLE_VALUE));
 	struct function func = makeFunction(args_s, i, type->token->lexeme);
-	newValue(value, FUNCTION_TAG, &func, argTree->getChild(argTree, START_TREE)->token->line, argTree->getChild(argTree, START_TREE)->token->column);
-	insertValue(par->table, argTree->getChild(argTree, START_TREE + 1)->token->lexeme, *value);
+	newValue(value, FUNCTION_TAG, &func, mainTree->getChild(mainTree, START_TREE)->token->line, mainTree->getChild(mainTree, START_TREE)->token->column);
+	insertValue(par->table, mainTree->getChild(mainTree, START_TREE)->token->lexeme, value);
 	return true;
 }
 

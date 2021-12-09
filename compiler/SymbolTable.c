@@ -18,7 +18,7 @@ TABLE_VALUE getValue(Table* table, char* key) {
     if(isDefined(table, key))
         for (size_t i = 0; i < table->size; i++)
             if(!strcmp(table->keys[i], key)) 
-                return table->values[i];
+                return *table->values[i];
     else {
         TABLE_VALUE val;
         struct error err = makeError("no such key");
@@ -31,13 +31,13 @@ TABLE_VALUE getValue(Table* table, char* key) {
     1 - Insertion succesded
     0 - Insertion Failed
 */
-bool insertValue(Table* table, char* key, TABLE_VALUE value) {
+bool insertValue(Table* table, char* key, TABLE_VALUE* value) {
     if (!isDefined(table,key)) {
         table->keys = (char**)realloc(table->keys, sizeof(char*) * ( table->size + 1 ));
         table->keys[table->size] = (char*)malloc(sizeof(char) * ( strlen(key) + 1 ));
         strncpy(table->keys[table->size], key, strlen(key));
         table->keys[table->size][strlen(key)] = '\0';
-        table->values = (TABLE_VALUE*)realloc(table->values, sizeof(TABLE_VALUE) * ( table->size + 1 ));
+        table->values = (TABLE_VALUE**)realloc(table->values, sizeof(TABLE_VALUE*) * ( table->size + 1 ));
         table->values[table->size] = value;
         table->size++;
 
@@ -53,7 +53,7 @@ struct function makeFunction(struct arg* args, int amount, char* returnType) {
     func.args = args;
     func.amount = amount;
     func.returnType = (char*)malloc(sizeof(char) * ( strlen(returnType) + 1 ));
-    strncpy(func.returnType, returnType, strlen(returnType));
+    strncpy(func.returnType, returnType, strlen(returnType) + 1);
     return func;
 }
 
@@ -72,12 +72,12 @@ struct error makeError(char* msg) {
     return err;
 }
 
-struct arg makeArg(char* name, char* type) {
-    struct arg arg2;
-    arg2.name = (char*)malloc(sizeof(char) * ( strlen(name) + 1 ));
-    arg2.type = (char*)malloc(sizeof(char) * ( strlen(type) + 1 ));
-    strncpy(arg2.name, name, strlen(name)+1);
-    strncpy(arg2.type, type, strlen(type)+1);
+struct arg* makeArg(char* name, char* type) {
+    struct arg* arg2 = (struct arg*)malloc(sizeof(struct arg));
+    arg2->name = (char*)malloc(sizeof(char) * ( strlen(name) + 1 ));
+    arg2->type = (char*)malloc(sizeof(char) * ( strlen(type) + 1 ));
+    strncpy(arg2->name, name, strlen(name)+1);
+    strncpy(arg2->type, type, strlen(type)+1);
     return arg2;
 }
 
