@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include "ParseTree.h"
-
+#define LENGTH(var) strlen(var) + 1
 typedef enum {
         FUNCTION_TAG, VARIABLE_TAG, ERROR_TAG
 } ValueTag;
