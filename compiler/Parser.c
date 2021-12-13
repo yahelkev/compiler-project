@@ -295,6 +295,8 @@ bool parseConditional(Parser* par, ParseTree* current) {
 }
 
 
+
+
 bool parseFunction(Parser* par, ParseTree* current) {
 	if (par->current->type != TOKEN_IDENTIFIER) {
 		// Might make this for anonymous function declarations in the future
@@ -409,4 +411,24 @@ bool parseArgs(Parser* par, ParseTree* current) {
 	return true;
 }
 
+bool parseLoop(Parser* par, ParseTree* current) {
+
+	ParseTree* mainTree = newTree(FULL_LOOP_PARSE, NULL);
+	// Parse Loop
+
+	ParseTree* condition = newTree(PARSE_LOOP, NULL);
+	ParseTree* treeExpression = newTree(EXPRESSION_PARSE, NULL);
+	parserAdvance(par); // Remove when merged, only for tests
+	if (!expression(par, treeExpression, TOKEN_RIGHT_PAREN)) return false; // Make if return
+	parserAdvance(par); // Remove when merged, only for tests
+	parserAdvance(par); // Remove when merged, only for tests
+	condition->addChild(condition, treeExpression);
+	mainTree->addChild(mainTree, condition);
+	ParseTree* loopBody = newTree(LOOP_PARSE, NULL);
+	parseBody(par, loopBody);
+	mainTree->addChild(mainTree, loopBody);
+
+	current->addChild(current, mainTree);
+	return true;
+}
 

@@ -57,6 +57,7 @@ bool parseVariableCreation(Parser* par, ParseTree* current);
 bool parseAssign(Parser* par, ParseTree* current);
 bool expression(Parser* par, ParseTree* current, TokenType stopper); // stopper will tell what character is last to come to look for
 bool parseConditional(Parser* par, ParseTree* current);
+bool parseLoop(Parser* par, ParseTree* current);
 bool parseBody(Parser* par, ParseTree* current);
 bool parseFunction(Parser* par, ParseTree* current);
 bool parseArgs(Parser* par, ParseTree* current);
