@@ -15,10 +15,10 @@ void testParser(char* code) {
     startParsing(&par);
     printParseTree(par.mainTree);
     TABLE_VALUE* val;
-    for (size_t i = 0; i < par.table->size; i++) {
+    /*for (size_t i = 0; i < par.table->size; i++) {
         val = par.table->values[i];
         printTableValue(val);
-    }
+    }*/
     par.mainTree->freeParseTree(par.mainTree);
 }
 

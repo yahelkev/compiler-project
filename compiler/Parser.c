@@ -40,6 +40,9 @@ bool statement(Parser* par, ParseTree* current) {
 	case TOKEN_FUNCTION:
 		parserAdvance(par);
 		return parseFunction(par, current);
+	case TOKEN_LOOP:
+		parserAdvance(par);
+		return parseLoop(par, current);
 	default:
 		error(par, par->current, "Invalid Syntax");
 		synchronize(par);
@@ -430,5 +433,57 @@ bool parseLoop(Parser* par, ParseTree* current) {
 
 	current->addChild(current, mainTree);
 	return true;
+}
+
+
+
+
+bool parseCalls(Parser* par, ParseTree* current) {
+	
+	ParseTree* call = newTree(FULL_CALL_PARSE, NULL);
+	call->addChild(call, newTree(CALL_NAME_PARSE, par->pre));
+	
+	parserAdvance(par);
+	if (par->current->type == TOKEN_RIGHT_PAREN) {
+		call->addChild(call, newTree(CALL_ARGS_PARSE, NULL));
+		current->addChild(current, call);
+		return true;
+	}
+
+	do {
+
+		// TODO : Make args in symbol table
+		ParseTree* exp = newTree(EXPRESSION_PARSE, NULL);
+		if(!expression(par, exp, TOKEN_COMMA)) return false;
+		switch (par->pre->type) {
+		case TOKEN_INT_V: {
+			argTree->addChild(argTree, newTree(PARSE_INT_V, par->pre));
+			break;
+		}
+		case TOKEN_STRING_V: {
+			argTree->addChild(argTree, newTree(PARSE_STRING_V, par->pre));
+			break;
+		}
+		case TOKEN_FLOAT_V: {
+			argTree->addChild(argTree, newTree(PARSE_FLOAT_V, par->pre));
+			break;
+		}
+		default:
+			error(par, par->pre, "Unknown type");
+			synchronize(par);
+			return false;
+		}
+
+		if (par->current->type != TOKEN_IDENTIFIER) {
+			error(par, par->current, "Missing identifier");
+			synchronize(par);
+			return false;
+		}
+		argTree->addChild(argTree, newTree(IDENTIFIER_PARSE, par->current));
+
+		current->addChild(current, argTree);
+		parserAdvance(par);
+		parserAdvance(par);
+	} while (par->pre->type == TOKEN_COMMA);
 }
 
