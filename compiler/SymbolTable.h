@@ -61,7 +61,7 @@ TABLE_VALUE getValue(Table* table, char* key);
 */
 bool insertValue(Table* table, char* key, TABLE_VALUE* value);
 
-struct function makeFunction(struct arg* args, int amount, char* returnType);
+struct function* makeFunction(struct arg* args, int amount, char* returnType);
 struct variable makeVariable(char* type, ParseTree* value);
 struct error makeError(char* msg);
 struct arg* makeArg(char* name, char* type);
