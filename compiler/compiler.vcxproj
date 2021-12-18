@@ -139,20 +139,29 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="debug.c" />
+    <ClCompile Include="Debug.c" />
     <ClCompile Include="interface.c" />
     <ClCompile Include="KeywordTypes.c" />
     <ClCompile Include="Lexer.c" />
     <ClCompile Include="main.c" />
+    <ClCompile Include="Parser.c" />
+    <ClCompile Include="ParseTree.c" />
+    <ClCompile Include="Postfix.c" />
     <ClCompile Include="SymbolTable.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="debug.h" />
+    <ClInclude Include="Debug.h" />
     <ClInclude Include="interface.h" />
     <ClInclude Include="KeywordTypes.h" />
     <ClInclude Include="Lexer.h" />
+    <ClInclude Include="Parser.h" />
+    <ClInclude Include="ParseTree.h" />
+    <ClInclude Include="Postfix.h" />
     <ClInclude Include="SymbolTable.h" />
     <ClInclude Include="TokenType.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="cpp.hint" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

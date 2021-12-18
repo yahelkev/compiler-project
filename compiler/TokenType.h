@@ -21,7 +21,7 @@ typedef enum {
 	TOKEN_MINUS,
 	TOKEN_MINUS_EQUAL,
 	TOKEN_MINUS_MINUS,
-	TOKEN_MINUS_LESS, //MINUS_LESS is for function syntax
+	TOKEN_MINUS_MORE, //MINUS_LESS is for function syntax
 	TOKEN_STAR,
 	TOKEN_STAR_EQUAL,
 
@@ -69,13 +69,20 @@ typedef enum {
 	TOKEN_PRINT,
 	TOKEN_RETURN,
 	TOKEN_TRUE,
-	TOKEN_WHILE,
+	TOKEN_LOOP,
 	TOKEN_FUNCTION,
 
 	//meta
 	TOKEN_PASS, //do nothing
 	TOKEN_ERROR,
-	TOKEN_EOF
+	TOKEN_EOF,
+	TOKEN_END_LINE,
+
+
+	// Variables Primitive Usable Types
+	TOKEN_INT_V,
+	TOKEN_FLOAT_V,
+	TOKEN_STRING_V
 
 } TokenType;
 

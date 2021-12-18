@@ -27,13 +27,19 @@
     <ClCompile Include="Lexer.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="debug.c">
+    <ClCompile Include="SymbolTable.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SymbolTable.c">
-<<<<<<< HEAD
-      <Filter>Header Files</Filter>
-=======
+    <ClCompile Include="Parser.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ParseTree.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Postfix.c">
       <Filter>Source Files</Filter>
 >>>>>>> 1009f7d6934ea1ee9e69409cbe25d844aae8bcd8
     </ClCompile>
@@ -51,15 +57,24 @@
     <ClInclude Include="TokenType.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="debug.h">
+    <ClInclude Include="SymbolTable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SymbolTable.h">
-<<<<<<< HEAD
-      <Filter>Source Files</Filter>
-=======
+    <ClInclude Include="Parser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ParseTree.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Debug.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Postfix.h">
       <Filter>Header Files</Filter>
 >>>>>>> 1009f7d6934ea1ee9e69409cbe25d844aae8bcd8
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="cpp.hint" />
   </ItemGroup>
 </Project>

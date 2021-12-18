@@ -9,7 +9,12 @@ KeywordType keywordTypes[] = {
 	{"return", TOKEN_RETURN},
 	{"fn", TOKEN_FUNCTION},
 	{"true", TOKEN_TRUE},
-	{"while", TOKEN_WHILE},
+	{"loop", TOKEN_LOOP},
+
+	// Variables Primitive Usable Types
+	{"int", TOKEN_INT_V},
+	{"float", TOKEN_FLOAT_V},
+	{"string", TOKEN_STRING_V},
 
 	{NULL, TOKEN_EOF}
 };
