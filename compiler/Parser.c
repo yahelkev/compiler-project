@@ -50,30 +50,8 @@ bool statement(Parser* par, ParseTree* current) {
 	return false;
 }
 
-
-
-bool expression(Parser* par, ParseTree* current, TokenType stopper) {
-
-	// In the future will create a branch to explore this path
-	// As of right now this will be very basic without arithmetic
-	// Also will add function calls here when we get to that template
-	
-
-
-	switch (par->current->type) {
-		case TOKEN_IDENTIFIER: {
-			ParseTree* iden = newTree(IDENTIFIER_PARSE, par->current);
-			current->addChild(current, iden);
-			return true;
-		}
-		case TOKEN_NUMBER:
-		case TOKEN_STRING: {
-			ParseTree* iden = newTree(ATOMIC_PARSE, par->current);
-			current->addChild(current, iden);
-			return true;
-		}
-	}
-	return false;
+bool expression(Parser* par, ParseTree* current, TokenType EO_Expr) {
+	return convertToPost(par, current, EO_Expr);
 }
 
 void synchronize(Parser* parser) {

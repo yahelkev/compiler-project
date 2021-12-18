@@ -3,6 +3,7 @@
 
 #include "Lexer.h"
 #include "ParseTree.h"
+#include "Postfix.h"
 #include "SymbolTable.h"
 #include <stdbool.h>
 
@@ -44,7 +45,8 @@ void startParsing(Parser* par);
 void scanParser(Parser* par, ParseTree* current);
 // Advances the parser to theh next token coming from the lexer
 void parserAdvance(Parser* par);
-// Liists possible creation statements of parse tress
+bool expression(Parser* par, ParseTree* current, TokenType EO_Expr);
+// Lists possible creation statements of parse tress
 bool statement(Parser* par, ParseTree* current);
 // Prints error to screen ( user )
 void error(Parser* parser, Token* token, const char* message);

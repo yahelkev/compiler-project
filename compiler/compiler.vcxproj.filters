@@ -39,6 +39,9 @@
     <ClCompile Include="Debug.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Postfix.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="interface.h">
@@ -63,6 +66,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Debug.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Postfix.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
