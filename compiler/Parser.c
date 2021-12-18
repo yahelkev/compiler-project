@@ -40,6 +40,9 @@ bool statement(Parser* par, ParseTree* current) {
 	case TOKEN_FUNCTION:
 		parserAdvance(par);
 		return parseFunction(par, current);
+	case TOKEN_LOOP:
+		parserAdvance(par);
+		return parseLoop(par, current);
 	default:
 		error(par, par->current, "Invalid Syntax");
 		synchronize(par);
@@ -98,8 +101,6 @@ void synchronize(Parser* parser) {
 	}
 }
 void scanParser(Parser* par, ParseTree* current) {
-
-	//synchronize(par);
 	if (par->current->type != TOKEN_EOF && 
 		statement(par, current) && 
 		par->current->type == TOKEN_END_LINE)
@@ -275,10 +276,10 @@ bool parseConditional(Parser* par, ParseTree* current) {
 
 	ParseTree* condition = newTree(CONDITION_PARSE, NULL);
 	ParseTree* treeExpression = newTree(EXPRESSION_PARSE, NULL);
-	parserAdvance(par); // Remove when merged, only for tests
+	parserAdvance(par); // Remove when merged with expression, only for tests
 	if(!expression(par, treeExpression, TOKEN_RIGHT_PAREN)) return false; // Make if return
-	parserAdvance(par); // Remove when merged, only for tests
-	parserAdvance(par); // Remove when merged, only for tests
+	parserAdvance(par); // Remove when merged with expression, only for tests
+	parserAdvance(par); // Remove when merged with expression, only for tests
 	condition->addChild(condition, treeExpression);
 	mainTree->addChild(mainTree, condition);
 	ParseTree* ifBody = newTree(IF_PARSE, NULL);
@@ -345,8 +346,8 @@ bool parseFunction(Parser* par, ParseTree* current) {
 		args_s[i] = *makeArg(argTree->getChild(argTree, START_TREE + 1)->token->lexeme, argTree->getChild(argTree, START_TREE)->token->lexeme);
 	}
 	TABLE_VALUE* value = (TABLE_VALUE*)malloc(sizeof(TABLE_VALUE));
-	struct function func = makeFunction(args_s, i, type->token->lexeme);
-	newValue(value, FUNCTION_TAG, &func, mainTree->getChild(mainTree, START_TREE)->token->line, mainTree->getChild(mainTree, START_TREE)->token->column);
+	struct function* func = makeFunction(args_s, i, type->token->lexeme);
+	newValue(value, FUNCTION_TAG, func, mainTree->getChild(mainTree, START_TREE)->token->line, mainTree->getChild(mainTree, START_TREE)->token->column);
 	insertValue(par->table, mainTree->getChild(mainTree, START_TREE)->token->lexeme, value);
 	return true;
 }
@@ -370,7 +371,6 @@ bool parseArgs(Parser* par, ParseTree* current) {
 	
 	do {
 		parserAdvance(par);
-		// TODO : Make args in symbol table
 		ParseTree* argTree = newTree(ARG_PARSE, NULL);
 		switch (par->pre->type) {
 		case TOKEN_INT_V: {
@@ -418,10 +418,10 @@ bool parseLoop(Parser* par, ParseTree* current) {
 
 	ParseTree* condition = newTree(PARSE_LOOP, NULL);
 	ParseTree* treeExpression = newTree(EXPRESSION_PARSE, NULL);
-	parserAdvance(par); // Remove when merged, only for tests
+	parserAdvance(par); // Remove when merged with expression, only for tests
 	if (!expression(par, treeExpression, TOKEN_RIGHT_PAREN)) return false; // Make if return
-	parserAdvance(par); // Remove when merged, only for tests
-	parserAdvance(par); // Remove when merged, only for tests
+	parserAdvance(par); // Remove when merged with expression, only for tests
+	parserAdvance(par); // Remove when merged with expression, only for tests
 	condition->addChild(condition, treeExpression);
 	mainTree->addChild(mainTree, condition);
 	ParseTree* loopBody = newTree(LOOP_PARSE, NULL);
@@ -429,6 +429,53 @@ bool parseLoop(Parser* par, ParseTree* current) {
 	mainTree->addChild(mainTree, loopBody);
 
 	current->addChild(current, mainTree);
+	return true;
+}
+
+
+
+
+bool parseCalls(Parser* par, ParseTree* current) {
+	
+	ParseTree* call = newTree(FULL_CALL_PARSE, NULL);
+	call->addChild(call, newTree(CALL_NAME_PARSE, par->pre));
+	if (!isDefined(par->table, par->pre->lexeme)) {
+		error(par, par->pre, "Undefined call");
+		synchronize(par);
+		return false;
+	}
+	parserAdvance(par);
+	if (par->current->type == TOKEN_RIGHT_PAREN) {
+		call->addChild(call, newTree(CALL_ARGS_PARSE, NULL));
+		current->addChild(current, call);
+		return true;
+	}
+
+
+	ParseTree* args = newTree(CALL_ARGS_PARSE, NULL);
+	int argCounter = 0;
+	TABLE_VALUE val = getValue(par->table, call->getChild(call, 0)->token->lexeme);
+	ParseTree* exp = newTree(EXPRESSION_PARSE, NULL);
+	// TODO : Make args in symbol table
+	while (val.function->amount != ++argCounter) {
+		
+		if(!expression(par, exp, TOKEN_COMMA)) 
+			return false;
+		parserAdvance(par); // Remove when merged with expression, only for tests
+		parserAdvance(par); // Remove when merged with expression, only for tests
+		args->addChild(args, exp);
+		exp = newTree(EXPRESSION_PARSE, NULL);
+	}
+	if (!expression(par, exp, TOKEN_RIGHT_PAREN))
+		return false;
+	parserAdvance(par); // Remove when merged with expression, only for tests
+	args->addChild(args, exp);
+
+
+		
+	call->addChild(call, args);
+	current->addChild(current, call);
+	parserAdvance(par);
 	return true;
 }
 

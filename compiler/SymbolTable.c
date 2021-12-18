@@ -15,11 +15,11 @@ bool isDefined(Table* table, char* key) {
 }
 
 TABLE_VALUE getValue(Table* table, char* key) {
-    if(isDefined(table, key))
+    if (isDefined(table, key)) {
         for (size_t i = 0; i < table->size; i++)
-            if(!strcmp(table->keys[i], key)) 
+            if (!strcmp(table->keys[i], key))
                 return *table->values[i];
-    else {
+    } else {
         TABLE_VALUE val;
         struct error err = makeError("no such key");
         newValue(&val, ERROR_TAG, &err, -1, -1);
@@ -48,12 +48,12 @@ bool insertValue(Table* table, char* key, TABLE_VALUE* value) {
 }
 
 
-struct function makeFunction(struct arg* args, int amount, char* returnType) {
-    struct function func;
-    func.args = args;
-    func.amount = amount;
-    func.returnType = (char*)malloc(sizeof(char) * (LENGTH(returnType)));
-    strncpy(func.returnType, returnType, LENGTH(returnType));
+struct function* makeFunction(struct arg* args, int amount, char* returnType) {
+    struct function* func = (struct function*)malloc(sizeof(struct function));
+    func->args = args;
+    func->amount = amount;
+    func->returnType = (char*)malloc(sizeof(char) * (LENGTH(returnType)));
+    strncpy(func->returnType, returnType, LENGTH(returnType));
     return func;
 }
 
