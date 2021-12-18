@@ -14,6 +14,11 @@ void testParser(char* code) {
     newParser(&par, &lex);
     startParsing(&par);
     printParseTree(par.mainTree);
+    TABLE_VALUE* val;
+    /*for (size_t i = 0; i < par.table->size; i++) {
+        val = par.table->values[i];
+        printTableValue(val);
+    }*/
     par.mainTree->freeParseTree(par.mainTree);
 }
 
@@ -35,37 +40,38 @@ void testLexer(Lexer* lex, char* rawCode) {
     return;
 }
 
-void testSymbolTable() {
-    Table tab;
-    newTable(&tab);
-    TABLE_VALUE val, val2;
-    struct arg argnew = makeArg("x", "int");
-    struct variable var = makeVariable("int", "5");
-    struct function func = makeFunction(&argnew, 1, "float");
-    newValue(&val, VARIABLE_TAG, &var, 1, 5);
-    newValue(&val2, FUNCTION_TAG, &func, 1, 10);
-    printTableValue(&val);
-    printTableValue(&val2);
-}
+//void testSymbolTable() {
+//    Table tab;
+//    newTable(&tab);
+//    TABLE_VALUE val, val2;
+//    struct arg argnew = makeArg("x", "int");
+//    struct variable var = makeVariable("int", "5");
+//    struct function func = makeFunction(&argnew, 1, "float");
+//    newValue(&val, VARIABLE_TAG, &var, 1, 5);
+//    newValue(&val2, FUNCTION_TAG, &func, 1, 10);
+//    printTableValue(&val);
+//    printTableValue(&val2);
+//}
 
 void testInterface(int argc, char** argv) {
     char* srcFileName = NULL;
     int flag = handleInput(argc, argv, &srcFileName);
     char* fileContent = getFileContent(srcFileName);
+    //printf("%s\n", fileContent);
     testParser(fileContent);
 }
 
 
 
 void testParseTree() {
-    ParseTree* tree = newTree(FUNCTION_PARSE, NULL);
+    ParseTree* tree = newTree(FULL_FUNCTION_PARSE, NULL);
     Token* toke = (Token*)malloc(sizeof(Token));
     toke->column = 3;
     toke->line = 1;
     toke->length = 3;
     toke->type = TOKEN_IDENTIFIER;
     toke->lexeme = (char*)malloc(sizeof(char) * 4);
-    strcpy(toke->lexeme, "add");
+    strncpy(toke->lexeme, "add", 3);
     ParseTree* iden = newTree(IDENTIFIER_PARSE, toke);
     tree->addChild(tree, iden);
     printParseTree(tree);

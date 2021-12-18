@@ -3,13 +3,29 @@
 #include "Lexer.h"
 #include <stdlib.h>
 #include <string.h>
-
+#include <stdbool.h>
 typedef enum {
 	// Capsul
-	FUNCTION_PARSE,
+
+	FULL_CONDITIONAL_PARSE,
+	FULL_LOOP_PARSE,
+	CONDITION_PARSE,
+	IF_PARSE,
+	LOOP_PARSE,
+	ELSE_PARSE,
 	VARIABLE_PARSE,
 	EXPRESSION_PARSE, // expression
 	MAIN_PARSE,
+	ASSIGN_PARSE,
+	FULL_FUNCTION_PARSE,
+	FUNCTION_NAME_PARSE,
+	FUNCTION_ARGS_PARSE,
+	FUNCTION_BODY_PARSE,
+	FUNCTION_TYPE_PARSE,
+	ARG_PARSE,
+	FULL_CALL_PARSE,
+	CALL_NAME_PARSE,
+	CALL_ARGS_PARSE,
 
 	// Special
 	ATOMIC_PARSE,
@@ -82,7 +98,7 @@ typedef enum {
 	PARSE_PRINT,
 	PARSE_RETURN,
 	PARSE_TRUE,
-	PARSE_WHILE,
+	PARSE_LOOP,
 	PARSE_FUNCTION,
 
 	//meta
@@ -96,20 +112,7 @@ typedef enum {
 	PARSE_CHAR_V,
 	PARSE_STRING_V
 } ParseTreeType;
-//// int x
-//// float y
-//// char letter
-//// string name
-//Different types of arg_list :
-//()
-//(int a)
-//(int a, int b)
-//fn add(int a, int b)...
-//function :
-//	fn
-//	identifier - add
-//	arg_list
-//	body
+
 typedef struct ParseTree {
 	ParseTreeType type; // expression, function, atomic
 	Token* token;
