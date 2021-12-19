@@ -46,7 +46,6 @@ int convertToPost(Parser* par, ParseTree* current, TokenType EO_Expr)
             }
             ParseTree* child = newTree(getType(par, par->current), par->current);
             current->addChild(current, child);
-            printf("%s ", par->current->lexeme);
         }
         else if (par->current->type == TOKEN_LEFT_PAREN) {
             if (numNiden > operators) {

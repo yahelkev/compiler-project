@@ -180,13 +180,19 @@ bool parseVariableCreation(Parser* par, ParseTree* current) {
 bool parseAssign(Parser * par, ParseTree * current) {
 	ParseTree* mainTree = newTree(ASSIGN_PARSE, NULL);
 	if (!isDefined(par->table, par->pre->lexeme)) {
-		error(par, par->pre, "Variable used but not defined");
+		if (par->current->type == TOKEN_LEFT_PAREN)
+			error(par, par->pre, "Function called but not defined");
+		else
+			error(par, par->pre, "Variable used but not defined");
 		mainTree->freeParseTree(mainTree);
 		synchronize(par);
 		return false;
 	}
 	TABLE_VALUE val = getValue(par->table, par->pre->lexeme);
 	if (val.tag == FUNCTION_TAG) {
+		if (par->current->type == TOKEN_LEFT_PAREN)
+			return parseCalls(par, current);
+
 		error(par, par->pre, "Function type is unassignable");
 		mainTree->freeParseTree(mainTree);
 		synchronize(par);
@@ -418,11 +424,11 @@ bool parseCalls(Parser* par, ParseTree* current) {
 	
 	ParseTree* call = newTree(FULL_CALL_PARSE, NULL);
 	call->addChild(call, newTree(CALL_NAME_PARSE, par->pre));
-	if (!isDefined(par->table, par->pre->lexeme)) {
+	/*if (!isDefined(par->table, par->pre->lexeme)) {
 		error(par, par->pre, "Undefined call");
 		synchronize(par);
 		return false;
-	}
+	}*/
 	parserAdvance(par);
 	if (par->current->type == TOKEN_RIGHT_PAREN) {
 		call->addChild(call, newTree(CALL_ARGS_PARSE, NULL));
@@ -435,19 +441,16 @@ bool parseCalls(Parser* par, ParseTree* current) {
 	int argCounter = 0;
 	TABLE_VALUE val = getValue(par->table, call->getChild(call, 0)->token->lexeme);
 	ParseTree* exp = newTree(EXPRESSION_PARSE, NULL);
-	// TODO : Make args in symbol table
 	while (val.function->amount != ++argCounter) {
 		
 		if(!expression(par, exp, TOKEN_COMMA)) 
 			return false;
-		parserAdvance(par); // Remove when merged with expression, only for tests
-		parserAdvance(par); // Remove when merged with expression, only for tests
+		parserAdvance(par);
 		args->addChild(args, exp);
 		exp = newTree(EXPRESSION_PARSE, NULL);
 	}
 	if (!expression(par, exp, TOKEN_RIGHT_PAREN))
 		return false;
-	parserAdvance(par); // Remove when merged with expression, only for tests
 	args->addChild(args, exp);
 
 
