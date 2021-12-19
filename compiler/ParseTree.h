@@ -123,7 +123,7 @@ typedef struct ParseTree {
 	struct ParseTree* (*getChild)(struct ParseTree* tree, int index);
 	void (*freeParseTree)(struct ParseTree* tree);
 
-}ParseTree;
+} ParseTree;
 
 ParseTree* newTree(ParseTreeType type, Token* toke);
 void __ADDCHILD__(ParseTree* tree, ParseTree* child);

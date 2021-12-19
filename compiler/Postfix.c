@@ -1,10 +1,11 @@
 #include "Postfix.h"
 
 
+
 Token* pop(Token** stack, int* top)
 {
-    if (top == -1)
-        return -1;
+    if (top == EMPTY_STACK)
+        return EMPTY_STACK;
     else
         return stack[(*top)--];
 }
@@ -28,7 +29,7 @@ int convertToPost(Parser* par, ParseTree* current, TokenType EO_Expr)
     int numNiden = 0;
     int operators = 0;
     Token* token;
-    Token* stack[100];
+    Token* stack[MAX_STACK_SIZE];
     int top = -1;
     stack[++top] = par->current;
     token = pop(stack, &top);
@@ -68,7 +69,6 @@ int convertToPost(Parser* par, ParseTree* current, TokenType EO_Expr)
             while (top != -1 && token->type != TOKEN_LEFT_PAREN) {
                 ParseTree* child = newTree(getType(par, token), token);
                 current->addChild(current, child);
-                printf("%s ", token->lexeme);
                 token = pop(stack, &top);
             }
         }
@@ -85,7 +85,6 @@ int convertToPost(Parser* par, ParseTree* current, TokenType EO_Expr)
                 token = pop(stack, &top);
                 ParseTree* child = newTree(getType(par, token), token);
                 current->addChild(current, child);
-                printf("%s ", token->lexeme);
             }
             stack[++top] = par->current;
         }
@@ -104,7 +103,6 @@ int convertToPost(Parser* par, ParseTree* current, TokenType EO_Expr)
         token = pop(stack, &top);
         ParseTree* child = newTree(getType(par, token), token);
         current->addChild(current, child);
-        printf("%s ", token->lexeme);
     }
     return 1;
 }

@@ -3,7 +3,7 @@
 
 #include "Lexer.h"
 #include "ParseTree.h"
-#include "Postfix.h"
+
 #include "SymbolTable.h"
 #include <stdbool.h>
 

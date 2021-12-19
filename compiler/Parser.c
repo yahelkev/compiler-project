@@ -1,4 +1,5 @@
 #include "Parser.h"
+#include "Postfix.h"
 
 void newParser(Parser* par, Lexer* lex) {
 	par->lex = lex;
