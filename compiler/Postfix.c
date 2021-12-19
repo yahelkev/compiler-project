@@ -40,7 +40,7 @@ int convertToPost(Parser* par, ParseTree* current, TokenType EO_Expr)
         {
             numNiden++;
             if ((numNiden - operators) >= 2) {
-                error(par, par->current, "Invalid Syntax");
+                error(par, par->current, "Too many operators");
                 synchronize(par);
                 return 0;
             }
@@ -49,7 +49,7 @@ int convertToPost(Parser* par, ParseTree* current, TokenType EO_Expr)
         }
         else if (par->current->type == TOKEN_LEFT_PAREN) {
             if (numNiden > operators) {
-                error(par, par->current, "Invalid Syntax");
+                error(par, par->current, "Unexpected '('");
                 synchronize(par);
                 return 0;
             }
@@ -59,7 +59,7 @@ int convertToPost(Parser* par, ParseTree* current, TokenType EO_Expr)
         else if (par->current->type == TOKEN_RIGHT_PAREN)
         {
             if (openParenthesis == 0 || numNiden == operators) {
-                error(par, par->current, "Invalid Syntax");
+                error(par, par->current, "Unexpected ')'");
                 synchronize(par);
                 return 0;
             }
@@ -75,7 +75,7 @@ int convertToPost(Parser* par, ParseTree* current, TokenType EO_Expr)
         {
             operators++;
             if (operators > numNiden){
-                error(par, par->current, "Invalid Syntax");
+                error(par, par->current, "Invalid identifier");
                 synchronize(par);
                 return 0;
             }
@@ -93,7 +93,7 @@ int convertToPost(Parser* par, ParseTree* current, TokenType EO_Expr)
 
     if (openParenthesis)
     {
-        error(par, par->current, "Invalid Syntax");
+        error(par, par->pre, "Unclosed parenthesis");
         synchronize(par);
         return 0;
     }
@@ -135,8 +135,8 @@ ParseTreeType getType(Parser* par, Token* token)
         return PARSE_LESS_EQUAL;
 
     default:
-        error(par, token, "Invalid Syntax");
+        error(par, token, "Unexpected operator");
         synchronize(par);
-        break;
+        return PARSE_ERROR;
     }
 }

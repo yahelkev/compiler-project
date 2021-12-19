@@ -158,7 +158,7 @@ bool parseVariableCreation(Parser* par, ParseTree* current) {
 	}
 	parserAdvance(par);
 	ParseTree* treeExpression = newTree(EXPRESSION_PARSE, NULL);
-	expression(par, treeExpression, TOKEN_END_LINE);
+	if(!expression(par, treeExpression, TOKEN_END_LINE)) return false;
 	mainTree->addChild(mainTree, treeExpression);
 	if (isDefined(par->table, mainTree->getChild(mainTree, START_TREE + 1)->token->lexeme)) {
 		error(par, mainTree->getChild(mainTree, START_TREE + 1)->token, "Variable already initialized");
@@ -171,7 +171,6 @@ bool parseVariableCreation(Parser* par, ParseTree* current) {
 	TABLE_VALUE* value = (TABLE_VALUE*)malloc(sizeof(TABLE_VALUE));
 	newValue(value, VARIABLE_TAG, &var, mainTree->getChild(mainTree, START_TREE)->token->line, mainTree->getChild(mainTree, START_TREE)->token->column);
 	insertValue(par->table, mainTree->getChild(mainTree, START_TREE + 1)->token->lexeme, value);
-	parserAdvance(par);
 	return true;
 }
 
@@ -261,10 +260,9 @@ bool parseConditional(Parser* par, ParseTree* current) {
 
 	ParseTree* condition = newTree(CONDITION_PARSE, NULL);
 	ParseTree* treeExpression = newTree(EXPRESSION_PARSE, NULL);
-	parserAdvance(par); // Remove when merged with expression, only for tests
+	parserAdvance(par);
 	if(!expression(par, treeExpression, TOKEN_RIGHT_PAREN)) return false; // Make if return
-	parserAdvance(par); // Remove when merged with expression, only for tests
-	parserAdvance(par); // Remove when merged with expression, only for tests
+	parserAdvance(par);
 	condition->addChild(condition, treeExpression);
 	mainTree->addChild(mainTree, condition);
 	ParseTree* ifBody = newTree(IF_PARSE, NULL);
@@ -273,6 +271,7 @@ bool parseConditional(Parser* par, ParseTree* current) {
 	
 	if (par->current->type == TOKEN_ELSE) {
 		ParseTree* elseBody = newTree(ELSE_PARSE, NULL);
+		parserAdvance(par);
 		if (!parseBody(par, elseBody)) return false;
 		mainTree->addChild(mainTree, elseBody);
 	}
@@ -392,7 +391,6 @@ bool parseArgs(Parser* par, ParseTree* current) {
 		synchronize(par);
 		return false;
 	}
-	//parserAdvance(par);
 	return true;
 }
 
@@ -403,10 +401,9 @@ bool parseLoop(Parser* par, ParseTree* current) {
 
 	ParseTree* condition = newTree(PARSE_LOOP, NULL);
 	ParseTree* treeExpression = newTree(EXPRESSION_PARSE, NULL);
-	parserAdvance(par); // Remove when merged with expression, only for tests
+	parserAdvance(par);
 	if (!expression(par, treeExpression, TOKEN_RIGHT_PAREN)) return false; // Make if return
-	parserAdvance(par); // Remove when merged with expression, only for tests
-	parserAdvance(par); // Remove when merged with expression, only for tests
+	parserAdvance(par);
 	condition->addChild(condition, treeExpression);
 	mainTree->addChild(mainTree, condition);
 	ParseTree* loopBody = newTree(LOOP_PARSE, NULL);
@@ -424,11 +421,6 @@ bool parseCalls(Parser* par, ParseTree* current) {
 	
 	ParseTree* call = newTree(FULL_CALL_PARSE, NULL);
 	call->addChild(call, newTree(CALL_NAME_PARSE, par->pre));
-	/*if (!isDefined(par->table, par->pre->lexeme)) {
-		error(par, par->pre, "Undefined call");
-		synchronize(par);
-		return false;
-	}*/
 	parserAdvance(par);
 	if (par->current->type == TOKEN_RIGHT_PAREN) {
 		call->addChild(call, newTree(CALL_ARGS_PARSE, NULL));
