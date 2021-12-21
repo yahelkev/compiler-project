@@ -17,10 +17,19 @@ void visitAll(Visitor* vis) {
 	}
 }
 
-bool visitAst(Visitor* vis) {
-	// Works close to how the statement funciton worked in the parser, as checking current tree and going down in lelvels if necessary
+bool visitAst(ParseTree* tree) {
+	// Works close to how the statement funciton worked in the parser, as checking current tree and going down in levels if necessary
+	switch (tree->type) {
+	case FULL_CALL_PARSE:
+		return visitCall(tree);
+	default:
+		return false;
+	}
 }
 
+bool visitCall(ParseTree* tree) {
+	// Check wheter call tree is ok or not with args
+}
 bool getParseTree(Parser* par) {
 	synchronize(par);
 	if (par->current->type != TOKEN_EOF) {
