@@ -148,6 +148,7 @@
     <ClCompile Include="ParseTree.c" />
     <ClCompile Include="Postfix.c" />
     <ClCompile Include="SymbolTable.c" />
+    <ClCompile Include="Visitor.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Debug.h" />
@@ -159,9 +160,7 @@
     <ClInclude Include="Postfix.h" />
     <ClInclude Include="SymbolTable.h" />
     <ClInclude Include="TokenType.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="cpp.hint" />
+    <ClInclude Include="Visitor.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
