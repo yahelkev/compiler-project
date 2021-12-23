@@ -118,6 +118,7 @@ ParseTreeType getType(Parser* par, Token* token)
         return ATOMIC_PARSE;
     case TOKEN_STRING:
         return PARSE_STRING;
+
     case TOKEN_PLUS:
         return PARSE_PLUS;
     case TOKEN_MINUS:

@@ -25,6 +25,7 @@ void visitAll(Visitor* vis);
 bool visitAst(Table* table, ParseTree* tree);
 
 bool visitCall(Table* table, ParseTree* tree);
+bool visitExperssion(Table* table, ParseTree* tree);
 // Returns the current parseTree from scanParser to work on
 bool getParseTree(Parser* par);
 
@@ -33,6 +34,8 @@ void throwError(Token* token, const char* message);
 
 // TODO : Create a function that takes a tree of type expression and returns the type of said tree
 char* getTypeOfExpression(Table* table, ParseTree* tree);
+ParseTreeType getTypeAsParseType(Table* table, ParseTree* child);
+
 #endif // !VISITOR_H
 
 
