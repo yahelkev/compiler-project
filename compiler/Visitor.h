@@ -26,7 +26,7 @@ bool visitAst(Table* table, ParseTree* tree);
 
 bool visitCall(Table* table, ParseTree* tree);
 bool visitExperssion(Table* table, ParseTree* tree);
-bool visitAssign(Table* table, ParseTree* tree);
+bool visitVariable(Table* table, ParseTree* tree);
 // Returns the current parseTree from scanParser to work on
 bool getParseTree(Parser* par);
 

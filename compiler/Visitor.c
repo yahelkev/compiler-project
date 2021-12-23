@@ -38,8 +38,8 @@ bool visitAst(Table* table, ParseTree* tree) {
 		return visitCall(table, tree);
 	case EXPRESSION_PARSE:
 		return visitExperssion(table, tree);
-	case ASSIGN_PARSE:
-		visitAssign(table, tree);
+	case VARIABLE_PARSE:
+		visitVariable(table, tree);
 	default:
 		return false;
 	}
@@ -87,9 +87,12 @@ bool visitExperssion(Table* table, ParseTree* tree)
 	return true;
 }
 
-bool visitAssign(Table* table, ParseTree* tree)
+bool visitVariable(Table* table, ParseTree* tree)
 {
-	if(getTypeAsParseType(table, tree->getChild(tree, 0)) != getTypeAsParseType(table, tree->getChild(tree, 2))) return false;
+	if (getTypeAsParseType(table,tree->getChild(tree, 1)) != getTypeAsParseType(table, tree->getChild(tree, 3))) {
+		throwError(tree->getChild(tree, 3), "Value must be same as variable");
+		return false;
+	}
 	return true;
 }
 
