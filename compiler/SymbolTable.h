@@ -13,7 +13,7 @@ typedef enum {
 
 struct variable {
     char* type;
-    char* value;
+    ParseTree* value;
 };
 
 

@@ -148,14 +148,16 @@ Token* makeErrorToken(Lexer* lex, char* msg, int startLine) {
 Token* makeNumber(Lexer* lex) {
 	while (isDigit(peek(lex))) advance(lex);
 
+	TokenType semiType = TOKEN_INT;
 	if (peek(lex) == '.') {
+		semiType = TOKEN_FLOAT;
 		advance(lex);
 		while (isDigit(peek(lex))) advance(lex);
 	}
 
 	Token* toke = (Token*)malloc(sizeof(Token));
 
-	toke->type = TOKEN_NUMBER;
+	toke->type = semiType;
 	toke->length = lex->index - lex->start + 1;
 	toke->lexeme = (char*)malloc(sizeof(char) * (toke->length + 1));
 	strncpy(toke->lexeme, &lex->text[lex->start], toke->length);
