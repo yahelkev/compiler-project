@@ -38,6 +38,8 @@ bool visitAst(Table* table, ParseTree* tree) {
 		return visitCall(table, tree);
 	case EXPRESSION_PARSE:
 		return visitExperssion(table, tree);
+	case ASSIGN_PARSE:
+		visitAssign(table, tree);
 	default:
 		return false;
 	}
@@ -82,6 +84,12 @@ bool visitExperssion(Table* table, ParseTree* tree)
 			}
 		}
 	}
+	return true;
+}
+
+bool visitAssign(Table* table, ParseTree* tree)
+{
+	if(getTypeAsParseType(table, tree->getChild(tree, 0)) != getTypeAsParseType(table, tree->getChild(tree, 2))) return false;
 	return true;
 }
 
