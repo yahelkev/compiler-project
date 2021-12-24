@@ -36,10 +36,10 @@ bool visitAst(Table* table, ParseTree* tree) {
 	switch (tree->type) {
 	case FULL_CALL_PARSE:
 		return visitCall(table, tree);
-	case EXPRESSION_PARSE:
-		return visitExperssion(table, tree);
 	case VARIABLE_PARSE:
-		visitVariable(table, tree);
+		return visitVariable(table, tree);
+	case ASSIGN_PARSE:
+		return visitAssign(table, tree);
 	default:
 		return false;
 	}
@@ -69,16 +69,18 @@ bool visitCall(Table* table, ParseTree* tree) {
 
 }
 
-bool visitExperssion(Table* table, ParseTree* tree)
-{
+bool visitExperssion(Table* table, ParseTree* tree) {
 	ParseTree* child = tree->getChild(tree, 0);
-	ParseTreeType type = getTypeAsParseType(table, child);
+	char type[10] = "\0";
+	strcpy(type, getTypeAsString(table, child));
+	char childType[10] = "\0";
 	for (int i = 1; i < tree->amountOfChilds; i++)
 	{
 		ParseTree* child = tree->getChild(tree, i);
-		if (child->type == ATOMIC_PARSE || child->type == PARSE_STRING)
+		strcpy(childType, getTypeAsString(table, child));
+		if (*childType != '\0')
 		{
-			if (getTypeAsParseType(table, child) != type) {
+			if (strcmp(childType, type)) {
 				throwError(child->token, "Make sure it is the same type");
 				return false;
 			}
@@ -87,10 +89,22 @@ bool visitExperssion(Table* table, ParseTree* tree)
 	return true;
 }
 
-bool visitVariable(Table* table, ParseTree* tree)
-{
-	if (getTypeAsParseType(table,tree->getChild(tree, 1)) != getTypeAsParseType(table, tree->getChild(tree, 3))) {
-		throwError(tree->getChild(tree, 3), "Value must be same as variable");
+bool visitVariable(Table* table, ParseTree* tree) {
+	if (!visitExperssion(table, tree->getChild(tree, 3))) {
+		return false;
+	}
+	if (strcmp(getValue(table, (tree->getChild(tree, 1))->token->lexeme).variable->type, getTypeOfExpression(table, tree->getChild(tree, 3)))) {
+		throwError(tree->getChild(tree, 3), "Value type and variable type don't much");
+		return false;
+	}
+	return true;
+}
+bool visitAssign(Table* table, ParseTree* tree) {
+	if (!visitExperssion(table, tree->getChild(tree, 2))) {
+		return false;
+	}
+	if (strcmp(getValue(table, (tree->getChild(tree, 0))->token->lexeme).variable->type, getTypeOfExpression(table, tree->getChild(tree, 2)))) {
+		throwError(tree->getChild(tree, 2), "Value type and variable type don't much");
 		return false;
 	}
 	return true;
@@ -118,20 +132,22 @@ char* getTypeOfExpression(Table* table, ParseTree* tree) {
 	return "void";
 }
 
-ParseTreeType getTypeAsParseType(Table* table, ParseTree* child)
+char* getTypeAsString(Table* table, ParseTree* child)
 {
-	if (child->type == IDENTIFIER_PARSE)
+	switch (child->token->type)
 	{
-		if (strcmp(getValue(table, child->token->lexeme).variable->type, "string"))
-		{
-			return PARSE_STRING;
-		}
-		else if (strcmp(getValue(table, child->token->lexeme).variable->type, "float") || strcmp(getValue(table, child->token->lexeme).variable->type, "int"))
-		{
-			return ATOMIC_PARSE;
-		}
+	case TOKEN_IDENTIFIER:
+		return getValue(table, child->token->lexeme).variable->type;
+	case TOKEN_INT:
+		return "int";
+	case TOKEN_FLOAT:
+		return "float";
+	case TOKEN_STRING:
+		return "string";
+	default:
+		return "\0";
+		break;
 	}
-	return child->type;
 }
 
 bool getParseTree(Parser* par) {
