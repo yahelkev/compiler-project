@@ -79,8 +79,7 @@ char* getTypeOfExpression(Table* table, ParseTree* tree) {
 		}
 		break;
 	}
-		// Got to find some kind of check
-		return "int";
+	break;
 	case FULL_CALL_PARSE:
 		return getValue(table, first->getChild(first, 0)->token->lexeme).function->returnType;
 	}
