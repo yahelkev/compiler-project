@@ -139,6 +139,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CodeGen.c" />
     <ClCompile Include="Debug.c" />
     <ClCompile Include="interface.c" />
     <ClCompile Include="KeywordTypes.c" />
@@ -150,6 +151,7 @@
     <ClCompile Include="SymbolTable.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CodeGen.h" />
     <ClInclude Include="Debug.h" />
     <ClInclude Include="interface.h" />
     <ClInclude Include="KeywordTypes.h" />
