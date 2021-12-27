@@ -11,7 +11,7 @@ void printToken(Token* token) {
 	printf("%d\t%d-%d\t", token->type, token->line, token->column);
 	printf("%d-%d\t", token->line, token->column + token->length - 1);
 
-	if (token->type == TOKEN_IDENTIFIER || token->type == TOKEN_INT || token->type == TOKEN_FLOAT|| token->type == TOKEN_STRING) {
+	if (token->type == TOKEN_IDENTIFIER || token->type == TOKEN_INT || token->type == TOKEN_FLOAT || token->type == TOKEN_STRING) {
 		printf("%.*s\n", token->length, token->lexeme);
 	}
 	else {
