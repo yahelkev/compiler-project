@@ -2,7 +2,7 @@
 #define VISITOR_H
 #include <stdbool.h>
 #include "Parser.h"
-
+#include "SymbolTable.h"
 // Return codes to signal wheter we should visit the tree or not, when creating a new visitor struct
 typedef enum {
 	VIS_OK,
@@ -22,9 +22,17 @@ Error_Codes newVisitor(Visitor* vis, Parser* par);
 // Main class function to start visiting all trees in the code
 void visitAll(Visitor* vis);
 // Single visit function to visit a single tree, will work in multiple levels
-bool visitAst(Visitor* vis);
+bool visitAst(Table* table, ParseTree* tree);
+
+bool visitCall(Table* table, ParseTree* tree);
 // Returns the current parseTree from scanParser to work on
 bool getParseTree(Parser* par);
+
+void throwError(Token* token, const char* message);
+
+
+// TODO : Create a function that takes a tree of type expression and returns the type of said tree
+char* getTypeOfExpression(Table* table, ParseTree* tree);
 #endif // !VISITOR_H
 
 
