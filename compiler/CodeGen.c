@@ -33,4 +33,11 @@ FILE* CreateBlankFile(const char* path) {
 	return fp;
 }
 
+void emitByte(FILE* fp, const char* row) {
+	fputc('\t', fp);
+	fwrite(row, sizeof(char), LENGTH(row), fp);
+	fputc('\n', fp);
+	return;
+}
+
 
