@@ -6,6 +6,7 @@
 #include "Parser.h"
 #include "ParseTree.h"
 #include "interface.h"
+#include "CodeGen.h"
 
 void testParser(char* code) {
     Lexer lex;
@@ -84,12 +85,8 @@ void testParseTree() {
 
 int main( int argc, char** argv ) {
 
-    /*Lexer lex;
-    newLexer(&lex, "int x = (2) > (3 -  (9 - 8)*1)\n");
-    Parser par;
-    newParser(&par, &lex);
-    startParsing(&par);
-    printParseTree(par.mainTree);*/
-    testInterface(argc, argv);
+    CodeGen gen;
+    newCodeGen(&gen, "main.c");
+    gen.filePointer = CreateBlankFile(gen.filePath);
     return 0;
 }
