@@ -36,7 +36,7 @@ int convertToPost(Parser* par, ParseTree* current, TokenType EO_Expr)
 
     while (par->current->type != EO_Expr && par->current->type != TOKEN_EOF)
     {
-        if (par->current->type == TOKEN_NUMBER || par->current->type == TOKEN_IDENTIFIER)
+        if (par->current->type == TOKEN_INT || par->current->type == TOKEN_FLOAT || par->current->type == TOKEN_IDENTIFIER || par->current->type == TOKEN_STRING)
         {
             numNiden++;
             if ((numNiden - operators) >= 2) {
@@ -74,7 +74,7 @@ int convertToPost(Parser* par, ParseTree* current, TokenType EO_Expr)
         else
         {
             operators++;
-            if (operators > numNiden){
+            if (operators > numNiden) {
                 error(par, par->current, "Invalid identifier");
                 synchronize(par);
                 return 0;
@@ -113,8 +113,11 @@ ParseTreeType getType(Parser* par, Token* token)
     case TOKEN_IDENTIFIER:
         return IDENTIFIER_PARSE;
 
-    case TOKEN_NUMBER:
+    case TOKEN_INT:
+    case TOKEN_FLOAT:
         return ATOMIC_PARSE;
+    case TOKEN_STRING:
+        return PARSE_STRING;
 
     case TOKEN_PLUS:
         return PARSE_PLUS;
