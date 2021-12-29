@@ -1,9 +1,10 @@
 #include "CodeGen.h"
 
-void newCodeGen(CodeGen* gen, char* path, ParseTree* mainTree) {
+void newCodeGen(CodeGen* gen, char* path, ParseTree* mainTree, Table* table) {
 	gen->filePath = (char*)malloc(sizeof(char) * LENGTH(path));
 	strncpy(gen->filePath, path, LENGTH(path));
 	gen->_main = mainTree;
+	gen->table = table;
 	return;
 }
 
@@ -36,9 +37,14 @@ FILE* CreateBlankFile(const char* path) {
 }
 
 void Generate(CodeGen* gen) {
-	ParseTree* currentChild = gen->_main->getChild(gen->_main, 0);
-	for (size_t i = 0; i < gen->_main->amountOfChilds; i++) {
-
+	size_t index = 0;
+	ParseTree* currentChild = gen->_main->getChild(gen->_main, index);
+	for (index = 0; index < gen->_main->amountOfChilds; index++, currentChild = gen->_main->getChild(gen->_main, index)) {
+		switch (currentChild->type) {
+		case VARIABLE_PARSE:
+			CaseVariable(gen->filePointer, currentChild);
+			break;
+		}
 	}
 }
 
@@ -51,7 +57,7 @@ void emitByte(FILE* fp, const char* row) {
 
 
 void CaseVariable(const FILE* fp, ParseTree* current) {
-
+	return;
 }
 
 

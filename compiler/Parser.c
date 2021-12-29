@@ -167,9 +167,9 @@ bool parseVariableCreation(Parser* par, ParseTree* current) {
 		return false;
 	}
 	current->addChild(current, mainTree);
-	struct variable var = makeVariable(mainTree->getChild(mainTree, START_TREE), mainTree->getChild(mainTree, END_VARIABLE_TREE));
+	struct variable* var = makeVariable(mainTree->getChild(mainTree, START_TREE)->token->lexeme, mainTree->getChild(mainTree, END_VARIABLE_TREE));
 	TABLE_VALUE* value = (TABLE_VALUE*)malloc(sizeof(TABLE_VALUE));
-	newValue(value, VARIABLE_TAG, &var, mainTree->getChild(mainTree, START_TREE)->token->line, mainTree->getChild(mainTree, START_TREE)->token->column);
+	newValue(value, VARIABLE_TAG, var, mainTree->getChild(mainTree, START_TREE)->token->line, mainTree->getChild(mainTree, START_TREE)->token->column);
 	insertValue(par->table, mainTree->getChild(mainTree, START_TREE + 1)->token->lexeme, value);
 	return true;
 }

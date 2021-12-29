@@ -38,7 +38,7 @@ int main( int argc, char** argv ) {
         c(GRAY);
         return 0;
     }
-    newCodeGen(&gen, srcFileName, vis.par->mainTree);
+    newCodeGen(&gen, srcFileName, vis.par->mainTree, vis.par->table);
     gen.filePointer = CreateBlankFile(gen.filePath);
     Generate(&gen);
     return 0;

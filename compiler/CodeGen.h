@@ -8,6 +8,7 @@
 #include <stdbool.h>
 
 #include "ParseTree.h"
+#include "SymbolTable.h"
 
 #define LENGTH(var) strlen(var) + 1
 #define START_OF_FILE "\t.file "
@@ -16,11 +17,11 @@
 typedef struct CodeGen {
 	char* filePath;
 	FILE* filePointer;
-
+	Table* table;
 	ParseTree* _main;
 } CodeGen;
 
-void newCodeGen(CodeGen* gen, char* path, ParseTree* mainTree);
+void newCodeGen(CodeGen* gen, char* path, ParseTree* mainTree, Table* table);
 FILE* CreateBlankFile(char* path);
 void Generate(CodeGen* gen);
 void emitByte(FILE* fp, const char* row);

@@ -27,7 +27,7 @@ void visitAll(Visitor* vis) {
 	while (getParseTree(vis->par)) {
 		// Check current ast
 		// Returns most recent parseTree structure
-		vis->error = vis->error || visitAst(vis->par->table, vis->par->mainTree->getChild(vis->par->mainTree, vis->par->mainTree->amountOfChilds - 1));
+		vis->error = vis->error || !visitAst(vis->par->table, vis->par->mainTree->getChild(vis->par->mainTree, vis->par->mainTree->amountOfChilds - 1));
 	}
 }
 
@@ -93,7 +93,7 @@ bool visitVariable(Table* table, ParseTree* tree) {
 	if (!visitExperssion(table, tree->getChild(tree, 3))) {
 		return false;
 	}
-	if (strcmp(getValue(table, (tree->getChild(tree, 1))->token->lexeme).variable->type, getTypeOfExpression(table, tree->getChild(tree, 3)))) {
+	if (strcmp(getValue(table, (tree->getChild(tree, 1)->token->lexeme)).variable->type, getTypeOfExpression(table, tree->getChild(tree, 3)))) {
 		throwError(tree->getChild(tree, 3), "Value type and variable type don't much");
 		return false;
 	}
