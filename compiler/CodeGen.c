@@ -37,6 +37,7 @@ FILE* CreateBlankFile(const char* path) {
 }
 
 void Generate(CodeGen* gen) {
+	expressionAsm(&gen, gen->_main->getChild(gen->_main, 0)->getChild(gen->_main->getChild(gen->_main, 0),3));
 	size_t index = 0;
 	ParseTree* currentChild = gen->_main->getChild(gen->_main, index);
 	for (index = 0; index < gen->_main->amountOfChilds; index++, currentChild = gen->_main->getChild(gen->_main, index)) {
@@ -64,45 +65,42 @@ void expressionAsm(CodeGen* gen, ParseTree* tree)
     {
 		child = tree->getChild(tree, i);
         if (child->type == IDENTIFIER_PARSE){
-			printf("PUSH [%s]\n", child->token->lexeme);
+			printf("PUSH	[%s]\n", child->token->lexeme);
         }
 		else if(child->type == ATOMIC_PARSE){
-			printf("PUSH %s\n", child->token->lexeme);
+			printf("PUSH	%s\n", child->token->lexeme);
 		}
         else
         {
-
-
-
-			printf("POP eax\n");
-			printf("POP ebx\n");
+			printf("POP	eax\n");
+			printf("POP	edx\n");
             switch (child->type)
             {
 			case PARSE_PLUS:
             {
-                n3 = n1 + n2;
+				printf("add	eax, edx\n");
                 break;
             }
             case PARSE_MINUS:
             {
-                n3 = n2 - n1;
+				printf("sub	eax, edx\n");
                 break;
             }
             case PARSE_STAR:
             {
-                n3 = n1 * n2;
+				printf("imul	eax, edx\n");
                 break;
             }
             case PARSE_SLASH:
             {
-                n3 = n2 / n1;
+				printf("idiv	edx\n");
                 break;
             }
             }
-            push(n3);
+			printf("PUSH	eax\n");
         }
     }
-    //printf("\nThe result of expression %s  =  %d\n\n", exp, pop());
+	printf("POP	eax\n");
     return 0;
 }
 
