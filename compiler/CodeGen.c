@@ -55,6 +55,57 @@ void emitByte(FILE* fp, const char* row) {
 	return;
 }
 
+void expressionAsm(CodeGen* gen, ParseTree* tree)
+{
+	ParseTree* child;
+    int n1, n2, n3, num;
+
+	for (int i = 0; i < tree->amountOfChilds; i++)
+    {
+		child = tree->getChild(tree, i);
+        if (child->type == IDENTIFIER_PARSE){
+			printf("PUSH [%s]\n", child->token->lexeme);
+        }
+		else if(child->type == ATOMIC_PARSE){
+			printf("PUSH %s\n", child->token->lexeme);
+		}
+        else
+        {
+
+
+
+			printf("POP eax\n");
+			printf("POP ebx\n");
+            switch (child->type)
+            {
+			case PARSE_PLUS:
+            {
+                n3 = n1 + n2;
+                break;
+            }
+            case PARSE_MINUS:
+            {
+                n3 = n2 - n1;
+                break;
+            }
+            case PARSE_STAR:
+            {
+                n3 = n1 * n2;
+                break;
+            }
+            case PARSE_SLASH:
+            {
+                n3 = n2 / n1;
+                break;
+            }
+            }
+            push(n3);
+        }
+    }
+    //printf("\nThe result of expression %s  =  %d\n\n", exp, pop());
+    return 0;
+}
+
 
 void CaseVariable(const FILE* fp, ParseTree* current) {
 	return;
