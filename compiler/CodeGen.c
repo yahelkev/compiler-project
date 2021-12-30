@@ -83,7 +83,8 @@ void expressionAsm(CodeGen* gen, ParseTree* tree)
             }
             case PARSE_MINUS:
             {
-				printf("sub	eax, edx\n");
+				printf("sub	edx, eax\n");
+				printf("mov	eax, edx\n");
                 break;
             }
             case PARSE_STAR:
