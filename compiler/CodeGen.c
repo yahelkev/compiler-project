@@ -37,6 +37,7 @@ FILE* CreateBlankFile(const char* path) {
 }
 
 void Generate(CodeGen* gen) {
+	CaseExpression(gen, gen->_main->getChild(gen->_main, 0)->getChild(gen->_main->getChild(gen->_main, 0),3));
 	size_t index = 0;
 	ParseTree* currentChild = gen->_main->getChild(gen->_main, index);
 	for (index = 0; index < gen->_main->amountOfChilds; index++, currentChild = gen->_main->getChild(gen->_main, index)) {
@@ -48,11 +49,66 @@ void Generate(CodeGen* gen) {
 	}
 }
 
-void emitByte(FILE* fp, const char* row) {
+void writeLine(FILE* fp, const char* row) {
 	fputc('\t', fp);
 	fwrite(row, sizeof(char), LENGTH(row), fp);
 	fputc('\n', fp);
 	return;
+}
+void emitByte(Literal lit, const char* row) {
+	switch (lit) {
+	case String_C:
+
+	}
+	
+}
+
+void CaseExpression(CodeGen* gen, ParseTree* tree) {
+	size_t i = 0;
+	ParseTree* child = tree->getChild(tree, i);
+	for (; i < tree->amountOfChilds; i++, child = tree->getChild(tree, i)) {
+        if (child->type == IDENTIFIER_PARSE){
+			fputs("PUSH	[", gen->filePointer);
+			fputs(child->token->lexeme, gen->filePointer);
+			fputs("]\n", gen->filePointer);
+        }
+		else if(child->type == ATOMIC_PARSE){
+			fputs("PUSH	", gen->filePointer);
+			fputs(child->token->lexeme, gen->filePointer);
+			fputs("\n", gen->filePointer);
+		}
+        else
+        {
+			fputs("POP	edx\n", gen->filePointer);
+			fputs("POP	eax\n", gen->filePointer);
+            switch (child->type)
+            {
+			case PARSE_PLUS:
+            {
+				fputs("add	eax, edx\n", gen->filePointer);
+                break;
+            }
+            case PARSE_MINUS:
+            {
+				fputs("sub	eax, edx\n", gen->filePointer);
+                break;
+            }
+            case PARSE_STAR:
+            {
+				fputs("imul	eax, edx\n", gen->filePointer);
+                break;
+            }
+            case PARSE_SLASH:
+            {
+				fputs("cdq\n", gen->filePointer);
+				fputs("idiv	edx\n", gen->filePointer);
+                break;
+            }
+            }
+			fputs("PUSH	eax\n", gen->filePointer);
+        }
+    }
+	fputs("POP	eax\n", gen->filePointer);
 }
 
 
