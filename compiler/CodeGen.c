@@ -37,7 +37,7 @@ FILE* CreateBlankFile(const char* path) {
 }
 
 void Generate(CodeGen* gen) {
-	expressionAsm(&gen, gen->_main->getChild(gen->_main, 0)->getChild(gen->_main->getChild(gen->_main, 0),3));
+	expressionAsm(gen, gen->_main->getChild(gen->_main, 0)->getChild(gen->_main->getChild(gen->_main, 0),3));
 	size_t index = 0;
 	ParseTree* currentChild = gen->_main->getChild(gen->_main, index);
 	for (index = 0; index < gen->_main->amountOfChilds; index++, currentChild = gen->_main->getChild(gen->_main, index)) {
@@ -58,6 +58,7 @@ void emitByte(FILE* fp, const char* row) {
 
 void expressionAsm(CodeGen* gen, ParseTree* tree)
 {
+	FILE* fPtr = fopen(gen->filePath, "a");
 	ParseTree* child;
     int n1, n2, n3, num;
 
@@ -65,44 +66,48 @@ void expressionAsm(CodeGen* gen, ParseTree* tree)
     {
 		child = tree->getChild(tree, i);
         if (child->type == IDENTIFIER_PARSE){
-			printf("PUSH	[%s]\n", child->token->lexeme);
+			fputs("PUSH	[", fPtr);
+			fputs(child->token->lexeme, fPtr);
+			fputs("]\n", fPtr);
         }
 		else if(child->type == ATOMIC_PARSE){
-			printf("PUSH	%s\n", child->token->lexeme);
+			fputs("PUSH	", fPtr);
+			fputs(child->token->lexeme, fPtr);
+			fputs("\n", fPtr);
 		}
         else
         {
-			printf("POP	edx\n");
-			printf("POP	eax\n");
+			fputs("POP	edx\n", fPtr);
+			fputs("POP	eax\n", fPtr);
             switch (child->type)
             {
 			case PARSE_PLUS:
             {
-				printf("add	eax, edx\n");
+				fputs("add	eax, edx\n", fPtr);
                 break;
             }
             case PARSE_MINUS:
             {
-				printf("sub	eax, edx\n");
+				fputs("sub	eax, edx\n", fPtr);
                 break;
             }
             case PARSE_STAR:
             {
-				printf("imul	eax, edx\n");
+				fputs("imul	eax, edx\n", fPtr);
                 break;
             }
             case PARSE_SLASH:
             {
-				printf("cdq\n");
-				printf("idiv	edx\n");
+				fputs("cdq\n", fPtr);
+				fputs("idiv	edx\n", fPtr);
                 break;
             }
             }
-			printf("PUSH	eax\n");
+			fputs("PUSH	eax\n", fPtr);
         }
     }
-	printf("POP	eax\n");
-    return 0;
+	fputs("POP	eax\n", fPtr);
+	fclose(fPtr);
 }
 
 
