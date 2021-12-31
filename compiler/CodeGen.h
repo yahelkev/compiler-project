@@ -9,6 +9,7 @@
 
 #include "ParseTree.h"
 #include "SymbolTable.h"
+#include "Postfix.h"
 
 #define LENGTH(var) strlen(var) + 1
 #define START_OF_FILE "\t.file "
@@ -25,6 +26,8 @@ void newCodeGen(CodeGen* gen, char* path, ParseTree* mainTree, Table* table);
 FILE* CreateBlankFile(char* path);
 void Generate(CodeGen* gen);
 void emitByte(FILE* fp, const char* row);
+
+void expressionAsm(CodeGen* gen, ParseTree* tree);
 
 // Valid cases
 void CaseVariable(const FILE* fp, ParseTree* current);
