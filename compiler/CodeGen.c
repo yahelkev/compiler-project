@@ -72,8 +72,8 @@ void expressionAsm(CodeGen* gen, ParseTree* tree)
 		}
         else
         {
-			printf("POP	eax\n");
 			printf("POP	edx\n");
+			printf("POP	eax\n");
             switch (child->type)
             {
 			case PARSE_PLUS:
@@ -83,8 +83,7 @@ void expressionAsm(CodeGen* gen, ParseTree* tree)
             }
             case PARSE_MINUS:
             {
-				printf("sub	edx, eax\n");
-				printf("mov	eax, edx\n");
+				printf("sub	eax, edx\n");
                 break;
             }
             case PARSE_STAR:
@@ -94,6 +93,7 @@ void expressionAsm(CodeGen* gen, ParseTree* tree)
             }
             case PARSE_SLASH:
             {
+				printf("cdq\n");
 				printf("idiv	edx\n");
                 break;
             }
