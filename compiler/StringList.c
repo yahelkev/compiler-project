@@ -14,3 +14,12 @@ void __ADD__(StringList* list, char* string) {
 	list->strings[list->amount][strlen(string)] = '\0';
 	return;
 }
+
+void __FREE__(StringList* list) {
+	for (size_t i = 0; i < list->amount; i++) {
+		free(list->strings[i]);
+	}
+	free(list->strings);
+	free(list);
+	return;
+}

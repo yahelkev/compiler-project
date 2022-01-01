@@ -12,6 +12,8 @@
     <ClCompile Include="SymbolTable.c" />
     <ClCompile Include="CodeGen.c" />
     <ClCompile Include="Visitor.c" />
+    <ClCompile Include="StringList.c" />
+    <ClCompile Include="VariableHeap.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Debug.h" />
@@ -25,6 +27,8 @@
     <ClInclude Include="TokenType.h" />
     <ClInclude Include="CodeGen.h" />
     <ClInclude Include="Visitor.h" />
+    <ClInclude Include="StringList.h" />
+    <ClInclude Include="VariableHeap.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />

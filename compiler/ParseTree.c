@@ -14,6 +14,7 @@ ParseTree* newTree(ParseTreeType type, Token* toke) {
 	tree->addChild = &__ADDCHILD__;
 	tree->freeParseTree = &__FREEPARSETREE__;
 	tree->getChild = &__GETCHILD__;
+	tree->delChild = &__DELCHILD__;
 
 	return tree;
 }
@@ -27,8 +28,15 @@ void __ADDCHILD__(ParseTree* tree, ParseTree* child) {
 	tree->amountOfChilds++;
 }
 ParseTree* __GETCHILD__(ParseTree* tree, int index) {
-	return index >= tree->amountOfChilds ? NULL : tree->childs[index];
+	return index >= tree->amountOfChilds || index < 0 ? NULL : tree->childs[index];
 }
+
+void __DELCHILD__(ParseTree* tree) {
+	tree->childs[tree->amountOfChilds - 1]->freeParseTree(tree->childs[tree->amountOfChilds - 1]);
+	tree->amountOfChilds--;
+	return;
+}
+
 void __FREEPARSETREE__(ParseTree* tree) {
 	if (!tree) return;
 	if (tree->amountOfChilds) {
