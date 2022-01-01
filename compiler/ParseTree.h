@@ -100,6 +100,7 @@ typedef enum {
 	PARSE_TRUE,
 	PARSE_LOOP,
 	PARSE_FUNCTION,
+	PARSE_RETURN_FULL,
 
 	//meta
 	PARSE_PASS, //do nothing

@@ -44,6 +44,9 @@ bool statement(Parser* par, ParseTree* current) {
 	case TOKEN_LOOP:
 		parserAdvance(par);
 		return parseLoop(par, current);
+	case TOKEN_RETURN:
+		parserAdvance(par);
+		return parseReturn(par, current);
 	default:
 		error(par, par->current, "Invalid Syntax");
 		synchronize(par);
@@ -451,5 +454,11 @@ bool parseCalls(Parser* par, ParseTree* current) {
 	current->addChild(current, call);
 	parserAdvance(par);
 	return true;
+}
+
+
+bool parseReturn(Parser* par, ParseTree* current) {
+	ParseTree* returnTree = newTree(PARSE_RETURN_FULL, NULL);
+	returnTree->addChild(returnTree, )
 }
 

@@ -55,6 +55,7 @@ void writeLine(FILE* fp, const char* row) {
 	fputc('\n', fp);
 	return;
 }
+
 void emitByte(CodeGen* gen, Literal lit, const char* row) {
 	switch (lit) {
 	case String_C: gen->stringList->add(gen->stringList, row); return;
@@ -96,6 +97,9 @@ void CaseExpression(CodeGen* gen, ParseTree* tree) {
 			fputs("PUSH	[", gen->filePointer);
 			fputs(child->token->lexeme, gen->filePointer);
 			fputs("]\n", gen->filePointer);
+			// x = 5
+			// PUSH [x]
+			// PUSH [5]
         }
 		else if(child->type == ATOMIC_PARSE) {
 			fputs("PUSH	", gen->filePointer);
@@ -138,6 +142,11 @@ void CaseExpression(CodeGen* gen, ParseTree* tree) {
 
 
 void CaseVariable(const FILE* fp, ParseTree* current) {
+	switch (current->getChild(current, 0)->type) {
+	case PARSE_INT_V: {
+
+	}
+	}
 	return;
 }
 
