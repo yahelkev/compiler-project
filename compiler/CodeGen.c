@@ -112,9 +112,22 @@ void CaseExpression(CodeGen* gen, Heap_List* heapList, ParseTree* current) {
 void CaseVariable(CodeGen* gen, Heap_List* heapList , ParseTree* current) {
 
 	switch (current->getChild(current, 0)->type) {
-	case PARSE_INT_V: {
+		case PARSE_INT_V: {
+			// Parsing the value of the variable
+			CaseExpression(gen, heapList, current->getChild(current, 3)->type);
 
-	}
+			// making the actuall row of creating the varialbe
+			char* currentRow = NULL;
+			int newMargin = heapList->size > 0 ? heapList->heaps[heapList->size - 1]->margin + 4 : 4;
+			Heap_ListAdd(heapList, newHeap(HEAP_DWORD, current->getChild(current, 1)->token->lexeme, newMargin));
+			assembleRow(currentRow, "PUSH DWORD PTR [rbp-");
+			char* marginString= (char*)malloc((int)((ceil(log10((int)newMargin)) + 1) * sizeof(char)));
+			sprintf(marginString, "%d", newMargin);
+			assembleRow(currentRow, marginString);
+			assembleRow(currentRow, "], eax");
+			free(marginString);
+
+		}
 	}
 	return;
 }
