@@ -142,6 +142,9 @@ void CaseExpression(CodeGen* gen, ParseTree* tree) {
 
 
 void CaseVariable(const FILE* fp, ParseTree* current) {
+
+	
+
 	switch (current->getChild(current, 0)->type) {
 	case PARSE_INT_V: {
 
