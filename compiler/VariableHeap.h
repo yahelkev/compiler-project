@@ -23,6 +23,8 @@ typedef struct Heap_List {
 	int size;
 }Heap_List;
 
+VariableHeap* getHeap(Heap_List* list, char* key);
+
 VariableHeap* newHeap(Heap_TYPE type, char* key, int margin);
 Heap_List* newHeap_List();
 void Heap_ListAdd(Heap_List* list, VariableHeap* lcConst);

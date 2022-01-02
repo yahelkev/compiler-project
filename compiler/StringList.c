@@ -1,6 +1,6 @@
 #include "StringList.h"
 
-StringList* newList() {
+StringList* newStringList() {
 	StringList* list = (StringList*)malloc(sizeof(StringList));
 	list->amount = 0;
 	list->strings = (char**)malloc(sizeof(char*) * (list->amount + 1));

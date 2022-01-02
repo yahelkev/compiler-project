@@ -11,6 +11,8 @@
 #include "SymbolTable.h"
 #include "Postfix.h"
 #include "StringList.h"
+#include "LCConst.h"
+#include "VariableHeap.h"
 
 #define LENGTH(var) strlen(var) + 1
 #define START_OF_FILE "\t.file "
@@ -29,17 +31,19 @@ typedef struct CodeGen {
 	Table* table;
 	ParseTree* _main;
 
-	StringList* stringList;
+	LC_List* lcList;
 	StringList* codeList;
 } CodeGen;
 
 void newCodeGen(CodeGen* gen, char* path, ParseTree* mainTree, Table* table);
 FILE* CreateBlankFile(char* path);
 void Generate(CodeGen* gen);
-void emitByte(CodeGen* gen, Literal lit, const char* row);
-void writeLine(FILE* fp, const char* row);
 
 // Valid cases
-void CaseVariable(const FILE* fp, ParseTree* current);
-void CaseExpression(CodeGen* gen, ParseTree* tree);
+void CaseVariable(CodeGen* gen, Heap_List* heapList, ParseTree* current);
+void CaseExpression(CodeGen* gen, Heap_List* heapList, ParseTree* current);
+
+// Tooling
+void writeLine(FILE* fp, const char* row);
+void assembleRow(char* asmRow, char* newRow); // Concats newRow to asmRow
 #endif // !CODE_GEN_H

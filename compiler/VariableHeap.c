@@ -1,5 +1,12 @@
 #include "VariableHeap.h"
 
+VariableHeap* getHeap(Heap_List* list, char* key) {
+	for (size_t i = 0; i < list->size; i++) {
+		if (!strcmp(list->heaps[i]->key, key))
+			return list->heaps[i];
+	}
+}
+
 VariableHeap* newHeap(Heap_TYPE type, char* key, int margin) {
 	VariableHeap* lc = (VariableHeap*)malloc(sizeof(VariableHeap));
 	lc->type = type;

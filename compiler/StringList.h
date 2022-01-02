@@ -12,7 +12,7 @@ typedef struct StringList {
 	void (*free)(struct StringList*);
 }StringList;
 
-StringList* newList();
+StringList* newStringList();
 void __ADD__(StringList* list, char* string);
 void __FREE__(StringList* list);
 #endif // !STRING_LIST_H
