@@ -5,6 +5,8 @@
 #include <string.h>
 #include "Lexer.h"
 
+#define LENGTH(var) strlen(var) + 1
+
 typedef enum LC_TYPE {
 	LC_String, // .string
 	LC_Long, // .long

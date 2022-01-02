@@ -13,6 +13,7 @@
     <ClCompile Include="CodeGen.c" />
     <ClCompile Include="Visitor.c" />
     <ClCompile Include="StringList.c" />
+    <ClCompile Include="LCConst.c" />
     <ClCompile Include="VariableHeap.c" />
   </ItemGroup>
   <ItemGroup>
@@ -28,6 +29,7 @@
     <ClInclude Include="CodeGen.h" />
     <ClInclude Include="Visitor.h" />
     <ClInclude Include="StringList.h" />
+    <ClInclude Include="LCConst.h" />
     <ClInclude Include="VariableHeap.h" />
   </ItemGroup>
   <ItemGroup>

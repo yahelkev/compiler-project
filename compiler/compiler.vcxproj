@@ -143,6 +143,7 @@
     <ClCompile Include="Debug.c" />
     <ClCompile Include="interface.c" />
     <ClCompile Include="KeywordTypes.c" />
+    <ClCompile Include="LCConst.c" />
     <ClCompile Include="Lexer.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="Parser.c" />
@@ -158,6 +159,7 @@
     <ClInclude Include="Debug.h" />
     <ClInclude Include="interface.h" />
     <ClInclude Include="KeywordTypes.h" />
+    <ClInclude Include="LCConst.h" />
     <ClInclude Include="Lexer.h" />
     <ClInclude Include="Parser.h" />
     <ClInclude Include="ParseTree.h" />
