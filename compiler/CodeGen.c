@@ -57,55 +57,55 @@ void CaseExpression(CodeGen* gen, Heap_List* heapList, ParseTree* current) {
 	ParseTree* child = current->getChild(current, i);
 	for (; i < current->amountOfChilds; i++, child = current->getChild(current, i)) {
         if (child->type == IDENTIFIER_PARSE){
-			char* currentRow = NULL;
-			// Continute here with assembling the row, with the new function
-			// Make it the same as the website i.e.
-			// int x = 5; =>  mov     DWORD PTR [rbp-4], 5
-			// But Just using PUSH instead
-			// When finished instead of writing it into the file, which is now forbidden, add it to the codeList field in code gen
-			assembleRow(currentRow, "PUSH ");
-			// Continue with assembling
-			// Do this for all other fields too ( ATOMIC, ADD, SUB )
-			// Use the heap list parameter for variables on the stack
+			char* currentRow = (char*)malloc(1);
+			*currentRow = '\0';
+			char marginString[15] = "";
+			assembleRow(currentRow, "PUSH [rbp-");
+			sprintf(marginString, "%d", getHeap(heapList, child->token->lexeme)->margin);
+			assembleRow(currentRow, marginString);
+			assembleRow(currentRow, "]");
+			gen->codeList->add(gen->codeList, currentRow);
         }
 		else if(child->type == ATOMIC_PARSE) {
 			// Check with the LC_List field on the codeGen parameter to know what constants to useאתה 
-			fputs("PUSH	", gen->filePointer);
-			fputs(child->token->lexeme, gen->filePointer);
-			fputs("\n", gen->filePointer);
+			char* currentRow = (char*)malloc(1);
+			*currentRow = '\0';
+			assembleRow(currentRow, "PUSH	");
+			assembleRow(currentRow, child->token->lexeme);
+			gen->codeList->add(gen->codeList, currentRow);
 		}
         else
         {
-			fputs("POP	edx\n", gen->filePointer);
-			fputs("POP	eax\n", gen->filePointer);
+			gen->codeList->add(gen->codeList, "POP	edx");
+			gen->codeList->add(gen->codeList, "POP	eax");
             switch (child->type)
             {
 			case PARSE_PLUS:
             {
-				fputs("add	eax, edx\n", gen->filePointer);
+				gen->codeList->add(gen->codeList, "add	eax, edx");
                 break;
             }
             case PARSE_MINUS:
             {
-				fputs("sub	eax, edx\n", gen->filePointer);
+				gen->codeList->add(gen->codeList, "sub	eax, edx");
                 break;
             }
             case PARSE_STAR:
             {
-				fputs("imul	eax, edx\n", gen->filePointer);
+				gen->codeList->add(gen->codeList, "imul	eax, edx");
                 break;
             }
             case PARSE_SLASH:
             {
-				fputs("cdq\n", gen->filePointer);
-				fputs("idiv	edx\n", gen->filePointer);
+				gen->codeList->add(gen->codeList, "cdq");
+				gen->codeList->add(gen->codeList, "idiv	edx");
                 break;
             }
             }
-			fputs("PUSH	eax\n", gen->filePointer);
+			gen->codeList->add(gen->codeList, "PUSH	eax");
         }
     }
-	fputs("POP	eax\n", gen->filePointer);
+	gen->codeList->add(gen->codeList, "POP	eax");
 }
 
 
