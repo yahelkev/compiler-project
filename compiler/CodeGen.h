@@ -41,6 +41,7 @@ void Generate(CodeGen* gen);
 
 // Valid cases
 void CaseVariable(CodeGen* gen, Heap_List* heapList, ParseTree* current);
+void CaseAssign(CodeGen* gen, Heap_List* heapList, ParseTree* current);
 void CaseExpression(CodeGen* gen, Heap_List* heapList, ParseTree* current);
 
 // Tooling

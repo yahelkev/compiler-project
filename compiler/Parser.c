@@ -26,8 +26,6 @@ bool statement(Parser* par, ParseTree* current) {
 		parserAdvance(par);
 		return parseAssign(par, current);
 	}
-
-
 	// Grammer rules and possiblities
 	switch (par->current->type) {
 	case TOKEN_INT_V:

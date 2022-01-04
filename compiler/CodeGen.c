@@ -48,7 +48,11 @@ void Generate(CodeGen* gen) {
 		case VARIABLE_PARSE:
 			CaseVariable(gen, heapList, currentChild);
 			break;
+		case ASSIGN_PARSE:
+			CaseAssign(gen, heapList, currentChild);
+			break;
 		}
+
 	}
 }
 
@@ -130,6 +134,38 @@ void CaseVariable(CodeGen* gen, Heap_List* heapList , ParseTree* current) {
 		}
 	}
 	return;
+}
+
+void CaseAssign(CodeGen* gen, Heap_List* heapList, ParseTree* current)
+{
+	/*
+	* int
+	    mov     DWORD PTR [rbp-4], 0
+	* string
+	    mov     QWORD PTR [rbp-16], OFFSET FLAT:.LC0
+    * float    
+		movss   xmm0, DWORD PTR .LC1[rip]
+        movss   DWORD PTR [rbp-20], xmm0
+	*/
+	char* currentRow = (char*)malloc(1);
+	*currentRow = '\0';
+	char numSTR[15] = "";
+	CaseExpression(gen, heapList, current->getChild(current, 2));
+	
+	ParseTree* firstChild = current->getChild(current, 0);
+	if (!strcmp(getValue(gen->table, (firstChild->token->lexeme)).variable->type, "string")){
+		assembleRow(currentRow, "mov     QWORD PTR [rbp-");
+	}
+	else if(!strcmp(getValue(gen->table, (firstChild->token->lexeme)).variable->type, "float")){
+		assembleRow(currentRow, "movss   DWORD PTR [rbp-");
+	}
+	else if (!strcmp(getValue(gen->table, (firstChild->token->lexeme)).variable->type, "int")){
+		assembleRow(currentRow, "mov     DWORD PTR [rbp-");
+	}
+	sprintf(numSTR, "%d", getHeap(heapList, firstChild->token->lexeme)->margin);
+	assembleRow(currentRow, numSTR);
+	assembleRow(currentRow, "], ax");
+	gen->codeList->add(gen->codeList, currentRow);
 }
 
 
