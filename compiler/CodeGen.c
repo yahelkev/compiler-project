@@ -114,7 +114,7 @@ void CaseVariable(CodeGen* gen, Heap_List* heapList , ParseTree* current) {
 	switch (current->getChild(current, 0)->type) {
 		case PARSE_INT_V: {
 			// Parsing the value of the variable
-			CaseExpression(gen, heapList, current->getChild(current, 3)->type);
+			CaseExpression(gen, heapList, current->getChild(current, 3));
 
 			// making the actuall row of creating the varialbe
 			char* currentRow = NULL;
