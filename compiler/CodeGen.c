@@ -1,4 +1,4 @@
-#include "CodeGen.h"
+﻿#include "CodeGen.h"
 
 void newCodeGen(CodeGen* gen, char* path, ParseTree* mainTree, Table* table) {
 	gen->filePath = (char*)malloc(sizeof(char) * LENGTH(path));
@@ -69,7 +69,7 @@ void CaseExpression(CodeGen* gen, Heap_List* heapList, ParseTree* current) {
 			// Use the heap list parameter for variables on the stack
         }
 		else if(child->type == ATOMIC_PARSE) {
-			// Check with the LC_List field on the codeGen parameter to know what constants to use
+			// Check with the LC_List field on the codeGen parameter to know what constants to useאתה 
 			fputs("PUSH	", gen->filePointer);
 			fputs(child->token->lexeme, gen->filePointer);
 			fputs("\n", gen->filePointer);
@@ -114,7 +114,7 @@ void CaseVariable(CodeGen* gen, Heap_List* heapList , ParseTree* current) {
 	switch (current->getChild(current, 0)->type) {
 		case PARSE_INT_V: {
 			// Parsing the value of the variable
-			CaseExpression(gen, heapList, current->getChild(current, 3)->type);
+			CaseExpression(gen, heapList, current->getChild(current, 3));
 
 			// making the actuall row of creating the varialbe
 			char* currentRow = NULL;
@@ -126,7 +126,7 @@ void CaseVariable(CodeGen* gen, Heap_List* heapList , ParseTree* current) {
 			assembleRow(currentRow, marginString);
 			assembleRow(currentRow, "], eax");
 			free(marginString);
-
+			gen->codeList->add(gen->codeList, currentRow);
 		}
 	}
 	return;

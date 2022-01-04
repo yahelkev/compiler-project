@@ -459,7 +459,7 @@ bool parseCalls(Parser* par, ParseTree* current) {
 
 bool parseReturn(Parser* par, ParseTree* current) {
 	ParseTree* returnTree = newTree(PARSE_RETURN_FULL, NULL);
-	ParseTree* keyword = newTree()
-	returnTree->addChild(returnTree, )
+	//ParseTree* keyword = newTree(PARSE_RETURN, );
+	//returnTree->addChild(returnTree, keyword);
 }
 
