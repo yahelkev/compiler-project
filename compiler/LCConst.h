@@ -32,6 +32,8 @@ typedef struct LC_List {
 	int size;
 }LC_List;
 
+int get_LC_offset(LC_List* list, char* value);
+
 LCConst* newLC(LC_TYPE type, char* value, Token* toke);
 LC_List* newLC_List();
 void LC_ListAdd(LC_List* list, LCConst* lcConst);

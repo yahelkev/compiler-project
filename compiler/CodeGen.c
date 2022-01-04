@@ -60,18 +60,38 @@ void CaseExpression(CodeGen* gen, Heap_List* heapList, ParseTree* current) {
 			char* currentRow = (char*)malloc(1);
 			*currentRow = '\0';
 			char marginString[15] = "";
-			assembleRow(currentRow, "PUSH [rbp-");
+			assembleRow(currentRow, "PUSH  DWORD PTR [rbp-");
 			sprintf(marginString, "%d", getHeap(heapList, child->token->lexeme)->margin);
 			assembleRow(currentRow, marginString);
 			assembleRow(currentRow, "]");
 			gen->codeList->add(gen->codeList, currentRow);
         }
 		else if(child->type == ATOMIC_PARSE) {
-			// Check with the LC_List field on the codeGen parameter to know what constants to useאתה 
 			char* currentRow = (char*)malloc(1);
 			*currentRow = '\0';
-			assembleRow(currentRow, "PUSH	");
-			assembleRow(currentRow, child->token->lexeme);
+			char numSTR[15] = "";
+			switch (child->token->type)
+			{
+			case TOKEN_STRING:
+					assembleRow(currentRow, "PUSH	OFFSET FLAT:.LC");
+					sprintf(numSTR, "%d", get_LC_offset(gen->lcList, child->token->lexeme));
+					assembleRow(currentRow, numSTR);
+					*numSTR = '\0';
+				break;
+			case TOKEN_FLOAT:
+					assembleRow(currentRow, "PUSH	DWORD PTR .LC");
+					sprintf(numSTR, "%d",get_LC_offset(gen->lcList, child->token->lexeme));
+					assembleRow(currentRow, numSTR);
+					*numSTR = '\0';
+					assembleRow(currentRow, "[rip]");
+				break;
+			case TOKEN_INT:
+					assembleRow(currentRow, "PUSH	");
+					assembleRow(currentRow, child->token->lexeme);
+				break;
+			default:
+				break;
+			}
 			gen->codeList->add(gen->codeList, currentRow);
 		}
         else

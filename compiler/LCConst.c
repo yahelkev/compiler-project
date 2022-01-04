@@ -37,3 +37,10 @@ void freeLC_List(LC_List* list) {
 	free(list);
 	return;
 }
+
+int get_LC_offset(LC_List* list, char* value) {
+	for (size_t i = 0; i < list->size; i++) {
+		if (!strcmp(list->consts[i]->value, value))
+			return i;
+	}
+}
