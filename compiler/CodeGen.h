@@ -40,6 +40,8 @@ void newCodeGen(CodeGen* gen, char* path, ParseTree* mainTree, Table* table);
 FILE* CreateBlankFile(char* path);
 void Generate(CodeGen* gen, ParseTree* current);
 
+char* getJmpCondition(ParseTreeType type);
+
 // Valid cases
 void CaseVariable(CodeGen* gen, Heap_List* heapList, ParseTree* current);
 void CaseExpression(CodeGen* gen, Heap_List* heapList, ParseTree* current);

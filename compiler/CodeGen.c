@@ -55,6 +55,25 @@ void Generate(CodeGen* gen, ParseTree* current) {
 	}
 }
 
+char* getJmpCondition(ParseTreeType type)
+{
+	switch (type)
+	{
+	case PARSE_GREATER:
+		return "jg";
+	case PARSE_GREATER_EQUAL:
+		return "jge";
+	case PARSE_LESS:
+		return "jl";
+	case PARSE_LESS_EQUAL:
+		return "jle";
+	case PARSE_EQUAL_EQUAL:
+		return "je";
+	case PARSE_BANG_EQUAL:
+		return "jne";
+	}
+}
+
 void CaseExpression(CodeGen* gen, Heap_List* heapList, ParseTree* current) {
 	size_t i = 0;
 	ParseTree* child = current->getChild(current, i);
@@ -153,6 +172,7 @@ void CaseLoop(CodeGen* gen, Heap_List* heapList, ParseTree* current)
 	sprintf(numSTR, "%d", gen->loopCounter);
 
 	ParseTree* condition = current->getChild(current, 0);
+	ParseTree* expression = condition->getChild(condition, 0);
 	ParseTree* body = current->getChild(current, 1);
 	assembleRow(currentRow, "jmp end_loop");
 	assembleRow(currentRow, numSTR);
@@ -172,11 +192,16 @@ void CaseLoop(CodeGen* gen, Heap_List* heapList, ParseTree* current)
 	gen->codeList->add(gen->codeList, currentRow);
 	*currentRow = '\0';
 
-	CaseExpression(gen, heapList, condition->getChild(condition, 0));
+	CaseExpression(gen, heapList, expression);
 	assembleRow(currentRow, "cmp dx, ax");
 	gen->codeList->add(gen->codeList, currentRow);
 	*currentRow = '\0';
-	//switch to get right jmp codition
+	
+	assembleRow(currentRow, getJmpCondition(expression->getChild(expression, expression->amountOfChilds - 1)->type));
+	assembleRow(currentRow, " start_loop");
+	assembleRow(currentRow, numSTR);
+	gen->codeList->add(gen->codeList, currentRow);
+
 	gen->loopCounter++;
 }
 
