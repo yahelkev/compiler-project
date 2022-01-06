@@ -39,11 +39,11 @@ FILE* CreateBlankFile(const char* path) {
 	return fp;
 }
 
-void Generate(CodeGen* gen) {
+void Generate(CodeGen* gen, ParseTree* current) {
 	size_t index = 0;
-	ParseTree* currentChild = gen->_main->getChild(gen->_main, index);
+	ParseTree* currentChild = current->getChild(gen->_main, index);
 	Heap_List* heapList = newHeap_List();
-	for (index = 0; index < gen->_main->amountOfChilds; index++, currentChild = gen->_main->getChild(gen->_main, index)) {
+	for (index = 0; index <current->amountOfChilds; index++, currentChild = current->getChild(current, index)) {
 
 		switch (currentChild->type) {
 		case VARIABLE_PARSE:
@@ -163,7 +163,9 @@ void CaseLoop(CodeGen* gen, Heap_List* heapList, ParseTree* current)
 	assembleRow(currentRow, ":");
 	gen->codeList->add(gen->codeList, currentRow);
 	*currentRow = '\0';
-	//handaling body
+	
+	Generate(gen, body);
+
 	assembleRow(currentRow, "end_loop");
 	assembleRow(currentRow, numSTR);
 	assembleRow(currentRow, ":");
