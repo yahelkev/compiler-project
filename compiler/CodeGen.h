@@ -33,6 +33,7 @@ typedef struct CodeGen {
 
 	LC_List* lcList;
 	StringList* codeList;
+	int loopCounter;
 } CodeGen;
 
 void newCodeGen(CodeGen* gen, char* path, ParseTree* mainTree, Table* table);
@@ -42,6 +43,7 @@ void Generate(CodeGen* gen);
 // Valid cases
 void CaseVariable(CodeGen* gen, Heap_List* heapList, ParseTree* current);
 void CaseExpression(CodeGen* gen, Heap_List* heapList, ParseTree* current);
+void CaseLoop(CodeGen* gen, Heap_List* heapList, ParseTree* current);
 
 // Tooling
 void writeLine(FILE* fp, const char* row);
