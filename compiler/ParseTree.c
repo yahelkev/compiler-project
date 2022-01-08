@@ -31,8 +31,19 @@ ParseTree* __GETCHILD__(ParseTree* tree, int index) {
 	return index >= tree->amountOfChilds || index < 0 ? NULL : tree->childs[index];
 }
 
-void __DELCHILD__(ParseTree* tree) {
-	tree->childs[tree->amountOfChilds - 1]->freeParseTree(tree->childs[tree->amountOfChilds - 1]);
+void __DELCHILD__(ParseTree* tree, ParseTree* child) {
+	for (size_t i = 0; i < tree->amountOfChilds; i++) {
+		if (tree->childs[i]->token->line == child->token->line && tree->childs[i]->token->column == child->token->column) {
+			ParseTree* del = tree->childs[i];
+			for (size_t j = i; j < tree->amountOfChilds - 1; j++) {
+				tree->childs[j] = tree->childs[j + 1];
+			}
+			del->freeParseTree(del);
+			i = tree->amountOfChilds;
+		}
+	}
+	//tree->childs[tree->amountOfChilds - 1]->freeParseTree(tree->childs[tree->amountOfChilds - 1]);
+	tree->childs = (ParseTree**)realloc(tree->childs, sizeof(ParseTree*) * (tree->amountOfChilds - 1));
 	tree->amountOfChilds--;
 	return;
 }

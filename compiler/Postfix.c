@@ -28,16 +28,14 @@ int priority(Token* x) {
     return 0;
 }
 
-int convertToPost(Parser* par, ParseTree* current, TokenType EO_Expr) {
-    int openParenthesis = 0, numNiden = 0, operators = 0, top = -1;;
+bool convertToPost(Parser* par, ParseTree* current, TokenType EO_Expr) {
+    int openParenthesis = 0, numNiden = 0, operators = 0, top = -1;
     Token* token = par->current, *stack[MAX_STACK_SIZE];
     ParseTree* child = NULL, *lastChild = NULL, *twoLastChild = NULL, *threeLastChild = NULL;
-    
 
-    while (par->current->type != EO_Expr && par->current->type != TOKEN_EOF)
-    {
-        if (par->current->type == TOKEN_INT || par->current->type == TOKEN_FLOAT || par->current->type == TOKEN_IDENTIFIER || par->current->type == TOKEN_STRING)
-        {
+
+    while (par->current->type != EO_Expr && par->current->type != TOKEN_EOF) {
+        if (par->current->type == TOKEN_INT || par->current->type == TOKEN_FLOAT || par->current->type == TOKEN_IDENTIFIER || par->current->type == TOKEN_STRING) {
             numNiden++;
             if ((numNiden - operators) >= 2) {
                 error(par, par->current, "Too many operators");
@@ -45,51 +43,14 @@ int convertToPost(Parser* par, ParseTree* current, TokenType EO_Expr) {
                 return 0;
             }
             child = newTree(getType(par, par->current), par->current);
-            lastChild = current->getChild(current, current->amountOfChilds - 1);
-            twoLastChild = current->getChild(current, current->amountOfChilds - 2);
-            // Check here if last child is a constant and then fold it with top stack
-            if (lastChild && twoLastChild && child->type == ATOMIC_PARSE && twoLastChild->type == ATOMIC_PARSE && priority(peekPost(stack, &top)) >= priority(lastChild ->token)) {
-                // Fold constants
-                // twoLastChild 3
-                // lastChild +
-                // child 5
-                float firstConst = atof(twoLastChild->token->lexeme);
-                float secondConst = atof(child->token->lexeme);
-                float out = 0;
-                switch (lastChild->type) {
-                case PARSE_PLUS:
-                    out = firstConst + secondConst;
-                    break;
-                case PARSE_MINUS:
-                    out = firstConst - secondConst;
-                    break;
-                case PARSE_STAR:
-                    out = firstConst * secondConst;
-                    break;
-                case PARSE_SLASH:
-                    out = firstConst / secondConst;
-                    break;
-                }
-                Token* foldToken = (Token*)malloc(sizeof(Token));
-                foldToken->column = twoLastChild->token->column;
-                foldToken->line = twoLastChild->token->line;
-                foldToken->type = out == (int)out ? TOKEN_INT : TOKEN_FLOAT;
-                foldToken->lexeme = (char*)malloc((int)((ceil(log10((int)out)) + 1) * sizeof(char)) + 3);
-                out == (int)out ? sprintf(foldToken->lexeme, "%d", (int)out) : sprintf(foldToken->lexeme, "%.3f", out);
-                foldToken->length = strlen(foldToken->lexeme);
-
-                child = newTree(ATOMIC_PARSE, foldToken);
-                current->delChild(current);
-                current->delChild(current);
-                printf("Fold\n");
-            }
+            child = foldTerms(current, child);
             current->addChild(current, child);
         }
         else if (par->current->type == TOKEN_LEFT_PAREN) {
             if (numNiden > operators) {
                 error(par, par->current, "Unexpected '('");
                 synchronize(par);
-                return 0;
+                return false;
             }
             openParenthesis++;
             stack[++top] = par->current;
@@ -99,7 +60,7 @@ int convertToPost(Parser* par, ParseTree* current, TokenType EO_Expr) {
             if (openParenthesis == 0 || numNiden == operators) {
                 error(par, par->current, "Unexpected ')'");
                 synchronize(par);
-                return 0;
+                return false;
             }
             openParenthesis--;
             token = pop(stack, &top);
@@ -109,18 +70,18 @@ int convertToPost(Parser* par, ParseTree* current, TokenType EO_Expr) {
                 token = pop(stack, &top);
             }
         }
-        else
-        {
+        else {
             operators++;
             if (operators > numNiden) {
                 error(par, par->current, "Invalid identifier");
                 synchronize(par);
-                return 0;
+                return false;
             }
-            while (top != -1 && priority(peekPost(stack, &top)) >= priority(par->current))
-            {
+            //if(current->)
+            while (top != -1 && priority(peekPost(stack, &top)) >= priority(par->current)) {
                 token = pop(stack, &top);
                 child = newTree(getType(par, token), token);
+                child = foldTerms(current, child);
                 current->addChild(current, child);
             }
             stack[++top] = par->current;
@@ -128,23 +89,22 @@ int convertToPost(Parser* par, ParseTree* current, TokenType EO_Expr) {
         parserAdvance(par);
     }
 
-    if (openParenthesis)
-    {
+    if (openParenthesis) {
         error(par, par->pre, "Unclosed parenthesis");
         synchronize(par);
-        return 0;
+        return false;
     }
-    while (top != -1)
-    {
+    while (top != -1) {
         token = pop(stack, &top);
         ParseTree* child = newTree(getType(par, token), token);
+        child = foldTerms(current, child);
         current->addChild(current, child);
     }
-    return 1;
+
+    return true;
 }
 
-ParseTreeType getType(Parser* par, Token* token)
-{
+ParseTreeType getType(Parser* par, Token* token) {
     switch (token->type)
     {
     case TOKEN_IDENTIFIER:
@@ -179,4 +139,63 @@ ParseTreeType getType(Parser* par, Token* token)
         synchronize(par);
         return PARSE_ERROR;
     }
+}
+
+ParseTree* foldTerms(ParseTree* currentTree, ParseTree* child) {
+    ParseTree* lastChild = currentTree->getChild(currentTree, currentTree->amountOfChilds - 1);
+    ParseTree* twoLastChild = currentTree->getChild(currentTree, currentTree->amountOfChilds - 2);
+    bool foldFlag = false;
+    ParseTree* first = NULL, * second = NULL, * sign = NULL;
+    if (!(lastChild && twoLastChild)) return child;
+    // Check here if last child is a constant and then fold it with top stack
+    if (lastChild->type == ATOMIC_PARSE && child->type != ATOMIC_PARSE && twoLastChild->type == ATOMIC_PARSE) {
+        first = lastChild;
+        second = twoLastChild;
+        sign = child;
+        foldFlag = true;
+    }
+    else {
+        sign = child;
+    }
+
+    if (foldFlag) {
+        // Fold constants
+        // 3 + 5
+        // 35+
+        // twoLastChild 5
+        // lastChild 3
+        // child +
+        float firstConst = atof(first->token->lexeme);
+        float secondConst = atof(second->token->lexeme);
+        float out = 0;
+        switch (sign->type) {
+        case PARSE_PLUS:
+            out = firstConst + secondConst;
+            break;
+        case PARSE_MINUS:
+            out = firstConst - secondConst;
+            break;
+        case PARSE_STAR:
+            out = firstConst * secondConst;
+            break;
+        case PARSE_SLASH:
+            out = firstConst / secondConst;
+            break;
+        }
+        Token* foldToken = (Token*)malloc(sizeof(Token));
+        foldToken->column = first->token->column;
+        foldToken->line = first->token->line;
+        foldToken->type = out == (int)out ? TOKEN_INT : TOKEN_FLOAT;
+        foldToken->lexeme = (char*)malloc((int)((ceil(log10((int)out)) + 1) * sizeof(char)) + 3);
+        out == (int)out ? sprintf(foldToken->lexeme, "%d", (int)out) : sprintf(foldToken->lexeme, "%.3f", out);
+        foldToken->length = strlen(foldToken->lexeme);
+
+        sign->freeParseTree(sign);
+
+        sign = newTree(ATOMIC_PARSE, foldToken);
+        currentTree->delChild(currentTree, first); // Del specific child
+        currentTree->delChild(currentTree, second);
+        printf("Fold\n");
+    }
+    return sign;
 }

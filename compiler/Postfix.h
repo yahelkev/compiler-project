@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <math.h>
 #include "Parser.h"
 
@@ -18,5 +19,8 @@
 Token* pop(Token** stack, int* top);
 Token* peekPost(Token** stack, int* top);
 int priority(Token* x);
-int convertToPost(Parser* par, ParseTree* current, TokenType EO_Expr);
+bool convertToPost(Parser* par, ParseTree* current, TokenType EO_Expr);
+
+ParseTree* foldTerms(ParseTree* currentTree, ParseTree* child);
+
 #endif // !POSTFIX_H

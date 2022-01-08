@@ -74,16 +74,12 @@ bool visitExperssion(Table* table, ParseTree* tree) {
 	char type[10] = "\0";
 	strcpy(type, getTypeAsString(table, child));
 	char childType[10] = "\0";
-	for (int i = 1; i < tree->amountOfChilds; i++)
-	{
+	for (int i = 1; i < tree->amountOfChilds; i++) {
 		ParseTree* child = tree->getChild(tree, i);
 		strcpy(childType, getTypeAsString(table, child));
-		if (*childType != '\0')
-		{
-			if (strcmp(childType, type)) {
-				throwError(child->token, "Types dont match");
-				return false;
-			}
+		if (*childType != '\0' && strcmp(childType, type)) {
+			throwError(child->token, "Types dont match");
+			return false;
 		}
 	}
 	return true;

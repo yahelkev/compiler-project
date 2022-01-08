@@ -122,7 +122,7 @@ typedef struct ParseTree {
 
 	void (*addChild)(struct ParseTree* tree, struct ParseTree* child);
 	struct ParseTree* (*getChild)(struct ParseTree* tree, int index);
-	void (*delChild)(struct ParseTree* tree);
+	void (*delChild)(struct ParseTree* tree, struct ParseTree* child);
 	void (*freeParseTree)(struct ParseTree* tree);
 
 } ParseTree;
@@ -130,7 +130,7 @@ typedef struct ParseTree {
 ParseTree* newTree(ParseTreeType type, Token* toke);
 void __ADDCHILD__(ParseTree* tree, ParseTree* child);
 ParseTree* __GETCHILD__(ParseTree* tree, int index);
-void __DELCHILD__(ParseTree* tree);
+void __DELCHILD__(ParseTree* tree, ParseTree* child);
 // Free tree's memory recursively
 void __FREEPARSETREE__(ParseTree* tree);
 #endif // !PARSE_TREE
