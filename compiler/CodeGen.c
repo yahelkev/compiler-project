@@ -51,6 +51,10 @@ void Generate(CodeGen* gen, ParseTree* current) {
 			break;
 		case FULL_LOOP_PARSE:
 			CaseLoop(gen, heapList, currentChild);
+			break;
+		case FULL_CONDITIONAL_PARSE:
+			CaseConditions(gen, heapList, currentChild);
+			break;
 		}
 	}
 }
@@ -203,6 +207,10 @@ void CaseLoop(CodeGen* gen, Heap_List* heapList, ParseTree* current)
 	gen->codeList->add(gen->codeList, currentRow);
 
 	gen->loopCounter++;
+}
+
+void CaseConditions(CodeGen* gen, Heap_List* heapList, ParseTree* current)
+{
 }
 
 
