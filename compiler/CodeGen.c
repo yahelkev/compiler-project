@@ -54,6 +54,10 @@ void Generate(CodeGen* gen, ParseTree* current) {
 			break;
 		case FULL_LOOP_PARSE:
 			CaseLoop(gen, heapList, currentChild);
+			break;
+		case FULL_CONDITIONAL_PARSE:
+			CaseConditions(gen, heapList, currentChild);
+			break;
 		}
 
 	}
@@ -218,8 +222,8 @@ void CaseLoop(CodeGen* gen, Heap_List* heapList, ParseTree* current)
 			*body*
 		end_loop:
 		expresion/condition
-		cmp dx,ax
-		jmp condotiom start_loop
+		cmp edx,eax
+		jmp condotion start_loop
 
 	*/
 	char numSTR[15] = "";
@@ -259,6 +263,66 @@ void CaseLoop(CodeGen* gen, Heap_List* heapList, ParseTree* current)
 	gen->codeList->add(gen->codeList, currentRow);
 
 	gen->loopCounter++;
+}
+
+void CaseConditions(CodeGen* gen, Heap_List* heapList, ParseTree* current)
+{
+	/*
+		cmp     edx, eax
+		jmp condotion   if_body
+		 *else Body
+		jmp end_if
+	if_body:
+		*if_body
+	end_if:
+
+	*/
+
+	char numSTR[15] = "";
+	char* currentRow = (char*)malloc(1);
+	*currentRow = '\0';
+	sprintf(numSTR, "%d", gen->conditionCounter);
+
+	ParseTree* condition = current->getChild(current, 0);
+	ParseTree* expression = condition->getChild(condition, 0);
+	ParseTree* body = current->getChild(current, 1);
+
+
+	CaseExpression(gen, heapList, expression);
+	assembleRow(currentRow, "cmp edx, eax");
+	gen->codeList->add(gen->codeList, currentRow);
+	*currentRow = '\0';
+
+	assembleRow(currentRow, getJmpCondition(expression->getChild(expression, expression->amountOfChilds - 1)->type));
+	assembleRow(currentRow, " if_body");
+	assembleRow(currentRow, numSTR);
+	gen->codeList->add(gen->codeList, currentRow);
+	*currentRow = '\0';
+
+	//if there is else
+	if (current->amountOfChilds == 3) {
+		Generate(gen, current->getChild(current, 2));
+	}
+
+	assembleRow(currentRow, "jmp end_if");
+	assembleRow(currentRow, numSTR);
+	gen->codeList->add(gen->codeList, currentRow);
+	*currentRow = '\0';
+
+	assembleRow(currentRow, "if_body");
+	assembleRow(currentRow, numSTR);
+	assembleRow(currentRow, ":");
+	gen->codeList->add(gen->codeList, currentRow);
+	*currentRow = '\0';
+
+	Generate(gen, body);
+
+	assembleRow(currentRow, "end_if");
+	assembleRow(currentRow, numSTR);
+	assembleRow(currentRow, ":");
+	gen->codeList->add(gen->codeList, currentRow);
+
+	gen->conditionCounter++;
 }
 
 
