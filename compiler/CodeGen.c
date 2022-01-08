@@ -121,7 +121,7 @@ void CaseVariable(CodeGen* gen, Heap_List* heapList , ParseTree* current) {
 			char* currentRow = NULL;
 			int newMargin = heapList->size > 0 ? heapList->heaps[heapList->size - 1]->margin + 4 : 4;
 			Heap_ListAdd(heapList, newHeap(HEAP_DWORD, current->getChild(current, 1)->token->lexeme, newMargin));
-			assembleRow(currentRow, "PUSH DWORD PTR [rbp-");
+			assembleRow(currentRow, "MOV DWORD PTR [rbp-");
 			char* marginString= (char*)malloc((int)((ceil(log10((int)newMargin)) + 1) * sizeof(char)));
 			sprintf(marginString, "%d", newMargin);
 			assembleRow(currentRow, marginString);
@@ -138,7 +138,7 @@ void CaseVariable(CodeGen* gen, Heap_List* heapList , ParseTree* current) {
 			char* currentRow = NULL;
 			int newMargin = heapList->size > 0 ? heapList->heaps[heapList->size - 1]->margin % 8 == 0 ? heapList->heaps[heapList->size - 1]->margin + 8 : heapList->heaps[heapList->size - 1]->margin + 12 : 4;
 			Heap_ListAdd(heapList, newHeap(HEAP_QWORD, current->getChild(current, 1)->token->lexeme, newMargin));
-			assembleRow(currentRow, "PUSH QWORD PTR [rbp-");
+			assembleRow(currentRow, "MOV QWORD PTR [rbp-");
 			char* marginString = (char*)malloc((int)((ceil(log10((int)newMargin)) + 1) * sizeof(char)));
 			sprintf(marginString, "%d", newMargin);
 			assembleRow(currentRow, marginString);
