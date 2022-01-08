@@ -11,6 +11,13 @@
     <ClCompile Include="Postfix.c" />
     <ClCompile Include="SymbolTable.c" />
     <ClCompile Include="CodeGen.c" />
+<<<<<<< HEAD
+=======
+    <ClCompile Include="Visitor.c" />
+    <ClCompile Include="StringList.c" />
+    <ClCompile Include="LCConst.c" />
+    <ClCompile Include="VariableHeap.c" />
+>>>>>>> code_gen/asm_assign
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Debug.h" />
@@ -23,6 +30,13 @@
     <ClInclude Include="SymbolTable.h" />
     <ClInclude Include="TokenType.h" />
     <ClInclude Include="CodeGen.h" />
+<<<<<<< HEAD
+=======
+    <ClInclude Include="Visitor.h" />
+    <ClInclude Include="StringList.h" />
+    <ClInclude Include="LCConst.h" />
+    <ClInclude Include="VariableHeap.h" />
+>>>>>>> code_gen/asm_assign
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />

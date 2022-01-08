@@ -26,7 +26,7 @@ enum Flags {
 	Help_Flag
 };
 
-//the 'main' of the handler. returns the flag.
+// Main function of the interface handler, returns a flag to check against in case of error
 int handleInput(int argc, char* argv[], char** fileNamePtr);
 
 int handleFlags(char* flag);

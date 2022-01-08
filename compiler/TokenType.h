@@ -37,7 +37,7 @@ typedef enum {
 	TOKEN_EQUAL,
 	TOKEN_EQUAL_EQUAL,
 	TOKEN_EQUAL_GREATER, //EQUAL_GREATER is for the arrow syntax
-	
+
 	TOKEN_GREATER,
 	TOKEN_GREATER_EQUAL,
 
@@ -59,7 +59,8 @@ typedef enum {
 
 	//literals
 	TOKEN_IDENTIFIER,
-	TOKEN_NUMBER,
+	TOKEN_INT,
+	TOKEN_FLOAT,
 	TOKEN_STRING,
 
 	TOKEN_ELSE,

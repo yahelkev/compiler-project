@@ -19,31 +19,35 @@ int handleInput(int argc, char* argv[], char** fileNamePtr) {
 	case MAX_ARGC:
 		flag = handleFlags(argv[1]);
 		if (Unknown_Flag == flag) {
-			errorInterface("invalid flag! try -h for help\n");
+			errorInterface("Invalid Flag.\n Try -h for help");
 		}
 		checkSrcFile(argv[2]);
 		*fileNamePtr = (char*)malloc(sizeof(char) * strlen(argv[2]) + sizeof(char));
 		strcpy(*fileNamePtr, argv[2]);
 		break;
 	default:
-		errorInterface("make sure you use the form of <flag(optional)> <srcCode.ourLanguage>");
+		errorInterface("Invalid Scheme\n.Please use the form of flag(optional) file.ourLanguage");
 		break;
 	}
 	return flag;
 }
 
 void errorInterface(char* msg) {
+	c(WHITE);
+	printf("Error while processing file");
+	c(NATRUAL);
+	printf(" : ");
 	c(ERROR);
-	printf("%s", msg);
+	printf("%s\n", msg);
 	c(NATRUAL);
 	exit(0);
 }
 
 int handleFlags(char* flag) {
 	if (!strcmp(flag, "-h") || !strcmp(flag, "--help")) {
-		printf("flag options are:\n");
-		printf("	-h/--help - for help\n");
-		errorInterface("	you can enter nothing to use no flag\n");
+		printf("Flag Options:\n");
+		printf("\t-h/--help - For this menu\n");
+		errorInterface("\tYou can run without any flags\n");
 		//no need to return a thing because the program stops
 	}
 	else { return Unknown_Flag; };
@@ -59,15 +63,18 @@ void checkSrcFile(char* srcfileName)
 			fclose(file);
 			return;
 		}
+		else {
+			errorInterface("Source file is empty");
+		}
 		fclose(file);
 	}
-	errorInterface("make sure src file exists!\n");
+	errorInterface("Source file doesnt exists");
 }
 
 
 char* getFileContent(char* filePath) {
 	FILE* filePointer = fopen(filePath, "r");
-	if (!filePointer) errorInterface("can't open file\n");
+	if (!filePointer) errorInterface("Can't open file");
 	char* buffer = 0;
 	long length;
 	fseek(filePointer, 0, SEEK_END);

@@ -1,12 +1,17 @@
-#include "CodeGen.h"
+﻿#include "CodeGen.h"
 
-void newCodeGen(CodeGen* gen, char* path) {
+void newCodeGen(CodeGen* gen, char* path, ParseTree* mainTree, Table* table) {
 	gen->filePath = (char*)malloc(sizeof(char) * LENGTH(path));
 	strncpy(gen->filePath, path, LENGTH(path));
+	gen->_main = mainTree;
+	gen->table = table;
+	gen->codeList = newStringList();
+	gen->lcList = newLC_List();
 	return;
 }
 
 void freeCodeGen(CodeGen* gen) {
+	gen->_main->freeParseTree(gen->_main);
 	free(gen->filePath);
 	fclose(gen->filePointer);
 	free(gen);
@@ -33,11 +38,152 @@ FILE* CreateBlankFile(const char* path) {
 	return fp;
 }
 
-void emitByte(FILE* fp, const char* row) {
+void Generate(CodeGen* gen) {
+	size_t index = 0;
+	ParseTree* currentChild = gen->_main->getChild(gen->_main, index);
+	Heap_List* heapList = newHeap_List();
+	for (index = 0; index < gen->_main->amountOfChilds; index++, currentChild = gen->_main->getChild(gen->_main, index)) {
+
+		switch (currentChild->type) {
+		case VARIABLE_PARSE:
+			CaseVariable(gen, heapList, currentChild);
+			break;
+		case ASSIGN_PARSE:
+			CaseAssign(gen, heapList, currentChild);
+			break;
+		}
+
+	}
+}
+
+void CaseExpression(CodeGen* gen, Heap_List* heapList, ParseTree* current) {
+	size_t i = 0;
+	ParseTree* child = current->getChild(current, i);
+	for (; i < current->amountOfChilds; i++, child = current->getChild(current, i)) {
+        if (child->type == IDENTIFIER_PARSE){
+			char* currentRow = NULL;
+			// Continute here with assembling the row, with the new function
+			// Make it the same as the website i.e.
+			// int x = 5; =>  mov     DWORD PTR [rbp-4], 5
+			// But Just using PUSH instead
+			// When finished instead of writing it into the file, which is now forbidden, add it to the codeList field in code gen
+			assembleRow(currentRow, "PUSH ");
+			// Continue with assembling
+			// Do this for all other fields too ( ATOMIC, ADD, SUB )
+			// Use the heap list parameter for variables on the stack
+        }
+		else if(child->type == ATOMIC_PARSE) {
+			// Check with the LC_List field on the codeGen parameter to know what constants to useאתה 
+			fputs("PUSH	", gen->filePointer);
+			fputs(child->token->lexeme, gen->filePointer);
+			fputs("\n", gen->filePointer);
+		}
+        else
+        {
+			fputs("POP	edx\n", gen->filePointer);
+			fputs("POP	eax\n", gen->filePointer);
+            switch (child->type)
+            {
+			case PARSE_PLUS:
+            {
+				fputs("add	eax, edx\n", gen->filePointer);
+                break;
+            }
+            case PARSE_MINUS:
+            {
+				fputs("sub	eax, edx\n", gen->filePointer);
+                break;
+            }
+            case PARSE_STAR:
+            {
+				fputs("imul	eax, edx\n", gen->filePointer);
+                break;
+            }
+            case PARSE_SLASH:
+            {
+				fputs("cdq\n", gen->filePointer);
+				fputs("idiv	edx\n", gen->filePointer);
+                break;
+            }
+            }
+			fputs("PUSH	eax\n", gen->filePointer);
+        }
+    }
+	fputs("POP	eax\n", gen->filePointer);
+}
+
+
+void CaseVariable(CodeGen* gen, Heap_List* heapList , ParseTree* current) {
+
+	switch (current->getChild(current, 0)->type) {
+		case PARSE_INT_V: {
+			// Parsing the value of the variable
+			CaseExpression(gen, heapList, current->getChild(current, 3));
+
+			// making the actuall row of creating the varialbe
+			char* currentRow = NULL;
+			int newMargin = heapList->size > 0 ? heapList->heaps[heapList->size - 1]->margin + 4 : 4;
+			Heap_ListAdd(heapList, newHeap(HEAP_DWORD, current->getChild(current, 1)->token->lexeme, newMargin));
+			assembleRow(currentRow, "PUSH DWORD PTR [rbp-");
+			char* marginString= (char*)malloc((int)((ceil(log10((int)newMargin)) + 1) * sizeof(char)));
+			sprintf(marginString, "%d", newMargin);
+			assembleRow(currentRow, marginString);
+			assembleRow(currentRow, "], eax");
+			free(marginString);
+			gen->codeList->add(gen->codeList, currentRow);
+		}
+	}
+	return;
+}
+
+void CaseAssign(CodeGen* gen, Heap_List* heapList, ParseTree* current)
+{
+	/*
+	* int
+	    mov     DWORD PTR [rbp-4], 0
+	* string
+	    mov     QWORD PTR [rbp-16], OFFSET FLAT:.LC0
+    * float    
+		movss   xmm0, DWORD PTR .LC1[rip]
+        movss   DWORD PTR [rbp-20], xmm0
+	*/
+	char* currentRow = (char*)malloc(1);
+	*currentRow = '\0';
+	char numSTR[15] = "";
+	CaseExpression(gen, heapList, current->getChild(current, 2));
+	
+	ParseTree* firstChild = current->getChild(current, 0);
+	if (!strcmp(getValue(gen->table, (firstChild->token->lexeme)).variable->type, "string")){
+		assembleRow(currentRow, "mov     QWORD PTR [rbp-");
+	}
+	else if(!strcmp(getValue(gen->table, (firstChild->token->lexeme)).variable->type, "float")){
+		assembleRow(currentRow, "movss   DWORD PTR [rbp-");
+	}
+	else if (!strcmp(getValue(gen->table, (firstChild->token->lexeme)).variable->type, "int")){
+		assembleRow(currentRow, "mov     DWORD PTR [rbp-");
+	}
+	sprintf(numSTR, "%d", getHeap(heapList, firstChild->token->lexeme)->margin);
+	assembleRow(currentRow, numSTR);
+	assembleRow(currentRow, "], ax");
+	gen->codeList->add(gen->codeList, currentRow);
+}
+
+
+
+void writeLine(FILE* fp, const char* row) {
 	fputc('\t', fp);
 	fwrite(row, sizeof(char), LENGTH(row), fp);
 	fputc('\n', fp);
 	return;
 }
+
+void assembleRow(char* asmRow, char* newRow) {
+	asmRow = (char*)realloc(asmRow, sizeof(char) * strlen(asmRow) + LENGTH(newRow));
+	strcat(asmRow, newRow);
+	return;
+}
+
+
+
 
 
