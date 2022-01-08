@@ -7,6 +7,7 @@ void newCodeGen(CodeGen* gen, char* path, ParseTree* mainTree, Table* table) {
 	gen->table = table;
 	gen->codeList = newStringList();
 	gen->lcList = newLC_List();
+	gen->loopCounter = 0;
 	return;
 }
 
@@ -38,11 +39,11 @@ FILE* CreateBlankFile(const char* path) {
 	return fp;
 }
 
-void Generate(CodeGen* gen) {
+void Generate(CodeGen* gen, ParseTree* current) {
 	size_t index = 0;
-	ParseTree* currentChild = gen->_main->getChild(gen->_main, index);
+	ParseTree* currentChild = current->getChild(gen->_main, index);
 	Heap_List* heapList = newHeap_List();
-	for (index = 0; index < gen->_main->amountOfChilds; index++, currentChild = gen->_main->getChild(gen->_main, index)) {
+	for (index = 0; index <current->amountOfChilds; index++, currentChild = current->getChild(current, index)) {
 
 		switch (currentChild->type) {
 		case VARIABLE_PARSE:
@@ -51,8 +52,29 @@ void Generate(CodeGen* gen) {
 		case ASSIGN_PARSE:
 			CaseAssign(gen, heapList, currentChild);
 			break;
+		case FULL_LOOP_PARSE:
+			CaseLoop(gen, heapList, currentChild);
 		}
 
+	}
+}
+
+char* getJmpCondition(ParseTreeType type)
+{
+	switch (type)
+	{
+	case PARSE_GREATER:
+		return "jg";
+	case PARSE_GREATER_EQUAL:
+		return "jge";
+	case PARSE_LESS:
+		return "jl";
+	case PARSE_LESS_EQUAL:
+		return "jle";
+	case PARSE_EQUAL_EQUAL:
+		return "je";
+	case PARSE_BANG_EQUAL:
+		return "jne";
 	}
 }
 
@@ -188,6 +210,56 @@ void CaseAssign(CodeGen* gen, Heap_List* heapList, ParseTree* current)
 	gen->codeList->add(gen->codeList, currentRow);
 }
 
+void CaseLoop(CodeGen* gen, Heap_List* heapList, ParseTree* current)
+{
+	/*
+		jmp end_loop
+		start_loop:
+			*body*
+		end_loop:
+		expresion/condition
+		cmp dx,ax
+		jmp condotiom start_loop
+
+	*/
+	char numSTR[15] = "";
+	char* currentRow = (char*)malloc(1);
+	*currentRow = '\0';
+	sprintf(numSTR, "%d", gen->loopCounter);
+
+	ParseTree* condition = current->getChild(current, 0);
+	ParseTree* expression = condition->getChild(condition, 0);
+	ParseTree* body = current->getChild(current, 1);
+	assembleRow(currentRow, "jmp end_loop");
+	assembleRow(currentRow, numSTR);
+	gen->codeList->add(gen->codeList, currentRow);
+	*currentRow = '\0';
+	assembleRow(currentRow, "start_loop");
+	assembleRow(currentRow, numSTR);
+	assembleRow(currentRow, ":");
+	gen->codeList->add(gen->codeList, currentRow);
+	*currentRow = '\0';
+	
+	Generate(gen, body);
+
+	assembleRow(currentRow, "end_loop");
+	assembleRow(currentRow, numSTR);
+	assembleRow(currentRow, ":");
+	gen->codeList->add(gen->codeList, currentRow);
+	*currentRow = '\0';
+
+	CaseExpression(gen, heapList, expression);
+	assembleRow(currentRow, "cmp edx, eax");
+	gen->codeList->add(gen->codeList, currentRow);
+	*currentRow = '\0';
+	
+	assembleRow(currentRow, getJmpCondition(expression->getChild(expression, expression->amountOfChilds - 1)->type));
+	assembleRow(currentRow, " start_loop");
+	assembleRow(currentRow, numSTR);
+	gen->codeList->add(gen->codeList, currentRow);
+
+	gen->loopCounter++;
+}
 
 
 void writeLine(FILE* fp, const char* row) {

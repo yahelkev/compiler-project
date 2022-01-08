@@ -19,7 +19,7 @@ Token* peekPost(Token** stack, int* top) {
 int priority(Token* x) {
     if (x->type == TOKEN_LEFT_PAREN)
         return 0;
-    if (x->type == TOKEN_GREATER || x->type == TOKEN_GREATER_EQUAL || x->type == TOKEN_LESS_EQUAL || x->type == TOKEN_LESS)
+    if (x->type == TOKEN_GREATER || x->type == TOKEN_GREATER_EQUAL || x->type == TOKEN_LESS_EQUAL || x->type == TOKEN_LESS || x->type == TOKEN_EQUAL_EQUAL ||  x->type == TOKEN_BANG_EQUAL)
         return CON_PRIORITY;
     if (x->type == TOKEN_PLUS || x->type == TOKEN_MINUS)
         return PLUS_MINUS_PRIORITY;
@@ -173,6 +173,10 @@ ParseTreeType getType(Parser* par, Token* token)
         return PARSE_LESS;
     case TOKEN_LESS_EQUAL:
         return PARSE_LESS_EQUAL;
+    case TOKEN_EQUAL_EQUAL:
+        return PARSE_EQUAL_EQUAL;
+    case TOKEN_BANG_EQUAL:
+        return PARSE_BANG_EQUAL;
 
     default:
         error(par, token, "Unexpected operator");
