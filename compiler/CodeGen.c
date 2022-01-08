@@ -193,7 +193,7 @@ void CaseLoop(CodeGen* gen, Heap_List* heapList, ParseTree* current)
 	*currentRow = '\0';
 
 	CaseExpression(gen, heapList, expression);
-	assembleRow(currentRow, "cmp dx, ax");
+	assembleRow(currentRow, "cmp edx, eax");
 	gen->codeList->add(gen->codeList, currentRow);
 	*currentRow = '\0';
 	
