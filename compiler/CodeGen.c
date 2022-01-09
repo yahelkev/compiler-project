@@ -127,20 +127,20 @@ void PostToAsmExp(CodeGen* gen, Heap_List* heapList, ParseTree* current) {
 			}
 			case ATOMIC_PARSE: {
 				char numSTR[15] = "";
-				switch (child->token->type) {
+				switch (stack[top]->token->type) {
 				case TOKEN_STRING:
 					currentRow = assembleRow(currentRow, "OFFSET FLAT:.LC");
-					sprintf(numSTR, "%d", getLCOffset(gen->lcList, child->token->lexeme));
+					sprintf(numSTR, "%d", getLCOffset(gen->lcList, stack[top]->token->lexeme));
 					currentRow = assembleRow(currentRow, numSTR);
 					break;
 				case TOKEN_FLOAT:
 					currentRow = assembleRow(currentRow, "DWORD PTR .LC");
-					sprintf(numSTR, "%d", getLCOffset(gen->lcList, child->token->lexeme));
+					sprintf(numSTR, "%d", getLCOffset(gen->lcList, stack[top]->token->lexeme));
 					currentRow = assembleRow(currentRow, numSTR);
 					currentRow = assembleRow(currentRow, "[rip]");
 					break;
 				case TOKEN_INT:
-					currentRow = assembleRow(currentRow, child->token->lexeme);
+					currentRow = assembleRow(currentRow, stack[top]->token->lexeme);
 					break;
 				default:
 					break;
@@ -161,7 +161,7 @@ void ExpressionFirst(CodeGen* gen, Heap_List* heapList, ParseTree* child) {
 	case IDENTIFIER_PARSE: {
 		char* currentRow = NULL;
 		char marginString[15] = "";
-		currentRow = assembleRow(currentRow, "MOV eax,	DWORD PTR [rbp-");
+		currentRow = assembleRow(currentRow, "MOV eax, DWORD PTR [rbp-");
 		sprintf(marginString, "%d", getHeap(heapList, child->token->lexeme)->margin);
 		currentRow = assembleRow(currentRow, marginString);
 		currentRow = assembleRow(currentRow, "]");
@@ -173,12 +173,12 @@ void ExpressionFirst(CodeGen* gen, Heap_List* heapList, ParseTree* child) {
 		char numSTR[15] = "";
 		switch (child->token->type) {
 		case TOKEN_STRING:
-			currentRow = assembleRow(currentRow, "MOV eax,	OFFSET FLAT:.LC");
+			currentRow = assembleRow(currentRow, "MOV eax, OFFSET FLAT:.LC");
 			sprintf(numSTR, "%d", getLCOffset(gen->lcList, child->token->lexeme));
 			currentRow = assembleRow(currentRow, numSTR);
 			break;
 		case TOKEN_FLOAT:
-			currentRow = assembleRow(currentRow, "MOV eax,	DWORD PTR .LC");
+			currentRow = assembleRow(currentRow, "MOV eax, DWORD PTR .LC");
 			sprintf(numSTR, "%d", getLCOffset(gen->lcList, child->token->lexeme));
 			currentRow = assembleRow(currentRow, numSTR);
 			currentRow = assembleRow(currentRow, "[rip]");
