@@ -41,5 +41,6 @@ int main( int argc, char** argv ) {
     newCodeGen(&gen, srcFileName, vis.par->mainTree, vis.par->table);
     gen.filePointer = CreateBlankFile(gen.filePath);
     Generate(&gen);
+    emitAsm(&gen);
     return 0;
 }

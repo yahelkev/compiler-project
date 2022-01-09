@@ -38,6 +38,7 @@ typedef struct CodeGen {
 void newCodeGen(CodeGen* gen, char* path, ParseTree* mainTree, Table* table);
 FILE* CreateBlankFile(char* path);
 void Generate(CodeGen* gen);
+void emitAsm(CodeGen* gen);
 
 // Valid cases
 void CaseVariable(CodeGen* gen, Heap_List* heapList, ParseTree* current);
@@ -45,5 +46,5 @@ void CaseExpression(CodeGen* gen, Heap_List* heapList, ParseTree* current);
 
 // Tooling
 void writeLine(FILE* fp, const char* row);
-void assembleRow(char* asmRow, char* newRow); // Concats newRow to asmRow
+char* assembleRow(char* asmRow, char* newRow); // Concats newRow to asmRow
 #endif // !CODE_GEN_H

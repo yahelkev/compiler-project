@@ -21,6 +21,6 @@ Token* peekPost(Token** stack, int* top);
 int priority(Token* x);
 bool convertToPost(Parser* par, ParseTree* current, TokenType EO_Expr);
 
-ParseTree* foldTerms(ParseTree* currentTree, ParseTree* child);
+ParseTree* foldTerms(ParseTree* currentTree, ParseTree* child, Token* stack[], int* top);
 
 #endif // !POSTFIX_H

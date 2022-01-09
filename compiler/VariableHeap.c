@@ -5,13 +5,14 @@ VariableHeap* getHeap(Heap_List* list, char* key) {
 		if (!strcmp(list->heaps[i]->key, key))
 			return list->heaps[i];
 	}
+	return NULL;
 }
 
 VariableHeap* newHeap(Heap_TYPE type, char* key, int margin) {
 	VariableHeap* lc = (VariableHeap*)malloc(sizeof(VariableHeap));
 	lc->type = type;
 	lc->key = (char*)malloc(sizeof(char) * LENGTH(key));
-	strncpy(lc->key, key, strlen(key));
+	strncpy(lc->key, key, LENGTH(key));
 	lc->margin = margin;
 	return lc;
 }
@@ -22,7 +23,7 @@ Heap_List* newHeap_List() {
 	return list;
 }
 void Heap_ListAdd(Heap_List* list, VariableHeap* heap) {
-	list->heaps = (VariableHeap**)malloc(sizeof(VariableHeap*) * (list->size + 1));
+	list->heaps = (VariableHeap**)realloc(list->heaps, sizeof(VariableHeap*) * (list->size + 1));
 	list->heaps[list->size] = (VariableHeap*)malloc(sizeof(VariableHeap));
 	list->heaps[list->size] = heap;
 	list->size++;

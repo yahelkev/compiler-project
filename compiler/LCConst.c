@@ -37,3 +37,19 @@ void freeLC_List(LC_List* list) {
 	free(list);
 	return;
 }
+
+int getLCOffset(LC_List* list, char* value) {
+	for (size_t i = 0; i < list->size; i++) {
+		if (!strcmp(list->consts[i]->value, value))
+			return i;
+	}
+	return 0;
+}
+
+void printLC(LCConst* lc, int index) {
+	printf("LC%d:\n", index);
+	printf("\t.%s ", lc->type == LC_String ? "string" : "long");
+	if (lc->type == LC_String) printf("\"%s\"\n\n", lc->value);
+	else printf("%s\n\n", lc->value);
+	return;
+}

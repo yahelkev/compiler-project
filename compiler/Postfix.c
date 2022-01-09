@@ -43,7 +43,7 @@ bool convertToPost(Parser* par, ParseTree* current, TokenType EO_Expr) {
                 return 0;
             }
             child = newTree(getType(par, par->current), par->current);
-            child = foldTerms(current, child);
+            child = foldTerms(current, child, stack, &top);
             current->addChild(current, child);
         }
         else if (par->current->type == TOKEN_LEFT_PAREN) {
@@ -81,7 +81,7 @@ bool convertToPost(Parser* par, ParseTree* current, TokenType EO_Expr) {
             while (top != -1 && priority(peekPost(stack, &top)) >= priority(par->current)) {
                 token = pop(stack, &top);
                 child = newTree(getType(par, token), token);
-                child = foldTerms(current, child);
+                child = foldTerms(current, child, stack, &top);
                 current->addChild(current, child);
             }
             stack[++top] = par->current;
@@ -97,7 +97,6 @@ bool convertToPost(Parser* par, ParseTree* current, TokenType EO_Expr) {
     while (top != -1) {
         token = pop(stack, &top);
         ParseTree* child = newTree(getType(par, token), token);
-        child = foldTerms(current, child);
         current->addChild(current, child);
     }
 
@@ -141,17 +140,24 @@ ParseTreeType getType(Parser* par, Token* token) {
     }
 }
 
-ParseTree* foldTerms(ParseTree* currentTree, ParseTree* child) {
+ParseTree* foldTerms(ParseTree* currentTree, ParseTree* child, Token* stack[], int* top) {
     ParseTree* lastChild = currentTree->getChild(currentTree, currentTree->amountOfChilds - 1);
     ParseTree* twoLastChild = currentTree->getChild(currentTree, currentTree->amountOfChilds - 2);
+    ParseTree* threeLastChild = currentTree->getChild(currentTree, currentTree->amountOfChilds - 3);
     bool foldFlag = false;
     ParseTree* first = NULL, * second = NULL, * sign = NULL;
-    if (!(lastChild && twoLastChild)) return child;
+    if (!(lastChild && twoLastChild && threeLastChild)) return child;
     // Check here if last child is a constant and then fold it with top stack
     if (lastChild->type == ATOMIC_PARSE && child->type != ATOMIC_PARSE && twoLastChild->type == ATOMIC_PARSE) {
         first = lastChild;
         second = twoLastChild;
         sign = child;
+        foldFlag = true;
+    }
+    else if (lastChild->type != ATOMIC_PARSE && child->type == ATOMIC_PARSE && (twoLastChild->type == ATOMIC_PARSE || threeLastChild->type == ATOMIC_PARSE) && priority(peekPost(stack, top)) >= priority(lastChild->token)) {
+        first = twoLastChild->type == ATOMIC_PARSE ? twoLastChild : threeLastChild;
+        second = child;
+        sign = lastChild;
         foldFlag = true;
     }
     else {
@@ -190,12 +196,11 @@ ParseTree* foldTerms(ParseTree* currentTree, ParseTree* child) {
         out == (int)out ? sprintf(foldToken->lexeme, "%d", (int)out) : sprintf(foldToken->lexeme, "%.3f", out);
         foldToken->length = strlen(foldToken->lexeme);
 
-        sign->freeParseTree(sign);
+        currentTree->delChild(currentTree, sign);
 
         sign = newTree(ATOMIC_PARSE, foldToken);
         currentTree->delChild(currentTree, first); // Del specific child
         currentTree->delChild(currentTree, second);
-        printf("Fold\n");
     }
     return sign;
 }
