@@ -40,6 +40,10 @@ bool visitAst(Table* table, ParseTree* tree) {
 		return visitVariable(table, tree);
 	case ASSIGN_PARSE:
 		return visitAssign(table, tree);
+	case FULL_CONDITIONAL_PARSE:
+	case FULL_FUNCTION_PARSE:
+	case FULL_LOOP_PARSE:
+		return true;
 	default:
 		return false;
 	}

@@ -121,11 +121,10 @@ void PostToAsmExp(CodeGen* gen, Heap_List* heapList, ParseTree* current) {
 			stack[++top] = child;
 			break;
 		default:
-			currentRow = NULL;
 			currentRow = GetOPRow(gen, child, currentRow);
 			switch (stack[top]->type) {
 			case IDENTIFIER_PARSE: {
-				char marginString[15] = "";
+				char marginString[MAX_DIGIT_LENGTH] = "";
 				currentRow = assembleRow(currentRow, "DWORD PTR [rbp-");
 				sprintf(marginString, "%d", getHeap(heapList, child->token->lexeme)->margin);
 				currentRow = assembleRow(currentRow, marginString);
@@ -133,7 +132,7 @@ void PostToAsmExp(CodeGen* gen, Heap_List* heapList, ParseTree* current) {
 				break;
 			}
 			case ATOMIC_PARSE: {
-				char numSTR[15] = "";
+				char numSTR[MAX_DIGIT_LENGTH] = "";
 				switch (stack[top]->token->type) {
 				case TOKEN_STRING:
 					currentRow = assembleRow(currentRow, "OFFSET FLAT:.LC");
@@ -168,8 +167,7 @@ void PostToAsmExp(CodeGen* gen, Heap_List* heapList, ParseTree* current) {
 void ExpressionFirst(CodeGen* gen, Heap_List* heapList, ParseTree* child) {
 	switch (child->type) {
 	case IDENTIFIER_PARSE: {
-		char* currentRow = NULL;
-		char marginString[15] = "";
+		char* currentRow = NULL, marginString[MAX_DIGIT_LENGTH] = "";
 		currentRow = assembleRow(currentRow, "MOV eax, DWORD PTR [rbp-");
 		sprintf(marginString, "%d", getHeap(heapList, child->token->lexeme)->margin);
 		currentRow = assembleRow(currentRow, marginString);
@@ -179,7 +177,7 @@ void ExpressionFirst(CodeGen* gen, Heap_List* heapList, ParseTree* child) {
 	}
 	case ATOMIC_PARSE: {
 		char* currentRow = NULL;
-		char numSTR[15] = "";
+		char numSTR[MAX_DIGIT_LENGTH] = "";
 		switch (child->token->type) {
 		case TOKEN_STRING:
 			currentRow = assembleRow(currentRow, "MOV eax, OFFSET FLAT:.LC");
@@ -285,24 +283,23 @@ void CaseAssign(CodeGen* gen, Heap_List* heapList, ParseTree* current) {
 		movss   xmm0, DWORD PTR .LC1[rip]
         movss   DWORD PTR [rbp-20], xmm0
 	*/
-	char* currentRow = (char*)malloc(1);
-	*currentRow = '\0';
-	char numSTR[15] = "";
+	char* currentRow = NULL;
+	char numSTR[MAX_DIGIT_LENGTH] = "";
 	CaseExpression(gen, heapList, current->getChild(current, 2));
 	
 	ParseTree* firstChild = current->getChild(current, 0);
 	if (!strcmp(getValue(gen->table, (firstChild->token->lexeme)).variable->type, "string")){
-		currentRow = assembleRow(currentRow, "mov     QWORD PTR [rbp-");
+		currentRow = assembleRow(currentRow, "MOV	QWORD PTR [rbp-");
 	}
 	else if(!strcmp(getValue(gen->table, (firstChild->token->lexeme)).variable->type, "float")){
-		currentRow = assembleRow(currentRow, "movss   DWORD PTR [rbp-");
+		currentRow = assembleRow(currentRow, "MOVSS	DWORD PTR [rbp-");
 	}
 	else if (!strcmp(getValue(gen->table, (firstChild->token->lexeme)).variable->type, "int")){
-		currentRow = assembleRow(currentRow, "mov     DWORD PTR [rbp-");
+		currentRow = assembleRow(currentRow, "MOV	DWORD PTR [rbp-");
 	}
 	sprintf(numSTR, "%d", getHeap(heapList, firstChild->token->lexeme)->margin);
 	currentRow = assembleRow(currentRow, numSTR);
-	currentRow = assembleRow(currentRow, "], ax");
+	currentRow = assembleRow(currentRow, "], eax");
 	gen->codeList->add(gen->codeList, currentRow);
 }
 
@@ -318,22 +315,23 @@ void CaseLoop(CodeGen* gen, Heap_List* heapList, ParseTree* current) {
 
 	*/
 	char numSTR[15] = "";
-	char* currentRow = (char*)malloc(1);
-	*currentRow = '\0';
+	char* currentRow = NULL;
 	sprintf(numSTR, "%d", gen->loopCounter);
 
 	ParseTree* condition = current->getChild(current, 0);
 	ParseTree* expression = condition->getChild(condition, 0);
 	ParseTree* body = current->getChild(current, 1);
+
 	currentRow = assembleRow(currentRow, "jmp end_loop");
 	currentRow = assembleRow(currentRow, numSTR);
 	gen->codeList->add(gen->codeList, currentRow);
-	*currentRow = '\0';
+	currentRow = NULL;
+
 	currentRow = assembleRow(currentRow, "start_loop");
 	currentRow = assembleRow(currentRow, numSTR);
 	currentRow = assembleRow(currentRow, ":");
 	gen->codeList->add(gen->codeList, currentRow);
-	*currentRow = '\0';
+	currentRow = NULL;
 	
 	Generate(gen, body);
 
@@ -341,12 +339,12 @@ void CaseLoop(CodeGen* gen, Heap_List* heapList, ParseTree* current) {
 	currentRow = assembleRow(currentRow, numSTR);
 	currentRow = assembleRow(currentRow, ":");
 	gen->codeList->add(gen->codeList, currentRow);
-	*currentRow = '\0';
+	currentRow = NULL;
 
 	CaseExpression(gen, heapList, expression);
 	currentRow = assembleRow(currentRow, "cmp edx, eax");
 	gen->codeList->add(gen->codeList, currentRow);
-	*currentRow = '\0';
+	currentRow = NULL;
 	
 	currentRow = assembleRow(currentRow, getJmpCondition(expression->getChild(expression, expression->amountOfChilds - 1)->type));
 	currentRow = assembleRow(currentRow, " start_loop");
@@ -356,22 +354,20 @@ void CaseLoop(CodeGen* gen, Heap_List* heapList, ParseTree* current) {
 	gen->loopCounter++;
 }
 
-void CaseConditions(CodeGen* gen, Heap_List* heapList, ParseTree* current)
-{
+void CaseConditions(CodeGen* gen, Heap_List* heapList, ParseTree* current) {
 	/*
 		cmp     edx, eax
-		jmp condotion   if_body
-		 *else Body
+		jmp_condition if_body
+		*else Body
 		jmp end_if
-	if_body:
-		*if_body
-	end_if:
+		if_body:
+			*if_body
+		end_if:
 
 	*/
 
-	char numSTR[15] = "";
-	char* currentRow = (char*)malloc(1);
-	*currentRow = '\0';
+	char numSTR[MAX_DIGIT_LENGTH] = "";
+	char* currentRow = NULL;
 	sprintf(numSTR, "%d", gen->conditionCounter);
 
 	ParseTree* condition = current->getChild(current, 0);
@@ -382,29 +378,27 @@ void CaseConditions(CodeGen* gen, Heap_List* heapList, ParseTree* current)
 	CaseExpression(gen, heapList, expression);
 	currentRow = assembleRow(currentRow, "cmp edx, eax");
 	gen->codeList->add(gen->codeList, currentRow);
-	*currentRow = '\0';
+	currentRow = NULL;
 
 	currentRow = assembleRow(currentRow, getJmpCondition(expression->getChild(expression, expression->amountOfChilds - 1)->type));
 	currentRow = assembleRow(currentRow, " if_body");
 	currentRow = assembleRow(currentRow, numSTR);
 	gen->codeList->add(gen->codeList, currentRow);
-	*currentRow = '\0';
+	currentRow = NULL;
 
-	//if there is else
-	if (current->amountOfChilds == 3) {
-		Generate(gen, current->getChild(current, 2));
-	}
+	// Converting Else Block
+	if (current->amountOfChilds == 3) Generate(gen, current->getChild(current, 2));
 
 	currentRow = assembleRow(currentRow, "jmp end_if");
 	currentRow = assembleRow(currentRow, numSTR);
 	gen->codeList->add(gen->codeList, currentRow);
-	*currentRow = '\0';
+	currentRow = NULL;
 
 	currentRow = assembleRow(currentRow, "if_body");
 	currentRow = assembleRow(currentRow, numSTR);
 	currentRow = assembleRow(currentRow, ":");
 	gen->codeList->add(gen->codeList, currentRow);
-	*currentRow = '\0';
+	currentRow = NULL;
 
 	Generate(gen, body);
 

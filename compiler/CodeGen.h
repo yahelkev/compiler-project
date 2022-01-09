@@ -17,6 +17,7 @@
 #define LENGTH(var) strlen(var) + 1
 #define START_OF_FILE "\t.file "
 #define ASM_EXTENSION ".asm"
+#define MAX_DIGIT_LENGTH 15
 
 typedef enum {
 	String_C,
