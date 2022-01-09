@@ -44,6 +44,9 @@ bool statement(Parser* par, ParseTree* current) {
 	case TOKEN_LOOP:
 		parserAdvance(par);
 		return parseLoop(par, current);
+	case TOKEN_RETURN:
+		parserAdvance(par);
+		return parseReturn(par, current);
 	default:
 		error(par, par->current, "Invalid Syntax");
 		synchronize(par);
@@ -167,9 +170,9 @@ bool parseVariableCreation(Parser* par, ParseTree* current) {
 		return false;
 	}
 	current->addChild(current, mainTree);
-	struct variable var = makeVariable(mainTree->getChild(mainTree, START_TREE), mainTree->getChild(mainTree, END_VARIABLE_TREE));
+	struct variable* var = makeVariable(mainTree->getChild(mainTree, START_TREE)->token->lexeme, mainTree->getChild(mainTree, END_VARIABLE_TREE));
 	TABLE_VALUE* value = (TABLE_VALUE*)malloc(sizeof(TABLE_VALUE));
-	newValue(value, VARIABLE_TAG, &var, mainTree->getChild(mainTree, START_TREE)->token->line, mainTree->getChild(mainTree, START_TREE)->token->column);
+	newValue(value, VARIABLE_TAG, var, mainTree->getChild(mainTree, START_TREE)->token->line, mainTree->getChild(mainTree, START_TREE)->token->column);
 	insertValue(par->table, mainTree->getChild(mainTree, START_TREE + 1)->token->lexeme, value);
 	return true;
 }
@@ -450,6 +453,17 @@ bool parseCalls(Parser* par, ParseTree* current) {
 	call->addChild(call, args);
 	current->addChild(current, call);
 	parserAdvance(par);
+	return true;
+}
+
+
+bool parseReturn(Parser* par, ParseTree* current) {
+	ParseTree* returnTree = newTree(PARSE_RETURN_FULL, NULL);
+	returnTree->addChild(returnTree, newTree(PARSE_RETURN, par->pre));
+	ParseTree* exp = newTree(EXPRESSION_PARSE, NULL);
+	if (!expression(par, exp, TOKEN_END_LINE)) return false;
+	returnTree->addChild(returnTree, exp);
+	current->addChild(current, returnTree);
 	return true;
 }
 
