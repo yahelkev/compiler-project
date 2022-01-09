@@ -312,63 +312,63 @@ void CaseAssign(CodeGen* gen, Heap_List* heapList, ParseTree* current) {
 
 void CaseLoop(CodeGen* gen, Heap_List* heapList, ParseTree* current) {
 	/*
-		jmp end_loop
 		start_loop:
-			*body*
+		cmp eax, constant
+		jmp condidtion end_loop
+		*body*
+		jmp start_loop
 		end_loop:
-		expresion/condition
-		cmp edx,eax
-		jmp condotion start_loop
+		
 
 	*/
-	char numSTR[15] = "";
+	char numSTR[MAX_DIGIT_LENGTH] = "";
 	char* currentRow = NULL;
-	sprintf(numSTR, "%d", gen->loopCounter);
+	sprintf(numSTR, "%d", gen->conditionCounter);
 
 	ParseTree* condition = current->getChild(current, 0);
 	ParseTree* expression = condition->getChild(condition, 0);
 	ParseTree* body = current->getChild(current, 1);
 
-	currentRow = assembleRow(currentRow, "jmp end_loop");
-	currentRow = assembleRow(currentRow, numSTR);
-	gen->codeList->add(gen->codeList, currentRow);
-	currentRow = NULL;
-
-	currentRow = assembleRow(currentRow, "start_loop");
-	currentRow = assembleRow(currentRow, numSTR);
-	currentRow = assembleRow(currentRow, ":");
-	gen->codeList->add(gen->codeList, currentRow);
-	currentRow = NULL;
 	
-	Generate(gen, heapList, body);
-
-	currentRow = assembleRow(currentRow, "end_loop");
+	currentRow = assembleRow(currentRow, "START_LOOP");
 	currentRow = assembleRow(currentRow, numSTR);
 	currentRow = assembleRow(currentRow, ":");
 	gen->codeList->add(gen->codeList, currentRow);
 	currentRow = NULL;
 
 	CaseExpression(gen, heapList, expression);
-	currentRow = assembleRow(currentRow, "cmp edx, eax");
+
+	currentRow = assembleRow(currentRow, getJmpCondition(expression->getChild(expression, expression->amountOfChilds - 1)->type));
+	currentRow = assembleRow(currentRow, " END_LOOP");
+	currentRow = assembleRow(currentRow, numSTR);
 	gen->codeList->add(gen->codeList, currentRow);
 	currentRow = NULL;
 	
-	currentRow = assembleRow(currentRow, getJmpCondition(expression->getChild(expression, expression->amountOfChilds - 1)->type));
-	currentRow = assembleRow(currentRow, " start_loop");
+	Generate(gen, heapList, body);
+
+	currentRow = assembleRow(currentRow, "\tJMP START_LOOP");
 	currentRow = assembleRow(currentRow, numSTR);
+	currentRow = assembleRow(currentRow, "\n");
 	gen->codeList->add(gen->codeList, currentRow);
+	currentRow = NULL;
+
+	currentRow = assembleRow(currentRow, "END_LOOP");
+	currentRow = assembleRow(currentRow, numSTR);
+	currentRow = assembleRow(currentRow, ":");
+	gen->codeList->add(gen->codeList, currentRow);
+	currentRow = NULL;
 
 	gen->loopCounter++;
 }
 
 void CaseConditions(CodeGen* gen, Heap_List* heapList, ParseTree* current) {
 	/*
-		cmp     edx, eax
-		jmp_condition if_body
-		*else Body
+		cmp     eax, consatnt
+		jmp_condition else_body/end
+		if_body
 		jmp end_if
-		if_body:
-			*if_body
+		*else:
+			*else_body
 		end_if:
 
 	*/
