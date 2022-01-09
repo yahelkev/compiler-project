@@ -72,12 +72,12 @@ bool visitCall(Table* table, ParseTree* tree) {
 bool visitExperssion(Table* table, ParseTree* tree) {
 	ParseTree* child = tree->getChild(tree, 0);
 	char type[10] = "\0";
-	strcpy(type, getTypeAsString(table, child));
 	char childType[10] = "\0";
+	strcpy(type, getTypeAsString(table, child));
 	for (int i = 1; i < tree->amountOfChilds; i++) {
 		ParseTree* child = tree->getChild(tree, i);
 		strcpy(childType, getTypeAsString(table, child));
-		if (*childType != '\0' && strcmp(childType, type)) {
+		if (childType[0] != '\0' && strcmp(childType, type)) {
 			throwError(child->token, "Types dont match");
 			return false;
 		}
@@ -117,6 +117,8 @@ char* getTypeOfExpression(Table* table, ParseTree* tree) {
 			return "int";
 		case TOKEN_FLOAT:
 			return "float";
+		case TOKEN_STRING:
+			return "string";
 		}
 		break;
 	}

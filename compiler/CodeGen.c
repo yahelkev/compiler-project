@@ -232,7 +232,7 @@ void CaseVariable(CodeGen* gen, Heap_List* heapList , ParseTree* current) {
 
 			// making the actual row of creating the varialbe
 			char* currentRow = NULL;
-			int newMargin = heapList->size > 0 ? heapList->heaps[heapList->size - 1]->margin % 8 == 0 ? heapList->heaps[heapList->size - 1]->margin + 8 : heapList->heaps[heapList->size - 1]->margin + 12 : 4;
+			int newMargin = heapList->size > 0 ? heapList->heaps[heapList->size - 1]->margin % 8 == 0 ? heapList->heaps[heapList->size - 1]->margin + 8 : heapList->heaps[heapList->size - 1]->margin + 12 : 8;
 			Heap_ListAdd(heapList, newHeap(HEAP_QWORD, current->getChild(current, 1)->token->lexeme, newMargin));
 			currentRow =  assembleRow(currentRow, "MOV QWORD PTR [rbp-");
 			char* marginString = (char*)malloc((int)((ceil(log10((int)newMargin)) + 1) * sizeof(char)));
