@@ -65,5 +65,6 @@ bool parseFunction(Parser* par, ParseTree* current);
 bool parseArgs(Parser* par, ParseTree* current);
 bool parseCalls(Parser* par, ParseTree* current);
 bool parseReturn(Parser* par, ParseTree* current);
+bool parseElse(Parser* par, ParseTree* current);
 
 #endif // !PARSER_H

@@ -45,6 +45,9 @@ bool statement(Parser* par, ParseTree* current) {
 	case TOKEN_RETURN:
 		parserAdvance(par);
 		return parseReturn(par, current);
+	case TOKEN_ELSE:
+		parserAdvance(par);
+		return parseElse(par, current);
 	default:
 		error(par, par->current, "Invalid Syntax");
 		synchronize(par);
@@ -69,6 +72,7 @@ void synchronize(Parser* parser) {
 		case TOKEN_STRING_V:
 		case TOKEN_LOOP:
 		case TOKEN_FUNCTION:
+		case TOKEN_ELSE:
 			parser->panic = 0;
 			return;
 		case TOKEN_END_LINE:
@@ -466,3 +470,13 @@ bool parseReturn(Parser* par, ParseTree* current) {
 	return true;
 }
 
+
+bool parseElse(Parser* par, ParseTree* current) {
+	Token* elseToken = par->pre;
+	ParseTree* elseBody = newTree(ELSE_PARSE, NULL);
+	parserAdvance(par);
+	if (!parseBody(par, elseBody)) return false;
+	error(par, elseToken, "Detached Else Block is not allowed");
+	synchronize(par);
+	return false;
+}
