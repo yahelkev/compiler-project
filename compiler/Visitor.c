@@ -59,7 +59,7 @@ bool visitCall(Table* table, ParseTree* tree) {
 	ParseTree* currentArg = argsTree->getChild(argsTree, 0);
 	bool return_ = true;
 	for (size_t i = 0; i < argsTree->amountOfChilds; i++, currentArg = argsTree->getChild(argsTree, i)) {
-		if (strcmp(getTypeOfExpression(table, currentArg), val.function->args[i].type)) {
+		if (!compareTypes(getTypeOfExpression(table, currentArg), val.function->args[i].type)) {
 			throwError(currentArg->getChild(currentArg, 0)->token, "Type mismatch on function call");
 			return_ = false;
 		}
@@ -71,13 +71,10 @@ bool visitCall(Table* table, ParseTree* tree) {
 
 bool visitExperssion(Table* table, ParseTree* tree) {
 	ParseTree* child = tree->getChild(tree, 0);
-	char type[10] = "\0";
-	char childType[10] = "\0";
-	strcpy(type, getTypeAsString(table, child));
+	char* type= getTypeAsString(table, child);
 	for (int i = 1; i < tree->amountOfChilds; i++) {
 		ParseTree* child = tree->getChild(tree, i);
-		strcpy(childType, getTypeAsString(table, child));
-		if (childType[0] != '\0' && strcmp(childType, type)) {
+		if (!compareTypes(getTypeAsString(table, child), type)) {
 			throwError(child->token, "Types dont match");
 			return false;
 		}
@@ -89,7 +86,7 @@ bool visitVariable(Table* table, ParseTree* tree) {
 	if (!visitExperssion(table, tree->getChild(tree, 3))) {
 		return false;
 	}
-	if (strcmp(getValue(table, (tree->getChild(tree, 1)->token->lexeme)).variable->type, getTypeOfExpression(table, tree->getChild(tree, 3)))) {
+	if (!compareTypes(getValue(table, (tree->getChild(tree, 1)->token->lexeme)).variable->type, getTypeOfExpression(table, tree->getChild(tree, 3)))) {
 		throwError(tree->getChild(tree, 3), "Value type and variable type don't much");
 		return false;
 	}
@@ -99,10 +96,20 @@ bool visitAssign(Table* table, ParseTree* tree) {
 	if (!visitExperssion(table, tree->getChild(tree, 2))) {
 		return false;
 	}
-	if (strcmp(getValue(table, (tree->getChild(tree, 0))->token->lexeme).variable->type, getTypeOfExpression(table, tree->getChild(tree, 2)))) {
+	if (!compareTypes(getValue(table, (tree->getChild(tree, 0))->token->lexeme).variable->type, getTypeOfExpression(table, tree->getChild(tree, 2)))) {
 		throwError(tree->getChild(tree, 2), "Value type and variable type don't much");
 		return false;
 	}
+	return true;
+}
+
+bool compareTypes(char* type1, char* type2) {
+	if(!(type1[0] && type2[0])) return true;
+	int floatIntCounter = 0;
+	floatIntCounter += !strcmp(type1, "float") ? 1 : !strcmp(type1, "int") ? 1 : 0;
+	floatIntCounter += !strcmp(type2, "float") ? 1 : !strcmp(type2, "int") ? 1 : 0;
+	if (strcmp(type1, type2) && floatIntCounter != 2) 
+		return false;
 	return true;
 }
 
@@ -122,7 +129,6 @@ char* getTypeOfExpression(Table* table, ParseTree* tree) {
 		}
 		break;
 	}
-					 break;
 	case FULL_CALL_PARSE:
 		return getValue(table, first->getChild(first, 0)->token->lexeme).function->returnType;
 	}

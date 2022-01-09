@@ -34,7 +34,7 @@ bool getParseTree(Parser* par);
 void throwError(Token* token, const char* message);
 
 
-// TODO : Create a function that takes a tree of type expression and returns the type of said tree
+bool compareTypes(char* type1, char* type2);
 char* getTypeOfExpression(Table* table, ParseTree* tree);
 char* getTypeAsString(Table* table, ParseTree* child);
 
