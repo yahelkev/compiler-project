@@ -66,7 +66,7 @@ void Generate(CodeGen* gen, ParseTree* current) {
 	size_t index = 0;
 	ParseTree* currentChild = current->getChild(gen->_main, index);
 	Heap_List* heapList = newHeap_List();
-	for (index = 0; index <current->amountOfChilds; index++, currentChild = current->getChild(current, index)) {
+	for (index = 0; index < current->amountOfChilds; index++, currentChild = current->getChild(current, index)) {
 
 		switch (currentChild->type) {
 		case VARIABLE_PARSE:
@@ -208,10 +208,11 @@ void ExpressionFirst(CodeGen* gen, Heap_List* heapList, ParseTree* child) {
 }
 
 void CaseExpression(CodeGen* gen, Heap_List* heapList, ParseTree* current) {
-	size_t i = 0;
-	ParseTree* child = current->getChild(current, i);
+
 	PostToAsmExp(gen, heapList, current);
 	return;
+}
+
 char* getJmpCondition(ParseTreeType type)
 {
 	switch (type)
@@ -231,83 +232,6 @@ char* getJmpCondition(ParseTreeType type)
 	}
 }
 
-void CaseExpression(CodeGen* gen, Heap_List* heapList, ParseTree* current) {
-	size_t i = 0;
-	ParseTree* child = current->getChild(current, i);
-	for (; i < current->amountOfChilds; i++, child = current->getChild(current, i)) {
-        if (child->type == IDENTIFIER_PARSE){
-			char* currentRow = (char*)malloc(1);
-			*currentRow = '\0';
-			char marginString[15] = "";
-			currentRow = assembleRow(currentRow, "PUSH  DWORD PTR [rbp-");
-			sprintf(marginString, "%d", getHeap(heapList, child->token->lexeme)->margin);
-			currentRow = assembleRow(currentRow, marginString);
-			currentRow = assembleRow(currentRow, "]");
-			gen->codeList->add(gen->codeList, currentRow);
-        }
-		else if(child->type == ATOMIC_PARSE) {
-			char* currentRow = (char*)malloc(1);
-			*currentRow = '\0';
-			char numSTR[15] = "";
-			switch (child->token->type)
-			{
-			case TOKEN_STRING:
-					currentRow = assembleRow(currentRow, "PUSH	OFFSET FLAT:.LC");
-					sprintf(numSTR, "%d", get_LC_offset(gen->lcList, child->token->lexeme));
-					currentRow = assembleRow(currentRow, numSTR);
-					*numSTR = '\0';
-				break;
-			case TOKEN_FLOAT:
-					currentRow = assembleRow(currentRow, "PUSH	DWORD PTR .LC");
-					sprintf(numSTR, "%d",get_LC_offset(gen->lcList, child->token->lexeme));
-					currentRow = assembleRow(currentRow, numSTR);
-					*numSTR = '\0';
-					currentRow = assembleRow(currentRow, "[rip]");
-				break;
-			case TOKEN_INT:
-					currentRow = assembleRow(currentRow, "PUSH	");
-					currentRow = assembleRow(currentRow, child->token->lexeme);
-				break;
-			default:
-				break;
-			}
-			gen->codeList->add(gen->codeList, currentRow);
-		}
-        else
-        {
-			gen->codeList->add(gen->codeList, "POP	edx");
-			gen->codeList->add(gen->codeList, "POP	eax");
-            switch (child->type)
-            {
-			case PARSE_PLUS:
-            {
-				gen->codeList->add(gen->codeList, "add	eax, edx");
-                break;
-            }
-            case PARSE_MINUS:
-            {
-				gen->codeList->add(gen->codeList, "sub	eax, edx");
-                break;
-            }
-            case PARSE_STAR:
-            {
-				gen->codeList->add(gen->codeList, "imul	eax, edx");
-                break;
-            }
-            case PARSE_SLASH:
-            {
-				gen->codeList->add(gen->codeList, "cdq");
-				gen->codeList->add(gen->codeList, "idiv	edx");
-                break;
-            }
-            }
-			gen->codeList->add(gen->codeList, "PUSH	eax");
-        }
-    }
-	gen->codeList->add(gen->codeList, "POP	eax");
-}
-
-
 
 void CaseVariable(CodeGen* gen, Heap_List* heapList , ParseTree* current) {
 
@@ -321,7 +245,7 @@ void CaseVariable(CodeGen* gen, Heap_List* heapList , ParseTree* current) {
 			char* currentRow = NULL;
 			int newMargin = heapList->size > 0 ? heapList->heaps[heapList->size - 1]->margin + 4 : 4;
 			Heap_ListAdd(heapList, newHeap(HEAP_DWORD, current->getChild(current, 1)->token->lexeme, newMargin));
-			assembleRow(currentRow, "PUSH DWORD PTR [rbp-");
+			currentRow = assembleRow(currentRow, "MOV DWORD PTR [rbp-");
 			char* marginString= (char*)malloc((int)((ceil(log10((int)newMargin)) + 1) * sizeof(char)));
 			sprintf(marginString, "%d", newMargin);
 			currentRow = assembleRow(currentRow, marginString);
@@ -351,8 +275,7 @@ void CaseVariable(CodeGen* gen, Heap_List* heapList , ParseTree* current) {
 	return;
 }
 
-void CaseAssign(CodeGen* gen, Heap_List* heapList, ParseTree* current)
-{
+void CaseAssign(CodeGen* gen, Heap_List* heapList, ParseTree* current) {
 	/*
 	* int
 	    mov     DWORD PTR [rbp-4], 0
@@ -383,8 +306,7 @@ void CaseAssign(CodeGen* gen, Heap_List* heapList, ParseTree* current)
 	gen->codeList->add(gen->codeList, currentRow);
 }
 
-void CaseLoop(CodeGen* gen, Heap_List* heapList, ParseTree* current)
-{
+void CaseLoop(CodeGen* gen, Heap_List* heapList, ParseTree* current) {
 	/*
 		jmp end_loop
 		start_loop:

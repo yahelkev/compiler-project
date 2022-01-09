@@ -6,6 +6,12 @@
 #include "Lexer.h"
 
 #define LENGTH(var) strlen(var) + 1
+#define printBinary(n) { unsigned i;  for (i = 1 << 31; i > 0; i = i / 2) { (n & i)? printf("1") : printf("0"); } printf("\n"); }
+
+typedef union ufloat {
+	float f;
+	unsigned u;
+}ufloat;
 
 typedef enum LC_TYPE {
 	LC_String, // .string

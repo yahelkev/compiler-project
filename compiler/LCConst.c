@@ -50,6 +50,10 @@ void printLC(LCConst* lc, int index, FILE* fp) {
 	fprintf(fp, "\nLC%d:\n", index);
 	fprintf(fp, "\t.%s ", lc->type == LC_String ? "string" : "long");
 	if (lc->type == LC_String) fprintf(fp, "\"%s\"\n\n", lc->value);
-	else fprintf(fp, "%s\n\n", lc->value);
+	else {
+		ufloat u1;
+		u1.f = atof(lc->value);
+		fprintf(fp, "%d\n\n", u1.u);
+	}
 	return;
 }
