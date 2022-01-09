@@ -252,6 +252,7 @@ bool parseBody(Parser* par, ParseTree* current) {
 		while (par->current->type == TOKEN_END_LINE) parserAdvance(par);
 		if (!statement(par, current)) return false;
 	}
+	return true;
 }
 
 bool parseConditional(Parser* par, ParseTree* current) {

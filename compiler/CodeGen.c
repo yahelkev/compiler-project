@@ -65,7 +65,7 @@ void emitAsm(CodeGen* gen) {
 
 void Generate(CodeGen* gen, Heap_List* list, ParseTree* current) {
 	size_t index = 0;
-	ParseTree* currentChild = current->getChild(gen->_main, index);
+	ParseTree* currentChild = current->getChild(current, index);
 	Heap_List* heapList = list ? list : newHeap_List();
 	for (index = 0; index < current->amountOfChilds; index++, currentChild = current->getChild(current, index)) {
 
@@ -399,7 +399,6 @@ void CaseConditions(CodeGen* gen, Heap_List* heapList, ParseTree* current) {
 	currentRow = assembleRow(currentRow, numSTR);
 	currentRow = assembleRow(currentRow, ":");
 	gen->codeList->add(gen->codeList, currentRow);
-
 	if (current->amountOfChilds == 3) {
 		gen->codeList->add(gen->codeList, "\tJMP END_IF");
 		Generate(gen, heapList, current->getChild(current, 2));
@@ -407,6 +406,7 @@ void CaseConditions(CodeGen* gen, Heap_List* heapList, ParseTree* current) {
 	}
 		
 
+	// TODO : Reduce the extra variables that were created insize of the if/else block
 	gen->conditionCounter++;
 }
 
