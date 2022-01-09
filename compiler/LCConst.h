@@ -39,6 +39,6 @@ void LC_ListAdd(LC_List* list, LCConst* lcConst);
 void freeLC_List(LC_List* list);
 void freeLC(LCConst* lc);
 int getLCOffset(LC_List* list, char* value);
-void printLC(LCConst* lc, int index);
+void printLC(LCConst* lc, int index, FILE* fp);
 
 #endif // !LCCONST_H

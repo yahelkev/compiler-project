@@ -44,7 +44,7 @@ void emitAsm(CodeGen* gen) {
 	
 	// Print LC Constants
 	for (size_t i = 0; i < gen->lcList->size; i++)
-		printLC(gen->lcList->consts[i], i);
+		printLC(gen->lcList->consts[i], i, gen->filePointer);
 	
 	// Print saved functions after constants
 	
@@ -132,12 +132,14 @@ void PostToAsmExp(CodeGen* gen, Heap_List* heapList, ParseTree* current) {
 					currentRow = assembleRow(currentRow, "OFFSET FLAT:.LC");
 					sprintf(numSTR, "%d", getLCOffset(gen->lcList, stack[top]->token->lexeme));
 					currentRow = assembleRow(currentRow, numSTR);
+					LC_ListAdd(gen->lcList, newLC(LC_String, child->token->lexeme, child->token));
 					break;
 				case TOKEN_FLOAT:
 					currentRow = assembleRow(currentRow, "DWORD PTR .LC");
 					sprintf(numSTR, "%d", getLCOffset(gen->lcList, stack[top]->token->lexeme));
 					currentRow = assembleRow(currentRow, numSTR);
 					currentRow = assembleRow(currentRow, "[rip]");
+					LC_ListAdd(gen->lcList, newLC(LC_Long, child->token->lexeme, child->token));
 					break;
 				case TOKEN_INT:
 					currentRow = assembleRow(currentRow, stack[top]->token->lexeme);
@@ -176,12 +178,14 @@ void ExpressionFirst(CodeGen* gen, Heap_List* heapList, ParseTree* child) {
 			currentRow = assembleRow(currentRow, "MOV eax, OFFSET FLAT:.LC");
 			sprintf(numSTR, "%d", getLCOffset(gen->lcList, child->token->lexeme));
 			currentRow = assembleRow(currentRow, numSTR);
+			LC_ListAdd(gen->lcList, newLC(LC_String, child->token->lexeme, child->token));
 			break;
 		case TOKEN_FLOAT:
 			currentRow = assembleRow(currentRow, "MOV eax, DWORD PTR .LC");
 			sprintf(numSTR, "%d", getLCOffset(gen->lcList, child->token->lexeme));
 			currentRow = assembleRow(currentRow, numSTR);
 			currentRow = assembleRow(currentRow, "[rip]");
+			LC_ListAdd(gen->lcList, newLC(LC_Long, child->token->lexeme, child->token));
 			break;
 		case TOKEN_INT:
 			currentRow = assembleRow(currentRow, "MOV eax, ");

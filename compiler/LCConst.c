@@ -4,7 +4,7 @@ LCConst* newLC(LC_TYPE type, char* value, Token* toke) {
 	LCConst* lc = (LCConst*)malloc(sizeof(LCConst));
 	lc->type = type;
 	lc->value = (char*)malloc(sizeof(char) * LENGTH(value));
-	strncpy(lc->value, value, strlen(value));
+	strncpy(lc->value, value, LENGTH(value));
 	lc->token = *toke;
 	return lc;
 }
@@ -46,10 +46,10 @@ int getLCOffset(LC_List* list, char* value) {
 	return 0;
 }
 
-void printLC(LCConst* lc, int index) {
-	printf("LC%d:\n", index);
-	printf("\t.%s ", lc->type == LC_String ? "string" : "long");
-	if (lc->type == LC_String) printf("\"%s\"\n\n", lc->value);
-	else printf("%s\n\n", lc->value);
+void printLC(LCConst* lc, int index, FILE* fp) {
+	fprintf(fp, "\nLC%d:\n", index);
+	fprintf(fp, "\t.%s ", lc->type == LC_String ? "string" : "long");
+	if (lc->type == LC_String) fprintf(fp, "\"%s\"\n\n", lc->value);
+	else fprintf(fp, "%s\n\n", lc->value);
 	return;
 }
