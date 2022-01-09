@@ -33,16 +33,24 @@ typedef struct CodeGen {
 
 	LC_List* lcList;
 	StringList* codeList;
+	int loopCounter;
+	int conditionCounter;
 } CodeGen;
 
 void newCodeGen(CodeGen* gen, char* path, ParseTree* mainTree, Table* table);
 FILE* CreateBlankFile(char* path);
-void Generate(CodeGen* gen);
+void Generate(CodeGen* gen, ParseTree* current);
 void emitAsm(CodeGen* gen);
+void Generate(CodeGen* gen, ParseTree* current);
+
+char* getJmpCondition(ParseTreeType type);
 
 // Valid cases
 void CaseVariable(CodeGen* gen, Heap_List* heapList, ParseTree* current);
+void CaseAssign(CodeGen* gen, Heap_List* heapList, ParseTree* current);
 void CaseExpression(CodeGen* gen, Heap_List* heapList, ParseTree* current);
+void CaseLoop(CodeGen* gen, Heap_List* heapList, ParseTree* current);
+void CaseConditions(CodeGen* gen, Heap_List* heapList, ParseTree* current);
 
 
 // Expression Handling
