@@ -31,12 +31,8 @@ FILE* CreateBlankFile(const char* path) {
 	strncat(asmPath, ASM_EXTENSION, LENGTH(ASM_EXTENSION));
 
 	fp = fopen(asmPath, "w");
-	char* btext = (char*)malloc(sizeof(char) * LENGTH(START_OF_FILE));
-	strncpy(btext, START_OF_FILE, LENGTH(START_OF_FILE));
-	btext = (char*)realloc(btext, sizeof(char) * LENGTH(btext) + strlen(path));
-	strncat(btext, path, LENGTH(path));
-	fwrite(btext, sizeof(char), strlen(btext), fp);
-	fputc('\n', fp);
+	fprintf(fp, "\t.file \"%s\"", path);
+	fprintf(fp, "\n\t.text\n\t.def\t___main;\t.scl  2;\t.type  32;\t.endef\n\t.section .rdata,\"dr\"");
 	return fp;
 }
 
