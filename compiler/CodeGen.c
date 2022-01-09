@@ -8,6 +8,7 @@ void newCodeGen(CodeGen* gen, char* path, ParseTree* mainTree, Table* table) {
 	gen->codeList = newStringList();
 	gen->lcList = newLC_List();
 	gen->loopCounter = 0;
+	gen->conditionCounter = 0;
 	return;
 }
 
@@ -376,7 +377,7 @@ void CaseConditions(CodeGen* gen, Heap_List* heapList, ParseTree* current) {
 
 
 	CaseExpression(gen, heapList, expression);
-	currentRow = assembleRow(currentRow, "cmp edx, eax");
+	currentRow = assembleRow(currentRow, "cmp eax, 0");
 	gen->codeList->add(gen->codeList, currentRow);
 	currentRow = NULL;
 

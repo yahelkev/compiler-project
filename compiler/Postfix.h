@@ -15,6 +15,9 @@
 #define MAX_STACK_SIZE 256
 #define EMPTY_STACK -1
 
+#define EPSILON_PRECISION 0.0001
+
+
 
 Token* pop(Token** stack, int* top);
 Token* peekPost(Token** stack, int* top);

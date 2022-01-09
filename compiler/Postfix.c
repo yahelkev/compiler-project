@@ -174,22 +174,50 @@ ParseTree* foldTerms(ParseTree* currentTree, ParseTree* child, Token* stack[], i
         // twoLastChild 5
         // lastChild 3
         // child +
-        float firstConst = atof(first->token->lexeme);
-        float secondConst = atof(second->token->lexeme);
+        float firstConst = atof(second->token->lexeme);
+        float secondConst = atof(first->token->lexeme);
         float out = 0;
         switch (sign->type) {
-        case PARSE_PLUS:
-            out = firstConst + secondConst;
-            break;
-        case PARSE_MINUS:
-            out = firstConst - secondConst;
-            break;
-        case PARSE_STAR:
-            out = firstConst * secondConst;
-            break;
-        case PARSE_SLASH:
-            out = firstConst / secondConst;
-            break;
+
+            // Arithmetic
+            case PARSE_PLUS:
+                out = firstConst + secondConst;
+                break;
+            case PARSE_MINUS:
+                out = firstConst - secondConst;
+                break;
+            case PARSE_STAR:
+                out = firstConst * secondConst;
+                break;
+            case PARSE_SLASH:
+                out = firstConst / secondConst;
+                break;
+
+            // Boolean
+            case PARSE_AND_AND:
+                out = firstConst && secondConst;
+                break;
+            case PARSE_OR_OR:
+                out = firstConst || secondConst;
+                break;
+            case PARSE_GREATER:
+                out = (int)(firstConst - secondConst) > 0;
+                break;
+            case PARSE_GREATER_EQUAL:
+                out = (int)(firstConst - secondConst) >= EPSILON_PRECISION;
+                break;
+            case PARSE_LESS:
+                out = (int)(firstConst - secondConst) < 0;
+                break;
+            case PARSE_LESS_EQUAL:
+                out = (int)(firstConst - secondConst) <= EPSILON_PRECISION;
+                break;
+            case PARSE_EQUAL_EQUAL:
+                out = (int)(firstConst - secondConst) < EPSILON_PRECISION;
+                break;
+            case PARSE_BANG_EQUAL:
+                out = (int)(firstConst - secondConst) > EPSILON_PRECISION;
+                break;
         }
         Token* foldToken = (Token*)malloc(sizeof(Token));
         foldToken->column = first->token->column;
