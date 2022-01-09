@@ -47,9 +47,9 @@ void emitAsm(CodeGen* gen) {
 	// Print saved functions after constants
 	
 
-	fwrite("\nmain:\n", sizeof(char), LENGTH("\nmain:\n"), gen->filePointer);
-	writeLine(gen->filePointer, "PUSH rbp");
-	writeLine(gen->filePointer, "MOV rbp, rsp\n");
+	writeLine(gen->filePointer, "\nmain:\n");
+	writeLine(gen->filePointer, "\tPUSH rbp");
+	writeLine(gen->filePointer, "\tMOV rbp, rsp\n");
 	
 
 	// Print entire code
@@ -57,9 +57,9 @@ void emitAsm(CodeGen* gen) {
 		writeLine(gen->filePointer, gen->codeList->strings[i]);
 
 	fputc('\n', gen->filePointer);
-	writeLine(gen->filePointer, "MOV eax, 0");
-	writeLine(gen->filePointer, "POP rbp");
-	writeLine(gen->filePointer, "RET");
+	writeLine(gen->filePointer, "\tMOV eax, 0");
+	writeLine(gen->filePointer, "\tPOP rbp");
+	writeLine(gen->filePointer, "\tRET");
 	return;
 }
 
@@ -89,23 +89,30 @@ void Generate(CodeGen* gen, ParseTree* current) {
 
 char* GetOPRow(CodeGen* gen, ParseTree* child, char* currentRow) {
 	switch (child->type) {
+
+		// Arithmetic
 		case PARSE_PLUS: {
-			currentRow = assembleRow(currentRow, "ADD eax, ");
+			currentRow = assembleRow(currentRow, "\tADD eax, ");
 			break;
 		}
 		case PARSE_MINUS: {
-			currentRow = assembleRow(currentRow, "SUB eax, ");
+			currentRow = assembleRow(currentRow, "\tSUB eax, ");
 			break;
 		}
 		case PARSE_STAR: {
-			currentRow = assembleRow(currentRow, "IMUL eax, ");
+			currentRow = assembleRow(currentRow, "\tIMUL eax, ");
 			break;
 		}
 		case PARSE_SLASH: {
-			gen->codeList->add(gen->codeList, "CDQ");
-			currentRow = assembleRow(currentRow, "IDIV ");
+			gen->codeList->add(gen->codeList, "\tCDQ");
+			currentRow = assembleRow(currentRow, "\tIDIV ");
 			break;
 		}
+
+		// Boolean
+		default:
+			currentRow = assembleRow(currentRow, "\tCMP eax, ");
+			break;
 	}
 	return currentRow;
 }
@@ -169,7 +176,7 @@ void ExpressionFirst(CodeGen* gen, Heap_List* heapList, ParseTree* child) {
 	switch (child->type) {
 	case IDENTIFIER_PARSE: {
 		char* currentRow = NULL, marginString[MAX_DIGIT_LENGTH] = "";
-		currentRow = assembleRow(currentRow, "MOV eax, DWORD PTR [rbp-");
+		currentRow = assembleRow(currentRow, "\tMOV eax, DWORD PTR [rbp-");
 		sprintf(marginString, "%d", getHeap(heapList, child->token->lexeme)->margin);
 		currentRow = assembleRow(currentRow, marginString);
 		currentRow = assembleRow(currentRow, "]");
@@ -181,20 +188,20 @@ void ExpressionFirst(CodeGen* gen, Heap_List* heapList, ParseTree* child) {
 		char numSTR[MAX_DIGIT_LENGTH] = "";
 		switch (child->token->type) {
 		case TOKEN_STRING:
-			currentRow = assembleRow(currentRow, "MOV eax, OFFSET FLAT:.LC");
+			currentRow = assembleRow(currentRow, "\tMOV eax, OFFSET FLAT:.LC");
 			sprintf(numSTR, "%d", getLCOffset(gen->lcList, child->token->lexeme));
 			currentRow = assembleRow(currentRow, numSTR);
 			LC_ListAdd(gen->lcList, newLC(LC_String, child->token->lexeme, child->token));
 			break;
 		case TOKEN_FLOAT:
-			currentRow = assembleRow(currentRow, "MOV eax, DWORD PTR .LC");
+			currentRow = assembleRow(currentRow, "\tMOV eax, DWORD PTR .LC");
 			sprintf(numSTR, "%d", getLCOffset(gen->lcList, child->token->lexeme));
 			currentRow = assembleRow(currentRow, numSTR);
 			currentRow = assembleRow(currentRow, "[rip]");
 			LC_ListAdd(gen->lcList, newLC(LC_Long, child->token->lexeme, child->token));
 			break;
 		case TOKEN_INT:
-			currentRow = assembleRow(currentRow, "MOV eax, ");
+			currentRow = assembleRow(currentRow, "\tMOV eax, ");
 			currentRow = assembleRow(currentRow, child->token->lexeme);
 			break;
 		default:
@@ -212,22 +219,21 @@ void CaseExpression(CodeGen* gen, Heap_List* heapList, ParseTree* current) {
 	return;
 }
 
-char* getJmpCondition(ParseTreeType type)
-{
-	switch (type)
-	{
+char* getJmpCondition(ParseTreeType type) {
+	// We return the opposite value of each jmp condition, so we can reverse the labels in the if block and reduce code size
+	switch (type) {
 	case PARSE_GREATER:
-		return "jg";
+		return "jle"; // > jle was jg
 	case PARSE_GREATER_EQUAL:
-		return "jge";
+		return "jl"; // >= jl was jge
 	case PARSE_LESS:
-		return "jl";
+		return "jge"; // < jge was jl
 	case PARSE_LESS_EQUAL:
-		return "jle";
+		return "jg"; // <= jg was jle
 	case PARSE_EQUAL_EQUAL:
-		return "je";
+		return "jne"; // == jne was je
 	case PARSE_BANG_EQUAL:
-		return "jne";
+		return "je"; // != je was jne
 	}
 }
 
@@ -244,11 +250,11 @@ void CaseVariable(CodeGen* gen, Heap_List* heapList , ParseTree* current) {
 			char* currentRow = NULL;
 			int newMargin = heapList->size > 0 ? heapList->heaps[heapList->size - 1]->margin + 4 : 4;
 			Heap_ListAdd(heapList, newHeap(HEAP_DWORD, current->getChild(current, 1)->token->lexeme, newMargin));
-			currentRow = assembleRow(currentRow, "MOV DWORD PTR [rbp-");
+			currentRow = assembleRow(currentRow, "\tMOV DWORD PTR [rbp-");
 			char* marginString= (char*)malloc((int)((ceil(log10((int)newMargin)) + 1) * sizeof(char)));
 			sprintf(marginString, "%d", newMargin);
 			currentRow = assembleRow(currentRow, marginString);
-			currentRow = assembleRow(currentRow, "], eax");
+			currentRow = assembleRow(currentRow, "], eax\n");
 			free(marginString);
 			gen->codeList->add(gen->codeList, currentRow);
 			break;
@@ -261,11 +267,11 @@ void CaseVariable(CodeGen* gen, Heap_List* heapList , ParseTree* current) {
 			char* currentRow = NULL;
 			int newMargin = heapList->size > 0 ? heapList->heaps[heapList->size - 1]->margin % 8 == 0 ? heapList->heaps[heapList->size - 1]->margin + 8 : heapList->heaps[heapList->size - 1]->margin + 12 : 8;
 			Heap_ListAdd(heapList, newHeap(HEAP_QWORD, current->getChild(current, 1)->token->lexeme, newMargin));
-			currentRow =  assembleRow(currentRow, "MOV QWORD PTR [rbp-");
+			currentRow =  assembleRow(currentRow, "\tMOV QWORD PTR [rbp-");
 			char* marginString = (char*)malloc((int)((ceil(log10((int)newMargin)) + 1) * sizeof(char)));
 			sprintf(marginString, "%d", newMargin);
 			currentRow = assembleRow(currentRow, marginString);
-			currentRow = assembleRow(currentRow, "], eax");
+			currentRow = assembleRow(currentRow, "], eax\n");
 			free(marginString);
 			gen->codeList->add(gen->codeList, currentRow);
 			break;
@@ -290,13 +296,13 @@ void CaseAssign(CodeGen* gen, Heap_List* heapList, ParseTree* current) {
 	
 	ParseTree* firstChild = current->getChild(current, 0);
 	if (!strcmp(getValue(gen->table, (firstChild->token->lexeme)).variable->type, "string")){
-		currentRow = assembleRow(currentRow, "MOV	QWORD PTR [rbp-");
+		currentRow = assembleRow(currentRow, "\tMOV	QWORD PTR [rbp-");
 	}
 	else if(!strcmp(getValue(gen->table, (firstChild->token->lexeme)).variable->type, "float")){
-		currentRow = assembleRow(currentRow, "MOVSS	DWORD PTR [rbp-");
+		currentRow = assembleRow(currentRow, "\tMOVSS	DWORD PTR [rbp-");
 	}
 	else if (!strcmp(getValue(gen->table, (firstChild->token->lexeme)).variable->type, "int")){
-		currentRow = assembleRow(currentRow, "MOV	DWORD PTR [rbp-");
+		currentRow = assembleRow(currentRow, "\tMOV	DWORD PTR [rbp-");
 	}
 	sprintf(numSTR, "%d", getHeap(heapList, firstChild->token->lexeme)->margin);
 	currentRow = assembleRow(currentRow, numSTR);
@@ -377,43 +383,36 @@ void CaseConditions(CodeGen* gen, Heap_List* heapList, ParseTree* current) {
 
 
 	CaseExpression(gen, heapList, expression);
-	currentRow = assembleRow(currentRow, "cmp eax, 0");
-	gen->codeList->add(gen->codeList, currentRow);
-	currentRow = NULL;
 
 	currentRow = assembleRow(currentRow, getJmpCondition(expression->getChild(expression, expression->amountOfChilds - 1)->type));
-	currentRow = assembleRow(currentRow, " if_body");
+	currentRow = assembleRow(currentRow, current->amountOfChilds == 3 ? " MID_IF" : " END_IF");
 	currentRow = assembleRow(currentRow, numSTR);
 	gen->codeList->add(gen->codeList, currentRow);
 	currentRow = NULL;
 
 	// Converting Else Block
-	if (current->amountOfChilds == 3) Generate(gen, current->getChild(current, 2));
-
-	currentRow = assembleRow(currentRow, "jmp end_if");
-	currentRow = assembleRow(currentRow, numSTR);
-	gen->codeList->add(gen->codeList, currentRow);
-	currentRow = NULL;
-
-	currentRow = assembleRow(currentRow, "if_body");
-	currentRow = assembleRow(currentRow, numSTR);
-	currentRow = assembleRow(currentRow, ":");
-	gen->codeList->add(gen->codeList, currentRow);
-	currentRow = NULL;
+	
 
 	Generate(gen, body);
 
-	currentRow = assembleRow(currentRow, "end_if");
+	currentRow = assembleRow(currentRow, current->amountOfChilds == 3 ? "MID_IF" : "END_IF");
 	currentRow = assembleRow(currentRow, numSTR);
 	currentRow = assembleRow(currentRow, ":");
 	gen->codeList->add(gen->codeList, currentRow);
+
+	if (current->amountOfChilds == 3) {
+		gen->codeList->add(gen->codeList, "\tJMP END_IF");
+		Generate(gen, current->getChild(current, 2));
+		gen->codeList->add(gen->codeList, "END_IF:");
+	}
+		
 
 	gen->conditionCounter++;
 }
 
 
 void writeLine(FILE* fp, const char* row) {
-	fputc('\t', fp);
+	//fputc('\t', fp);
 	fwrite(row, sizeof(char), LENGTH(row), fp);
 	fputc('\n', fp);
 	return;
