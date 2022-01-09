@@ -12,7 +12,7 @@
 #define PLUS_MINUS_PRIORITY 2
 #define MUL_DIV_PRIORITY 3
 
-#define MAX_STACK_SIZE 100
+#define MAX_STACK_SIZE 256
 #define EMPTY_STACK -1
 
 

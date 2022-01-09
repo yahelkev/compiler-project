@@ -29,7 +29,7 @@ int priority(Token* x) {
 }
 
 bool convertToPost(Parser* par, ParseTree* current, TokenType EO_Expr) {
-    int openParenthesis = 0, numNiden = 0, operators = 0, top = -1;
+    int openParenthesis = 0, numNiden = 0, operators = 0, top = EMPTY_STACK;
     Token* token = par->current, *stack[MAX_STACK_SIZE];
     ParseTree* child = NULL, *lastChild = NULL, *twoLastChild = NULL, *threeLastChild = NULL;
 
@@ -77,8 +77,7 @@ bool convertToPost(Parser* par, ParseTree* current, TokenType EO_Expr) {
                 synchronize(par);
                 return false;
             }
-            //if(current->)
-            while (top != -1 && priority(peekPost(stack, &top)) >= priority(par->current)) {
+            while (top != EMPTY_STACK && priority(peekPost(stack, &top)) >= priority(par->current)) {
                 token = pop(stack, &top);
                 child = newTree(getType(par, token), token);
                 child = foldTerms(current, child, stack, &top);
@@ -94,7 +93,7 @@ bool convertToPost(Parser* par, ParseTree* current, TokenType EO_Expr) {
         synchronize(par);
         return false;
     }
-    while (top != -1) {
+    while (top != EMPTY_STACK) {
         token = pop(stack, &top);
         ParseTree* child = newTree(getType(par, token), token);
         current->addChild(current, child);

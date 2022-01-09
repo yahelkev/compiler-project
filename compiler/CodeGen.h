@@ -44,6 +44,12 @@ void emitAsm(CodeGen* gen);
 void CaseVariable(CodeGen* gen, Heap_List* heapList, ParseTree* current);
 void CaseExpression(CodeGen* gen, Heap_List* heapList, ParseTree* current);
 
+
+// Expression Handling
+char* GetOPRow(CodeGen* gen, ParseTree* child, char* currentRow);
+void PostToAsmExp(CodeGen* gen, Heap_List* heapList, ParseTree* child);
+void ExpressionFirst(CodeGen* gen, Heap_List* heapList, ParseTree* child);
+
 // Tooling
 void writeLine(FILE* fp, const char* row);
 char* assembleRow(char* asmRow, char* newRow); // Concats newRow to asmRow

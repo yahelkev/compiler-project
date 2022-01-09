@@ -79,121 +79,126 @@ void Generate(CodeGen* gen) {
 	}
 }
 
-void SwitchExpression(CodeGen* gen, Heap_List* heapList, ParseTree* child) {
+char* GetOPRow(CodeGen* gen, ParseTree* child, char* currentRow) {
 	switch (child->type) {
-		case IDENTIFIER_PARSE: {
-			char* currentRow = NULL;
-			char marginString[15] = "";
-			currentRow = assembleRow(currentRow, "PUSH  DWORD PTR [rbp-");
-			sprintf(marginString, "%d", getHeap(heapList, child->token->lexeme)->margin);
-			currentRow = assembleRow(currentRow, marginString);
-			currentRow = assembleRow(currentRow, "]");
-			gen->codeList->add(gen->codeList, currentRow);
+		case PARSE_PLUS: {
+			currentRow = assembleRow(currentRow, "ADD eax, ");
 			break;
 		}
-		case ATOMIC_PARSE: {
-			char* currentRow = NULL;
-			char numSTR[15] = "";
-			switch (child->token->type) {
-			case TOKEN_STRING:
-				currentRow = assembleRow(currentRow, "PUSH	OFFSET FLAT:.LC");
-				sprintf(numSTR, "%d", getLCOffset(gen->lcList, child->token->lexeme));
-				currentRow = assembleRow(currentRow, numSTR);
-				break;
-			case TOKEN_FLOAT:
-				currentRow = assembleRow(currentRow, "PUSH	DWORD PTR .LC");
-				sprintf(numSTR, "%d", getLCOffset(gen->lcList, child->token->lexeme));
-				currentRow = assembleRow(currentRow, numSTR);
-				currentRow = assembleRow(currentRow, "[rip]");
-				break;
-			case TOKEN_INT:
-				currentRow = assembleRow(currentRow, "PUSH	");
-				currentRow = assembleRow(currentRow, child->token->lexeme);
-				break;
-			default:
-				break;
-			}
-			gen->codeList->add(gen->codeList, currentRow);
+		case PARSE_MINUS: {
+			currentRow = assembleRow(currentRow, "SUB eax, ");
 			break;
 		}
-		default: {
-			gen->codeList->add(gen->codeList, "POP	edx");
-			gen->codeList->add(gen->codeList, "POP	eax");
-			switch (child->type)
-			{
-			case PARSE_PLUS:
-			{
-				gen->codeList->add(gen->codeList, "ADD	eax, edx");
-				break;
-			}
-			case PARSE_MINUS:
-			{
-				gen->codeList->add(gen->codeList, "SUB	eax, edx");
-				break;
-			}
-			case PARSE_STAR:
-			{
-				gen->codeList->add(gen->codeList, "IMUL	eax, edx");
-				break;
-			}
-			case PARSE_SLASH:
-			{
-				gen->codeList->add(gen->codeList, "CDQ");
-				gen->codeList->add(gen->codeList, "IDIV	edx");
-				break;
-			}
-			}
-			gen->codeList->add(gen->codeList, "PUSH	eax");
+		case PARSE_STAR: {
+			currentRow = assembleRow(currentRow, "IMUL eax, ");
+			break;
+		}
+		case PARSE_SLASH: {
+			gen->codeList->add(gen->codeList, "CDQ");
+			currentRow = assembleRow(currentRow, "IDIV ");
+			break;
 		}
 	}
+	return currentRow;
 }
+void PostToAsmExp(CodeGen* gen, Heap_List* heapList, ParseTree* current) {
+	ExpressionFirst(gen, heapList, current->getChild(current, 0));
+	ParseTree* stack[MAX_STACK_SIZE], * child = NULL;
+	int top = EMPTY_STACK;
+	char* currentRow = NULL;
+	size_t i = 1;
+	for (child = current->getChild(current, i); i < current->amountOfChilds; i++, child = current->getChild(current, i)) {
+		switch (child->type) {
+		case IDENTIFIER_PARSE:
+		case ATOMIC_PARSE:
+			stack[++top] = child;
+			break;
+		default:
+			currentRow = NULL;
+			currentRow = GetOPRow(gen, child, currentRow);
+			switch (stack[top - 1]->type) {
+			case IDENTIFIER_PARSE: {
+				char marginString[15] = "";
+				currentRow = assembleRow(currentRow, "DWORD PTR [rbp-");
+				sprintf(marginString, "%d", getHeap(heapList, child->token->lexeme)->margin);
+				currentRow = assembleRow(currentRow, marginString);
+				currentRow = assembleRow(currentRow, "]");
+				break;
+			}
+			case ATOMIC_PARSE: {
+				char numSTR[15] = "";
+				switch (child->token->type) {
+				case TOKEN_STRING:
+					currentRow = assembleRow(currentRow, "OFFSET FLAT:.LC");
+					sprintf(numSTR, "%d", getLCOffset(gen->lcList, child->token->lexeme));
+					currentRow = assembleRow(currentRow, numSTR);
+					break;
+				case TOKEN_FLOAT:
+					currentRow = assembleRow(currentRow, "DWORD PTR .LC");
+					sprintf(numSTR, "%d", getLCOffset(gen->lcList, child->token->lexeme));
+					currentRow = assembleRow(currentRow, numSTR);
+					currentRow = assembleRow(currentRow, "[rip]");
+					break;
+				case TOKEN_INT:
+					currentRow = assembleRow(currentRow, child->token->lexeme);
+					break;
+				default:
+					break;
+				}
+				break;
+			}
+			}
+		}
+	}
+	gen->codeList->add(gen->codeList, currentRow);
+	return;
+}
+
+void ExpressionFirst(CodeGen* gen, Heap_List* heapList, ParseTree* child) {
+	switch (child->type) {
+	case IDENTIFIER_PARSE: {
+		char* currentRow = NULL;
+		char marginString[15] = "";
+		currentRow = assembleRow(currentRow, "MOV eax,	DWORD PTR [rbp-");
+		sprintf(marginString, "%d", getHeap(heapList, child->token->lexeme)->margin);
+		currentRow = assembleRow(currentRow, marginString);
+		currentRow = assembleRow(currentRow, "]");
+		gen->codeList->add(gen->codeList, currentRow);
+		break;
+	}
+	case ATOMIC_PARSE: {
+		char* currentRow = NULL;
+		char numSTR[15] = "";
+		switch (child->token->type) {
+		case TOKEN_STRING:
+			currentRow = assembleRow(currentRow, "MOV eax,	OFFSET FLAT:.LC");
+			sprintf(numSTR, "%d", getLCOffset(gen->lcList, child->token->lexeme));
+			currentRow = assembleRow(currentRow, numSTR);
+			break;
+		case TOKEN_FLOAT:
+			currentRow = assembleRow(currentRow, "MOV eax,	DWORD PTR .LC");
+			sprintf(numSTR, "%d", getLCOffset(gen->lcList, child->token->lexeme));
+			currentRow = assembleRow(currentRow, numSTR);
+			currentRow = assembleRow(currentRow, "[rip]");
+			break;
+		case TOKEN_INT:
+			currentRow = assembleRow(currentRow, "MOV eax, ");
+			currentRow = assembleRow(currentRow, child->token->lexeme);
+			break;
+		default:
+			break;
+		}
+		gen->codeList->add(gen->codeList, currentRow);
+		break;
+	}
+	}
+}
+
 void CaseExpression(CodeGen* gen, Heap_List* heapList, ParseTree* current) {
 	size_t i = 0;
 	ParseTree* child = current->getChild(current, i);
-	if (current->amountOfChilds == 1) {
-		switch (child->type) {
-		case IDENTIFIER_PARSE: {
-			char* currentRow = NULL;
-			char marginString[15] = "";
-			currentRow = assembleRow(currentRow, "MOV eax,	DWORD PTR [rbp-");
-			sprintf(marginString, "%d", getHeap(heapList, child->token->lexeme)->margin);
-			currentRow = assembleRow(currentRow, marginString);
-			currentRow = assembleRow(currentRow, "]");
-			gen->codeList->add(gen->codeList, currentRow);
-			break;
-		}
-		case ATOMIC_PARSE: {
-			char* currentRow = NULL;
-			char numSTR[15] = "";
-			switch (child->token->type) {
-			case TOKEN_STRING:
-				currentRow = assembleRow(currentRow, "MOV eax,	OFFSET FLAT:.LC");
-				sprintf(numSTR, "%d", getLCOffset(gen->lcList, child->token->lexeme));
-				currentRow = assembleRow(currentRow, numSTR);
-				break;
-			case TOKEN_FLOAT:
-				currentRow = assembleRow(currentRow, "MOV eax,	DWORD PTR .LC");
-				sprintf(numSTR, "%d", getLCOffset(gen->lcList, child->token->lexeme));
-				currentRow = assembleRow(currentRow, numSTR);
-				currentRow = assembleRow(currentRow, "[rip]");
-				break;
-			case TOKEN_INT:
-				currentRow = assembleRow(currentRow, "MOV eax, ");
-				currentRow = assembleRow(currentRow, child->token->lexeme);
-				break;
-			default:
-				break;
-			}
-			gen->codeList->add(gen->codeList, currentRow);
-			break;
-		}
-	}
-	} else {
-		for (; i < current->amountOfChilds; i++, child = current->getChild(current, i)) {
-			SwitchExpression(gen, heapList, child);
-		}
-		gen->codeList->add(gen->codeList, "POP	eax");
-	}
+	PostToAsmExp(gen, heapList, current);
+	return;
 }
 
 
