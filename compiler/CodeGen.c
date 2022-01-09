@@ -17,7 +17,7 @@ void freeCodeGen(CodeGen* gen) {
 	free(gen->filePath);
 	fclose(gen->filePointer);
 	gen->codeList->free(gen->codeList);
-	free(gen);
+	//free(gen);
 	return;
 }
 
@@ -63,10 +63,10 @@ void emitAsm(CodeGen* gen) {
 	return;
 }
 
-void Generate(CodeGen* gen, ParseTree* current) {
+void Generate(CodeGen* gen, Heap_List* list, ParseTree* current) {
 	size_t index = 0;
 	ParseTree* currentChild = current->getChild(gen->_main, index);
-	Heap_List* heapList = newHeap_List();
+	Heap_List* heapList = list ? list : newHeap_List();
 	for (index = 0; index < current->amountOfChilds; index++, currentChild = current->getChild(current, index)) {
 
 		switch (currentChild->type) {
@@ -340,7 +340,7 @@ void CaseLoop(CodeGen* gen, Heap_List* heapList, ParseTree* current) {
 	gen->codeList->add(gen->codeList, currentRow);
 	currentRow = NULL;
 	
-	Generate(gen, body);
+	Generate(gen, heapList, body);
 
 	currentRow = assembleRow(currentRow, "end_loop");
 	currentRow = assembleRow(currentRow, numSTR);
@@ -393,7 +393,7 @@ void CaseConditions(CodeGen* gen, Heap_List* heapList, ParseTree* current) {
 	// Converting Else Block
 	
 
-	Generate(gen, body);
+	Generate(gen, heapList, body);
 
 	currentRow = assembleRow(currentRow, current->amountOfChilds == 3 ? "MID_IF" : "END_IF");
 	currentRow = assembleRow(currentRow, numSTR);
@@ -402,7 +402,7 @@ void CaseConditions(CodeGen* gen, Heap_List* heapList, ParseTree* current) {
 
 	if (current->amountOfChilds == 3) {
 		gen->codeList->add(gen->codeList, "\tJMP END_IF");
-		Generate(gen, current->getChild(current, 2));
+		Generate(gen, heapList, current->getChild(current, 2));
 		gen->codeList->add(gen->codeList, "END_IF:");
 	}
 		

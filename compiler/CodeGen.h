@@ -40,9 +40,9 @@ typedef struct CodeGen {
 
 void newCodeGen(CodeGen* gen, char* path, ParseTree* mainTree, Table* table);
 FILE* CreateBlankFile(char* path);
-void Generate(CodeGen* gen, ParseTree* current);
+void Generate(CodeGen* gen, Heap_List* list, ParseTree* current);
+void freeCodeGen(CodeGen* gen);
 void emitAsm(CodeGen* gen);
-void Generate(CodeGen* gen, ParseTree* current);
 
 char* getJmpCondition(ParseTreeType type);
 
