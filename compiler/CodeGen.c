@@ -116,7 +116,7 @@ void PostToAsmExp(CodeGen* gen, Heap_List* heapList, ParseTree* current) {
 		default:
 			currentRow = NULL;
 			currentRow = GetOPRow(gen, child, currentRow);
-			switch (stack[top - 1]->type) {
+			switch (stack[top]->type) {
 			case IDENTIFIER_PARSE: {
 				char marginString[15] = "";
 				currentRow = assembleRow(currentRow, "DWORD PTR [rbp-");
@@ -148,9 +148,11 @@ void PostToAsmExp(CodeGen* gen, Heap_List* heapList, ParseTree* current) {
 				break;
 			}
 			}
+			gen->codeList->add(gen->codeList, currentRow);
 		}
+		
 	}
-	gen->codeList->add(gen->codeList, currentRow);
+	
 	return;
 }
 
