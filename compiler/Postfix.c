@@ -96,6 +96,7 @@ bool convertToPost(Parser* par, ParseTree* current, TokenType EO_Expr) {
     while (top != EMPTY_STACK) {
         token = pop(stack, &top);
         ParseTree* child = newTree(getType(par, token), token);
+        child = foldTerms(current, child, stack, &top);
         current->addChild(current, child);
     }
 
@@ -148,7 +149,7 @@ ParseTree* foldTerms(ParseTree* currentTree, ParseTree* child, Token* stack[], i
     ParseTree* threeLastChild = currentTree->getChild(currentTree, currentTree->amountOfChilds - 3);
     bool foldFlag = false;
     ParseTree* first = NULL, * second = NULL, * sign = NULL;
-    if (!(lastChild && twoLastChild && threeLastChild)) return child;
+    if (!(lastChild && twoLastChild)) return child;
     // Check here if last child is a constant and then fold it with top stack
     if (lastChild->type == ATOMIC_PARSE && child->type != ATOMIC_PARSE && twoLastChild->type == ATOMIC_PARSE) {
         first = lastChild;
@@ -156,7 +157,7 @@ ParseTree* foldTerms(ParseTree* currentTree, ParseTree* child, Token* stack[], i
         sign = child;
         foldFlag = true;
     }
-    else if (lastChild->type != ATOMIC_PARSE && child->type == ATOMIC_PARSE && (twoLastChild->type == ATOMIC_PARSE || threeLastChild->type == ATOMIC_PARSE) && priority(peekPost(stack, top)) >= priority(lastChild->token)) {
+    else if (threeLastChild && lastChild->type != ATOMIC_PARSE && child->type == ATOMIC_PARSE && (twoLastChild->type == ATOMIC_PARSE || threeLastChild->type == ATOMIC_PARSE) && priority(peekPost(stack, top)) >= priority(lastChild->token)) {
         first = twoLastChild->type == ATOMIC_PARSE ? twoLastChild : threeLastChild;
         second = child;
         sign = lastChild;

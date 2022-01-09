@@ -149,7 +149,6 @@ char* getTypeAsString(Table* table, ParseTree* child)
 		return "string";
 	default:
 		return "\0";
-		break;
 	}
 }
 
