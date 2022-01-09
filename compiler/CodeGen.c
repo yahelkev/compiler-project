@@ -223,17 +223,17 @@ char* getJmpCondition(ParseTreeType type) {
 	// We return the opposite value of each jmp condition, so we can reverse the labels in the if block and reduce code size
 	switch (type) {
 	case PARSE_GREATER:
-		return "jle"; // > jle was jg
+		return "\tjle"; // > jle was jg
 	case PARSE_GREATER_EQUAL:
-		return "jl"; // >= jl was jge
+		return "\tjl"; // >= jl was jge
 	case PARSE_LESS:
-		return "jge"; // < jge was jl
+		return "\tjge"; // < jge was jl
 	case PARSE_LESS_EQUAL:
-		return "jg"; // <= jg was jle
+		return "\tjg"; // <= jg was jle
 	case PARSE_EQUAL_EQUAL:
-		return "jne"; // == jne was je
+		return "\tjne"; // == jne was je
 	case PARSE_BANG_EQUAL:
-		return "je"; // != je was jne
+		return "\tje"; // != je was jne
 	}
 }
 
