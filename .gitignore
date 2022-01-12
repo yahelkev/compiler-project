@@ -52,6 +52,8 @@
 *.vs/*
 *.Browse.VC.db
 *.ipch
+*.vcxproj
+*.vcxproj.filters
 
 
 # User-specific files (MonoDevelop/Xamarin Studio)
