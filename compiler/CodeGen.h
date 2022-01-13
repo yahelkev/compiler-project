@@ -57,7 +57,7 @@ void CaseConditions(CodeGen* gen, Heap_List* heapList, ParseTree* current, Strin
 // Expression Handling
 char* GetOPRow(CodeGen* gen, ParseTree* child, char* currentRow, StringList* codeList);
 void PostToAsmExp(CodeGen* gen, Heap_List* heapList, ParseTree* child, StringList* codeList);
-void ExpressionFirst(CodeGen* gen, Heap_List* heapList, ParseTree* child);
+void ExpressionFirst(CodeGen* gen, Heap_List* heapList, ParseTree* child, StringList* codeList);
 
 // Tooling
 void writeLine(FILE* fp, const char* row);

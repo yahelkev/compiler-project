@@ -5,7 +5,7 @@ void newCodeGen(CodeGen* gen, char* path, ParseTree* mainTree, Table* table) {
 	strncpy(gen->filePath, path, LENGTH(path));
 	gen->_main = mainTree;
 	gen->table = table;
-	codeList = newStringList();
+	gen->codeList = newStringList();
 	gen->lcList = newLC_List();
 	gen->loopCounter = 0;
 	gen->conditionCounter = 0;
@@ -16,7 +16,7 @@ void freeCodeGen(CodeGen* gen) {
 	gen->_main->freeParseTree(gen->_main);
 	free(gen->filePath);
 	fclose(gen->filePointer);
-	codeList->free(codeList);
+	gen->codeList->free(gen->codeList);
 	//free(gen);
 	return;
 }
@@ -53,8 +53,8 @@ void emitAsm(CodeGen* gen) {
 	
 
 	// Print entire code
-	for (size_t i = 0; i < codeList->amount; i++)
-		writeLine(gen->filePointer, codeList->strings[i]);
+	for (size_t i = 0; i < gen->codeList->amount; i++)
+		writeLine(gen->filePointer, gen->codeList->strings[i]);
 
 	fputc('\n', gen->filePointer);
 	writeLine(gen->filePointer, "\tMOV eax, 0");
@@ -117,7 +117,7 @@ char* GetOPRow(CodeGen* gen, ParseTree* child, char* currentRow, StringList* cod
 	return currentRow;
 }
 void PostToAsmExp(CodeGen* gen, Heap_List* heapList, ParseTree* current, StringList* codeList) {
-	ExpressionFirst(gen, heapList, current->getChild(current, 0));
+	ExpressionFirst(gen, heapList, current->getChild(current, 0), codeList);
 	ParseTree* stack[MAX_STACK_SIZE], * child = NULL;
 	int top = EMPTY_STACK;
 	char* currentRow = NULL;
@@ -129,7 +129,7 @@ void PostToAsmExp(CodeGen* gen, Heap_List* heapList, ParseTree* current, StringL
 			stack[++top] = child;
 			break;
 		default:
-			currentRow = GetOPRow(gen, child, currentRow);
+			currentRow = GetOPRow(gen, child, currentRow, codeList);
 			switch (stack[top]->type) {
 			case IDENTIFIER_PARSE: {
 				char marginString[MAX_DIGIT_LENGTH] = "";
