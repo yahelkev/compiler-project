@@ -67,6 +67,7 @@ void Generate(CodeGen* gen, Heap_List* list, ParseTree* current, StringList* cod
 	size_t index = 0;
 	ParseTree* currentChild = current->getChild(current, index);
 	Heap_List* heapList = list ? list : newHeap_List();
+	int marginSize = 0;
 	for (index = 0; index < current->amountOfChilds; index++, currentChild = current->getChild(current, index)) {
 
 		switch (currentChild->type) {
@@ -82,6 +83,10 @@ void Generate(CodeGen* gen, Heap_List* list, ParseTree* current, StringList* cod
 		case FULL_CONDITIONAL_PARSE:
 			CaseConditions(gen, heapList, currentChild, codeList);
 			break;
+		case FULL_FUNCTION_PARSE:
+			marginSize = heapList->size;
+			CaseFunctionDef(gen, heapList, currentChild, newStringList());
+			Heap_ListDelLast(heapList, heapList->size - marginSize);
 		}
 
 	}
@@ -425,6 +430,10 @@ char* assembleRow(char* asmRow, char* newRow) {
 	return asmRow;
 }
 
+
+void CaseFunctionDef(CodeGen* gen, Heap_List* heapList, ParseTree* current, StringList* codeList) {
+	// TODO : Create function case generator
+}
 
 
 

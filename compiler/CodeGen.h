@@ -52,6 +52,7 @@ void CaseAssign(CodeGen* gen, Heap_List* heapList, ParseTree* current, StringLis
 void CaseExpression(CodeGen* gen, Heap_List* heapList, ParseTree* current, StringList* codeList);
 void CaseLoop(CodeGen* gen, Heap_List* heapList, ParseTree* current, StringList* codeList);
 void CaseConditions(CodeGen* gen, Heap_List* heapList, ParseTree* current, StringList* codeList);
+void CaseFunctionDef(CodeGen* gen, Heap_List* heapList, ParseTree* current, StringList* codeList);
 
 
 // Expression Handling
