@@ -433,6 +433,7 @@ char* assembleRow(char* asmRow, char* newRow) {
 
 void CaseFunctionDef(CodeGen* gen, Heap_List* heapList, ParseTree* current, StringList* codeList) {
 	// TODO : Create function case generator
+
 }
 
 
