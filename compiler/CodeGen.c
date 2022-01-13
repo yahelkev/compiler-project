@@ -5,8 +5,11 @@ void newCodeGen(CodeGen* gen, char* path, ParseTree* mainTree, Table* table) {
 	strncpy(gen->filePath, path, LENGTH(path));
 	gen->_main = mainTree;
 	gen->table = table;
+
 	gen->codeList = newStringList();
 	gen->lcList = newLC_List();
+	gen->funcList = newFunctionList();
+
 	gen->loopCounter = 0;
 	gen->conditionCounter = 0;
 	return;
@@ -17,6 +20,7 @@ void freeCodeGen(CodeGen* gen) {
 	free(gen->filePath);
 	fclose(gen->filePointer);
 	gen->codeList->free(gen->codeList);
+	freeFunctionList(gen->funcList);
 	//free(gen);
 	return;
 }
@@ -45,7 +49,12 @@ void emitAsm(CodeGen* gen) {
 		printLC(gen->lcList->consts[i], i, gen->filePointer);
 	
 	// Print saved functions after constants
-	
+	for (size_t i = 0; i < gen->funcList->size; i++) {
+		fprintf(gen->filePointer, "\n\n%s:\n", gen->funcList->funcs[i]->name);
+		for (size_t j = 0; j < gen->funcList->funcs[i]->code->amount; j++)
+			writeLine(gen->filePointer, gen->funcList->funcs[i]->code->strings[j]);
+		writeLine(gen->filePointer, "\tRET");
+	}
 
 	writeLine(gen->filePointer, "\nmain:\n");
 	writeLine(gen->filePointer, "\tPUSH rbp");
@@ -433,7 +442,11 @@ char* assembleRow(char* asmRow, char* newRow) {
 
 void CaseFunctionDef(CodeGen* gen, Heap_List* heapList, ParseTree* current, StringList* codeList) {
 	// TODO : Create function case generator
-
+	FunctionDef* def = newFunctionDef(current->getChild(current, 0)->token->lexeme, codeList);
+	// TODO : Generate function parameters code, will add when funciton calls are added, to know how the function argumants are calculated on the stack
+	Generate(gen, heapList, current->getChild(current, 3), def->code); //  Generate code of the function block
+	FunctionListAdd(gen->funcList, def);
+	return;
 }
 
 

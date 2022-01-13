@@ -13,6 +13,7 @@
 #include "StringList.h"
 #include "LCConst.h"
 #include "VariableHeap.h"
+#include "FunctionDef.h"
 
 #define LENGTH(var) strlen(var) + 1
 #define START_OF_FILE "\t.file "
@@ -34,8 +35,11 @@ typedef struct CodeGen {
 
 	LC_List* lcList;
 	StringList* codeList;
+	FunctionList* funcList;
+
 	int loopCounter;
 	int conditionCounter;
+
 } CodeGen;
 
 void newCodeGen(CodeGen* gen, char* path, ParseTree* mainTree, Table* table);
