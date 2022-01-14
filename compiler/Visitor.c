@@ -43,7 +43,16 @@ bool visitAst(Table* table, ParseTree* tree) {
 	case FULL_CONDITIONAL_PARSE:
 	case FULL_FUNCTION_PARSE:
 	case FULL_LOOP_PARSE:
+	{
+		ParseTree* body = tree->getChild(tree, 1);
+		for (int i = 0; i < body->amountOfChilds; i++)
+		{
+			if (!visitAst(table, body->getChild(body, i))) {
+				return false;
+			}
+		}
 		return true;
+	}
 	default:
 		return false;
 	}

@@ -34,7 +34,7 @@ int main( int argc, char** argv ) {
     visitAll(&vis);
     if (vis.error) {
         c(RED);
-        fprintf(stderr, "Error while parsing trees\n");
+        fprintf(stderr, "Error while visiting trees\n");
         c(GRAY);
         return 0;
     }
