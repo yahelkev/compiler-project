@@ -63,3 +63,5 @@ void ExpressionFirst(CodeGen* gen, Heap_List* heapList, ParseTree* child);
 void writeLine(FILE* fp, const char* row);
 char* assembleRow(char* asmRow, char* newRow); // Concats newRow to asmRow
 #endif // !CODE_GEN_H
+
+

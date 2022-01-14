@@ -1,2 +1,6 @@
 int num = 5
 int anotherNumber = num + 17
+loop (num < anotherNumber)
+{
+	num = num + 1
+}
