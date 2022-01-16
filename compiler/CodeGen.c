@@ -130,11 +130,11 @@ void PostToAsmExp(CodeGen* gen, Heap_List* heapList, ParseTree* current) {
 			break;
 		default:
 			currentRow = GetOPRow(gen, child, currentRow);
-			switch (child->type) {
+			switch (stack[top]->type) {
 			case IDENTIFIER_PARSE: {
 				char marginString[MAX_DIGIT_LENGTH] = "";
 				currentRow = assembleRow(currentRow, "DWORD PTR [rbp-");
-				sprintf(marginString, "%d", getHeap(heapList, child->token->lexeme)->margin);
+				sprintf(marginString, "%d", getHeap(heapList, stack[top]->token->lexeme)->margin);
 				currentRow = assembleRow(currentRow, marginString);
 				currentRow = assembleRow(currentRow, "]");
 				break;

@@ -2,6 +2,5 @@ int num = 5
 int anotherNumber = num + 17
 loop (num < anotherNumber)
 {
-	num = mum + 1
-	int i = 0
+	num = num + 1
 }
