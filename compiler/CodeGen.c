@@ -45,8 +45,7 @@ FILE* CreateBlankFile(const char* path) {
 void emitAsm(CodeGen* gen) {
 	
 	// Print LC Constants
-	for (size_t i = 0; i < gen->lcList->size; i++)
-		printLC(gen->lcList->consts[i], i, gen->filePointer);
+	for (size_t i = 0; i < gen->lcList->size; i++)		printLC(gen->lcList->consts[i], i, gen->filePointer);
 	
 	// Print saved functions after constants
 	for (size_t i = 0; i < gen->funcList->size; i++) {
@@ -96,6 +95,10 @@ void Generate(CodeGen* gen, Heap_List* list, ParseTree* current, StringList* cod
 			marginSize = heapList->size;
 			CaseFunctionDef(gen, heapList, currentChild, newStringList());
 			Heap_ListDelLast(heapList, heapList->size - marginSize);
+			break;
+		case FULL_CALL_PARSE:
+			CaseFunctionCall(gen, heapList, currentChild, gen->codeList);
+			break;
 		}
 
 	}
@@ -439,13 +442,33 @@ char* assembleRow(char* asmRow, char* newRow) {
 	return asmRow;
 }
 
+void toLower(char* string) {
+	for (size_t i = 0; i < strlen(string); i++) {
+		if (string[i] >= ASCII_CAPITAL_A && string[i] <= ASCII_CAPITAL_Z)
+			string[i] = string[i] + (ASCII_SMALL_A - ASCII_CAPITAL_A);
+	}
+}
+
 
 void CaseFunctionDef(CodeGen* gen, Heap_List* heapList, ParseTree* current, StringList* codeList) {
-	// TODO : Create function case generator
 	FunctionDef* def = newFunctionDef(current->getChild(current, 0)->token->lexeme, codeList);
 	// TODO : Generate function parameters code, will add when funciton calls are added, to know how the function argumants are calculated on the stack
 	Generate(gen, heapList, current->getChild(current, 3), def->code); //  Generate code of the function block
 	FunctionListAdd(gen->funcList, def);
+	return;
+}
+
+
+void CaseFunctionCall(CodeGen* gen, Heap_List* heapList, ParseTree* current, StringList* codeList) {
+	ParseTree* treeArgs = current->getChild(current, 1), * arg = treeArgs->getChild(treeArgs, 0);
+	char* currentRow = NULL;
+	for (size_t i = 0; i < treeArgs->amountOfChilds; i++, arg = treeArgs->getChild(treeArgs, i)) {
+		CaseExpression(gen, heapList, arg, codeList);
+		codeList->add(codeList, "\tPUSH eax");
+	}
+	toLower(current->getChild(current, 0)->token->lexeme);
+	currentRow = assembleRow(currentRow, "\tCALL ");
+	currentRow = assembleRow(currentRow, current->getChild(current, 0)->token->lexeme);
 	return;
 }
 

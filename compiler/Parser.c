@@ -24,7 +24,7 @@ bool statement(Parser* par, ParseTree* current) {
 
 	if (par->current->type == TOKEN_IDENTIFIER) {
 		parserAdvance(par);
-		return parseAssign(par, current);
+		return par->current->type == TOKEN_LEFT_PAREN ? parseCalls(par, current) : parseAssign(par, current);
 	}
 	// Grammer rules and possiblities
 	switch (par->current->type) {
@@ -45,6 +45,7 @@ bool statement(Parser* par, ParseTree* current) {
 	case TOKEN_RETURN:
 		parserAdvance(par);
 		return parseReturn(par, current);
+	
 	case TOKEN_ELSE:
 		parserAdvance(par);
 		return parseElse(par, current);
@@ -73,6 +74,7 @@ void synchronize(Parser* parser) {
 		case TOKEN_LOOP:
 		case TOKEN_FUNCTION:
 		case TOKEN_ELSE:
+		case TOKEN_IDENTIFIER:
 			parser->panic = 0;
 			return;
 		case TOKEN_END_LINE:

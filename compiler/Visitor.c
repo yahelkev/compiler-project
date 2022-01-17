@@ -40,11 +40,11 @@ bool visitAst(Table* table, ParseTree* tree) {
 		return visitVariable(table, tree);
 	case ASSIGN_PARSE:
 		return visitAssign(table, tree);
-	case FULL_CONDITIONAL_PARSE:
 	case FULL_FUNCTION_PARSE:
+	case FULL_CONDITIONAL_PARSE:
 	case FULL_LOOP_PARSE:
 	{
-		ParseTree* body = tree->getChild(tree, 1);
+		ParseTree* body = tree->getChild(tree, tree->type == FULL_FUNCTION_PARSE ? 2 : 1);
 		for (int i = 0; i < body->amountOfChilds; i++)
 		{
 			if (!visitAst(table, body->getChild(body, i))) {

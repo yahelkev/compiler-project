@@ -20,6 +20,11 @@
 #define ASM_EXTENSION ".asm"
 #define MAX_DIGIT_LENGTH 15
 
+#define ASCII_CAPITAL_A 'A'
+#define ASCII_CAPITAL_Z 'Z'
+#define ASCII_SMALL_A 'a'
+#define ASCII_SMALL_Z 'z'
+
 typedef enum {
 	String_C,
 	Code_C,
@@ -57,7 +62,7 @@ void CaseExpression(CodeGen* gen, Heap_List* heapList, ParseTree* current, Strin
 void CaseLoop(CodeGen* gen, Heap_List* heapList, ParseTree* current, StringList* codeList);
 void CaseConditions(CodeGen* gen, Heap_List* heapList, ParseTree* current, StringList* codeList);
 void CaseFunctionDef(CodeGen* gen, Heap_List* heapList, ParseTree* current, StringList* codeList);
-
+void CaseFunctionCall(CodeGen* gen, Heap_List* heapList, ParseTree* current, StringList* codeList);
 
 // Expression Handling
 char* GetOPRow(CodeGen* gen, ParseTree* child, char* currentRow, StringList* codeList);
@@ -67,6 +72,7 @@ void ExpressionFirst(CodeGen* gen, Heap_List* heapList, ParseTree* child, String
 // Tooling
 void writeLine(FILE* fp, const char* row);
 char* assembleRow(char* asmRow, char* newRow); // Concats newRow to asmRow
+void toLower(char* string);
 #endif // !CODE_GEN_H
 
 
