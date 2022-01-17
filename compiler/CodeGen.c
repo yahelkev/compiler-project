@@ -99,6 +99,9 @@ void Generate(CodeGen* gen, Heap_List* list, ParseTree* current, StringList* cod
 		case FULL_CALL_PARSE:
 			CaseFunctionCall(gen, heapList, currentChild, gen->codeList);
 			break;
+		case PARSE_RETURN_FULL:
+			CaseExpression(gen, heapList, currentChild->getChild(currentChild, 1), gen->codeList);
+			break;
 		}
 
 	}
@@ -451,8 +454,18 @@ void toLower(char* string) {
 
 
 void CaseFunctionDef(CodeGen* gen, Heap_List* heapList, ParseTree* current, StringList* codeList) {
+	toLower(current->getChild(current, 0)->token->lexeme);
 	FunctionDef* def = newFunctionDef(current->getChild(current, 0)->token->lexeme, codeList);
 	// TODO : Generate function parameters code, will add when funciton calls are added, to know how the function argumants are calculated on the stack
+	// heapList->size > 0 ? heapList->heaps[heapList->size - 1]->margin % 8 == 0 ? heapList->heaps[heapList->size - 1]->margin + 8 : heapList->heaps[heapList->size - 1]->margin + 12 : 8;
+	TABLE_VALUE value = getValue(gen->table, current->getChild(current, 0)->token->lexeme);
+	int argMargin = 0;
+	Heap_TYPE type = 0;
+	for (size_t i = 0; i < value.function->amount; i++) {
+		type = !strcmp(value.function->args[i].type, "int") ? HEAP_DWORD : HEAP_QWORD;
+		Heap_ListAdd(heapList, newHeap(type, value.function->args[i].name, type ? argMargin));
+	}
+	
 	Generate(gen, heapList, current->getChild(current, 3), def->code); //  Generate code of the function block
 	FunctionListAdd(gen->funcList, def);
 	return;

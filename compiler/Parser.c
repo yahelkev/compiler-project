@@ -45,7 +45,6 @@ bool statement(Parser* par, ParseTree* current) {
 	case TOKEN_RETURN:
 		parserAdvance(par);
 		return parseReturn(par, current);
-	
 	case TOKEN_ELSE:
 		parserAdvance(par);
 		return parseElse(par, current);
