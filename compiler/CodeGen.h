@@ -13,6 +13,7 @@
 #include "StringList.h"
 #include "LCConst.h"
 #include "VariableHeap.h"
+#include "FunctionDef.h"
 
 #define LENGTH(var) strlen(var) + 1
 #define START_OF_FILE "\t.file "
@@ -34,30 +35,34 @@ typedef struct CodeGen {
 
 	LC_List* lcList;
 	StringList* codeList;
+	FunctionList* funcList;
+
 	int loopCounter;
 	int conditionCounter;
+
 } CodeGen;
 
 void newCodeGen(CodeGen* gen, char* path, ParseTree* mainTree, Table* table);
 FILE* CreateBlankFile(char* path);
-void Generate(CodeGen* gen, Heap_List* list, ParseTree* current);
+void Generate(CodeGen* gen, Heap_List* list, ParseTree* current, StringList* codeList);
 void freeCodeGen(CodeGen* gen);
 void emitAsm(CodeGen* gen);
 
 char* getJmpCondition(ParseTreeType type);
 
 // Valid cases
-void CaseVariable(CodeGen* gen, Heap_List* heapList, ParseTree* current);
-void CaseAssign(CodeGen* gen, Heap_List* heapList, ParseTree* current);
-void CaseExpression(CodeGen* gen, Heap_List* heapList, ParseTree* current);
-void CaseLoop(CodeGen* gen, Heap_List* heapList, ParseTree* current);
-void CaseConditions(CodeGen* gen, Heap_List* heapList, ParseTree* current);
+void CaseVariable(CodeGen* gen, Heap_List* heapList, ParseTree* current, StringList* codeList);
+void CaseAssign(CodeGen* gen, Heap_List* heapList, ParseTree* current, StringList* codeList);
+void CaseExpression(CodeGen* gen, Heap_List* heapList, ParseTree* current, StringList* codeList);
+void CaseLoop(CodeGen* gen, Heap_List* heapList, ParseTree* current, StringList* codeList);
+void CaseConditions(CodeGen* gen, Heap_List* heapList, ParseTree* current, StringList* codeList);
+void CaseFunctionDef(CodeGen* gen, Heap_List* heapList, ParseTree* current, StringList* codeList);
 
 
 // Expression Handling
-char* GetOPRow(CodeGen* gen, ParseTree* child, char* currentRow);
-void PostToAsmExp(CodeGen* gen, Heap_List* heapList, ParseTree* child);
-void ExpressionFirst(CodeGen* gen, Heap_List* heapList, ParseTree* child);
+char* GetOPRow(CodeGen* gen, ParseTree* child, char* currentRow, StringList* codeList);
+void PostToAsmExp(CodeGen* gen, Heap_List* heapList, ParseTree* child, StringList* codeList);
+void ExpressionFirst(CodeGen* gen, Heap_List* heapList, ParseTree* child, StringList* codeList);
 
 // Tooling
 void writeLine(FILE* fp, const char* row);

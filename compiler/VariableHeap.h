@@ -27,7 +27,9 @@ VariableHeap* getHeap(Heap_List* list, char* key);
 
 VariableHeap* newHeap(Heap_TYPE type, char* key, int margin);
 Heap_List* newHeap_List();
-void Heap_ListAdd(Heap_List* list, VariableHeap* lcConst);
+void Heap_ListAdd(Heap_List* list, VariableHeap* heap);
+void Heap_ListDel(Heap_List* list, int index);
+void Heap_ListDelLast(Heap_List* list, int amount);
 void freeHeap_List(Heap_List* list);
 void freeHeap(VariableHeap* heap);
 

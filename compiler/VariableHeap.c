@@ -31,7 +31,7 @@ void Heap_ListAdd(Heap_List* list, VariableHeap* heap) {
 }
 void freeHeap_List(Heap_List* list) {
 	for (size_t i = 0; i < list->size; i++)
-		freeLC(list->heaps[list->size]);
+		freeHeap(list->heaps[list->size]);
 	free(list->heaps);
 	free(list);
 	return;
@@ -39,5 +39,20 @@ void freeHeap_List(Heap_List* list) {
 void freeHeap(VariableHeap* heap) {
 	free(heap->key);
 	free(heap);
+	return;
+}
+
+void Heap_ListDel(Heap_List* list, int index) {
+	if (!list->size || index >= list->size || index < 0 ) return;
+	freeHeap(list->heaps[index]);
+	list->heaps = (VariableHeap**)realloc(list->heaps, sizeof(VariableHeap*) * (list->size - 1));
+	list->size--;
+	return;
+}
+
+void Heap_ListDelLast(Heap_List* list, int amount) {
+	if (!list->size || amount >= list->size || amount < 0) return;
+	for (size_t i = 0; i < amount; i++) 
+		Heap_ListDel(list, list->size - 1);
 	return;
 }

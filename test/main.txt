@@ -1,6 +1,4 @@
-int num = 5
-int anotherNumber = num + 17
-loop (num < anotherNumber)
-{
-	num = num + 1
+fn add(int a, int b) int {
+	int x = 5
+	return x
 }
