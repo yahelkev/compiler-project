@@ -4,7 +4,7 @@ void newObjectFile(ObjectFile* obj, char* path, Table* table) {
 	obj->filePath = (char*)malloc(sizeof(char) * LENGTH(path));
 	strncpy(obj->filePath, path, LENGTH(path));
 	obj->table = table;
-	obj->filePointer = CreateObjFile;
+	obj->filePointer = CreateObjFile(path);
 }
 
 void freeObjectFile(ObjectFile* obj) {
@@ -25,5 +25,16 @@ FILE* CreateObjFile(const char* path) {
 
 	fp = fopen(objPath, "wb");
 	return fp;
+}
+
+void writeHeaders(ObjectFile* obj, int pcType, int numSections, int timeDate, int symbolTableOffset, int numSymbols, int SizeOptionalHeader, int flag)
+{
+	fwrite((const void*)&pcType, 2, 1, obj->filePointer);
+	fwrite((const void*)&numSections, 2, 1, obj->filePointer);
+	fwrite((const void*)&timeDate, 4, 1, obj->filePointer);
+	fwrite((const void*)&symbolTableOffset, 4, 1, obj->filePointer);
+	fwrite((const void*)&numSymbols, 4, 1, obj->filePointer);
+	fwrite((const void*)&SizeOptionalHeader, 2, 1, obj->filePointer);
+	fwrite((const void*)&flag, 2, 1, obj->filePointer);
 }
 

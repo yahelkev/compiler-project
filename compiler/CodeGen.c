@@ -8,7 +8,7 @@ void newCodeGen(CodeGen* gen, char* path, ParseTree* mainTree, Table* table) {
 
 	gen->codeList = newStringList();
 	gen->lcList = newLC_List();
-	gen->funcList = newFunctionList();
+	//gen->funcList = newFunctionList();
 
 	gen->loopCounter = 0;
 	gen->conditionCounter = 0;
@@ -20,7 +20,7 @@ void freeCodeGen(CodeGen* gen) {
 	free(gen->filePath);
 	fclose(gen->filePointer);
 	gen->codeList->free(gen->codeList);
-	freeFunctionList(gen->funcList);
+	//freeFunctionList(gen->funcList);
 	//free(gen);
 	return;
 }
@@ -442,10 +442,10 @@ char* assembleRow(char* asmRow, char* newRow) {
 
 void CaseFunctionDef(CodeGen* gen, Heap_List* heapList, ParseTree* current, StringList* codeList) {
 	// TODO : Create function case generator
-	FunctionDef* def = newFunctionDef(current->getChild(current, 0)->token->lexeme, codeList);
+	//FunctionDef* def = newFunctionDef(current->getChild(current, 0)->token->lexeme, codeList);
 	// TODO : Generate function parameters code, will add when funciton calls are added, to know how the function argumants are calculated on the stack
-	Generate(gen, heapList, current->getChild(current, 3), def->code); //  Generate code of the function block
-	FunctionListAdd(gen->funcList, def);
+	//Generate(gen, heapList, current->getChild(current, 3), def->code); //  Generate code of the function block
+	//FunctionListAdd(gen->funcList, def);
 	return;
 }
 

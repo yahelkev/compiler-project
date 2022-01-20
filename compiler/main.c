@@ -8,6 +8,7 @@
 #include "interface.h"
 #include "Visitor.h"
 #include "CodeGen.h"
+#include "ObjectFile.h"
 
 
 
@@ -21,6 +22,7 @@ int main( int argc, char** argv ) {
     Parser par;
     Visitor vis;
     CodeGen gen;
+    ObjectFile obj;
 
     newLexer(&lex, getFileContent(srcFileName));
     newParser(&par, &lex);
@@ -36,11 +38,14 @@ int main( int argc, char** argv ) {
         c(RED);
         fprintf(stderr, "Error while visiting trees\n");
         c(GRAY);
-        return 0;
+     //   return 0;
     }
     newCodeGen(&gen, srcFileName, vis.par->mainTree, vis.par->table);
     gen.filePointer = CreateBlankFile(gen.filePath);
     Generate(&gen, NULL, gen._main, gen.codeList);
-    emitAsm(&gen);
+  //  emitAsm(&gen);
+    newObjectFile(&obj, srcFileName, vis.par->table);
+    writeHeaders(&obj, 0x1c4, 0, 0, 0, 0, 0, 0);
+    freeObjectFile(&obj);
     return 0;
 }
