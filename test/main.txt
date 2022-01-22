@@ -1,4 +1,6 @@
-fn add(int a, int b) int {
-	int x = 5
-	return x
+fn ADD(int a, int b) int {
+	return a + b
 }
+
+ADD(1, 2)
+
