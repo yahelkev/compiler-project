@@ -463,7 +463,7 @@ void CaseFunctionDef(CodeGen* gen, Heap_List* heapList, ParseTree* current, Stri
 	Heap_TYPE type = 0;
 	for (size_t i = 0; i < value.function->amount; i++) {
 		type = !strcmp(value.function->args[i].type, "int") ? HEAP_DWORD : HEAP_QWORD;
-		Heap_ListAdd(heapList, newHeap(type, value.function->args[i].name, type ? argMargin));
+		//Heap_ListAdd(heapList, newHeap(type, value.function->args[i].name, type ? argMargin + 4));
 	}
 	
 	Generate(gen, heapList, current->getChild(current, 3), def->code); //  Generate code of the function block
