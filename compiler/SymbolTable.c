@@ -15,16 +15,15 @@ bool isDefined(Table* table, char* key) {
 }
 
 TABLE_VALUE getValue(Table* table, char* key) {
-    if (isDefined(table, key)) {
-        for (size_t i = 0; i < table->size; i++)
-            if (!strcmp(table->keys[i], key))
+    for (size_t i = 0; i < table->size; i++)
+        if (!strcmp(table->keys[i], key))
                 return *table->values[i];
-    } else {
-        TABLE_VALUE val;
-        struct error err = makeError("no such key");
-        newValue(&val, ERROR_TAG, &err, -1, -1);
-        return val;
-    }
+    
+    TABLE_VALUE val;
+    struct error err = makeError("no such key");
+    newValue(&val, ERROR_TAG, &err, -1, -1);
+    return val;
+    
 }
 
 /* Return :

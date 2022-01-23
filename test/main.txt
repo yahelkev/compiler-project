@@ -1,5 +1,7 @@
 fn ADD(int a, int b) int {
-	return a + b
+	int div = 5
+
+	return (a + b) * div
 }
 
 ADD(1, 2)

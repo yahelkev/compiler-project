@@ -481,3 +481,4 @@ bool parseElse(Parser* par, ParseTree* current) {
 	synchronize(par);
 	return false;
 }
+

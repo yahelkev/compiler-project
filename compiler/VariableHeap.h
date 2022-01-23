@@ -5,12 +5,16 @@
 #include <string.h>
 
 #define LENGTH(var) strlen(var) + 1
+#define DWORD_SIZE 4
 
 typedef enum {
-	HEAP_QWORD,
 	HEAP_DWORD,
 }Heap_TYPE;
 
+typedef enum {
+	SEARCH_VARIABLE,
+	SEARCH_ARG
+}Search_Flag;
 
 typedef struct VariableHeap {
 	Heap_TYPE type;
@@ -24,6 +28,8 @@ typedef struct Heap_List {
 }Heap_List;
 
 VariableHeap* getHeap(Heap_List* list, char* key);
+int getLast(Heap_List* list, Search_Flag flag);
+
 
 VariableHeap* newHeap(Heap_TYPE type, char* key, int margin);
 Heap_List* newHeap_List();
