@@ -150,16 +150,22 @@ char* getTypeOfExpression(Table* table, ParseTree* tree) {
 
 char* getTypeAsString(Table* table, ParseTree* child)
 {
-	switch (child->token->type)
+	switch (child->type)
 	{
-	case TOKEN_IDENTIFIER:
+	case PARSE_IDENTIFIER:
 		return getValue(table, child->token->lexeme).variable->type;
-	case TOKEN_INT:
-		return "int";
-	case TOKEN_FLOAT:
-		return "float";
-	case TOKEN_STRING:
-		return "string";
+	case ATOMIC_PARSE:
+		switch (child->token->type) {
+			case TOKEN_INT:
+				return "int";
+			case TOKEN_FLOAT:
+				return "float";
+			case TOKEN_STRING:
+				return "string";
+		}
+	case FULL_CALL_PARSE:
+		return getValue(table, child->getChild(child, 0)->token->lexeme).function->returnType;
+	
 	default:
 		return "\0";
 	}

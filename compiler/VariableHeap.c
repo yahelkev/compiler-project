@@ -56,3 +56,12 @@ void Heap_ListDelLast(Heap_List* list, int amount) {
 		Heap_ListDel(list, list->size - 1);
 	return;
 }
+
+
+int getLast(Heap_List* list, Search_Flag flag) {
+	for (int i = list->size - 1; i >= 0; i--) {
+		if (list->heaps[i]->margin < 0 && !flag) return list->heaps[i]->margin - DWORD_SIZE;
+		if (list->heaps[i]->margin > 0 && flag) return list->heaps[i]->margin + DWORD_SIZE;
+	}
+	return flag ? DWORD_SIZE : -DWORD_SIZE;
+}

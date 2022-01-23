@@ -97,10 +97,10 @@ void Generate(CodeGen* gen, Heap_List* list, ParseTree* current, StringList* cod
 			Heap_ListDelLast(heapList, heapList->size - marginSize);
 			break;
 		case FULL_CALL_PARSE:
-			CaseFunctionCall(gen, heapList, currentChild, gen->codeList);
+			CaseFunctionCall(gen, heapList, currentChild, codeList);
 			break;
 		case PARSE_RETURN_FULL:
-			CaseExpression(gen, heapList, currentChild->getChild(currentChild, 1), gen->codeList);
+			CaseExpression(gen, heapList, currentChild->getChild(currentChild, 1), codeList);
 			break;
 		}
 
@@ -149,12 +149,15 @@ void PostToAsmExp(CodeGen* gen, Heap_List* heapList, ParseTree* current, StringL
 			stack[++top] = child;
 			break;
 		default:
+
 			currentRow = GetOPRow(gen, child, currentRow, codeList);
 			switch (stack[top]->type) {
 			case IDENTIFIER_PARSE: {
 				char marginString[MAX_DIGIT_LENGTH] = "";
-				currentRow = assembleRow(currentRow, "DWORD PTR [rbp-");
-				sprintf(marginString, "%d", getHeap(heapList, stack[top]->token->lexeme)->margin);
+				int margin = getHeap(heapList, stack[top]->token->lexeme)->margin;
+				currentRow = assembleRow(currentRow, "DWORD PTR [rbp");
+				sprintf(marginString, "%d", margin);
+				if (margin > 0) currentRow = assembleRow(currentRow, "+");
 				currentRow = assembleRow(currentRow, marginString);
 				currentRow = assembleRow(currentRow, "]");
 				break;
@@ -182,9 +185,14 @@ void PostToAsmExp(CodeGen* gen, Heap_List* heapList, ParseTree* current, StringL
 					break;
 				}
 				break;
+			case FULL_CALL_PARSE: {
+				CaseFunctionCall(gen, heapList, stack[top], codeList);
+				break;
+			}	
 			}
 			}
 			codeList->add(codeList, currentRow);
+			currentRow = NULL;
 		}
 		
 	}
@@ -196,8 +204,10 @@ void ExpressionFirst(CodeGen* gen, Heap_List* heapList, ParseTree* child, String
 	switch (child->type) {
 	case IDENTIFIER_PARSE: {
 		char* currentRow = NULL, marginString[MAX_DIGIT_LENGTH] = "";
-		currentRow = assembleRow(currentRow, "\tMOV eax, DWORD PTR [rbp-");
-		sprintf(marginString, "%d", getHeap(heapList, child->token->lexeme)->margin);
+		int margin = getHeap(heapList, child->token->lexeme)->margin;
+		currentRow = assembleRow(currentRow, "\tMOV eax, DWORD PTR [rbp");
+		sprintf(marginString, "%d", margin);
+		if (margin > 0) currentRow = assembleRow(currentRow, "+");
 		currentRow = assembleRow(currentRow, marginString);
 		currentRow = assembleRow(currentRow, "]");
 		codeList->add(codeList, currentRow);
@@ -262,33 +272,18 @@ void CaseVariable(CodeGen* gen, Heap_List* heapList , ParseTree* current, String
 
 	switch (current->getChild(current, 0)->type) {
 		case PARSE_INT_V: 
-		case PARSE_FLOAT_V: {
-			// Parsing the value of the variable
-			CaseExpression(gen, heapList, current->getChild(current, 3), codeList);
-
-			// making the actual row of creating the varialbe
-			char* currentRow = NULL;
-			int newMargin = heapList->size > 0 ? heapList->heaps[heapList->size - 1]->margin + 4 : 4;
-			Heap_ListAdd(heapList, newHeap(HEAP_DWORD, current->getChild(current, 1)->token->lexeme, newMargin));
-			currentRow = assembleRow(currentRow, "\tMOV DWORD PTR [rbp-");
-			char* marginString= (char*)malloc((int)((ceil(log10((int)newMargin)) + 1) * sizeof(char)));
-			sprintf(marginString, "%d", newMargin);
-			currentRow = assembleRow(currentRow, marginString);
-			currentRow = assembleRow(currentRow, "], eax\n");
-			free(marginString);
-			codeList->add(codeList, currentRow);
-			break;
-		}
+		case PARSE_FLOAT_V:
 		case PARSE_STRING_V: {
 			// Parsing the value of the variable
 			CaseExpression(gen, heapList, current->getChild(current, 3), codeList);
 
 			// making the actual row of creating the varialbe
 			char* currentRow = NULL;
-			int newMargin = heapList->size > 0 ? heapList->heaps[heapList->size - 1]->margin % 8 == 0 ? heapList->heaps[heapList->size - 1]->margin + 8 : heapList->heaps[heapList->size - 1]->margin + 12 : 8;
-			Heap_ListAdd(heapList, newHeap(HEAP_QWORD, current->getChild(current, 1)->token->lexeme, newMargin));
-			currentRow =  assembleRow(currentRow, "\tMOV QWORD PTR [rbp-");
-			char* marginString = (char*)malloc((int)((ceil(log10((int)newMargin)) + 1) * sizeof(char)));
+			int newMargin = getLast(heapList, SEARCH_VARIABLE);
+			Heap_ListAdd(heapList, newHeap(HEAP_DWORD, current->getChild(current, 1)->token->lexeme, newMargin));
+			currentRow = assembleRow(currentRow, "\tMOV DWORD PTR [rbp");
+			if (newMargin > 0) currentRow = assembleRow(currentRow, "+");
+			char* marginString = (char*)malloc((int)((ceil(log10(abs((int)newMargin))) + 2) * sizeof(char)));
 			sprintf(marginString, "%d", newMargin);
 			currentRow = assembleRow(currentRow, marginString);
 			currentRow = assembleRow(currentRow, "], eax\n");
@@ -296,6 +291,7 @@ void CaseVariable(CodeGen* gen, Heap_List* heapList , ParseTree* current, String
 			codeList->add(codeList, currentRow);
 			break;
 		}
+		
 	}
 	return;
 }
@@ -305,7 +301,7 @@ void CaseAssign(CodeGen* gen, Heap_List* heapList, ParseTree* current, StringLis
 	* int
 	    mov     DWORD PTR [rbp-4], 0
 	* string
-	    mov     QWORD PTR [rbp-16], OFFSET FLAT:.LC0
+	    mov     DWORD PTR [rbp-16], OFFSET FLAT:.LC0
     * float    
 		movss   xmm0, DWORD PTR .LC1[rip]
         movss   DWORD PTR [rbp-20], xmm0
@@ -315,18 +311,23 @@ void CaseAssign(CodeGen* gen, Heap_List* heapList, ParseTree* current, StringLis
 	CaseExpression(gen, heapList, current->getChild(current, 2), codeList);
 	
 	ParseTree* firstChild = current->getChild(current, 0);
+	int margin = getHeap(heapList, firstChild->token->lexeme)->margin;
 	if (!strcmp(getValue(gen->table, (firstChild->token->lexeme)).variable->type, "string")){
-		currentRow = assembleRow(currentRow, "\tMOV	QWORD PTR [rbp-");
+		
+		currentRow = assembleRow(currentRow, "\tMOV	DWORD PTR [rbp");
 	}
 	else if(!strcmp(getValue(gen->table, (firstChild->token->lexeme)).variable->type, "float")){
-		currentRow = assembleRow(currentRow, "\tMOVSS	DWORD PTR [rbp-");
+		
+		currentRow = assembleRow(currentRow, "\tMOVSS	DWORD PTR [rbp");
 	}
 	else if (!strcmp(getValue(gen->table, (firstChild->token->lexeme)).variable->type, "int")){
-		currentRow = assembleRow(currentRow, "\tMOV	DWORD PTR [rbp-");
+		
+		currentRow = assembleRow(currentRow, "\tMOV	DWORD PTR [rbp");
 	}
-	sprintf(numSTR, "%d", getHeap(heapList, firstChild->token->lexeme)->margin);
+	if (margin > 0) currentRow = assembleRow(currentRow, "+");
+	sprintf(numSTR, "%d", margin);
 	currentRow = assembleRow(currentRow, numSTR);
-	currentRow = assembleRow(currentRow, "], eax");
+	currentRow = assembleRow(currentRow, "], eax\n");
 	codeList->add(codeList, currentRow);
 }
 
@@ -454,19 +455,18 @@ void toLower(char* string) {
 
 
 void CaseFunctionDef(CodeGen* gen, Heap_List* heapList, ParseTree* current, StringList* codeList) {
-	toLower(current->getChild(current, 0)->token->lexeme);
 	FunctionDef* def = newFunctionDef(current->getChild(current, 0)->token->lexeme, codeList);
 	// TODO : Generate function parameters code, will add when funciton calls are added, to know how the function argumants are calculated on the stack
-	// heapList->size > 0 ? heapList->heaps[heapList->size - 1]->margin % 8 == 0 ? heapList->heaps[heapList->size - 1]->margin + 8 : heapList->heaps[heapList->size - 1]->margin + 12 : 8;
+	// getLast(heapList, SEARCH_VARIABLE);
+	codeList->add(codeList, "\tPUSH rbp");
+	codeList->add(codeList, "\tMOV rbp, rsp\n");
 	TABLE_VALUE value = getValue(gen->table, current->getChild(current, 0)->token->lexeme);
-	int argMargin = 0;
-	Heap_TYPE type = 0;
 	for (size_t i = 0; i < value.function->amount; i++) {
-		type = !strcmp(value.function->args[i].type, "int") ? HEAP_DWORD : HEAP_QWORD;
-		//Heap_ListAdd(heapList, newHeap(type, value.function->args[i].name, type ? argMargin + 4));
+		Heap_ListAdd(heapList, newHeap(HEAP_DWORD, value.function->args[i].name, getLast(heapList, SEARCH_ARG)));
 	}
 	
 	Generate(gen, heapList, current->getChild(current, 3), def->code); //  Generate code of the function block
+	codeList->add(codeList, "\tPOP rbp");
 	FunctionListAdd(gen->funcList, def);
 	return;
 }
@@ -479,9 +479,9 @@ void CaseFunctionCall(CodeGen* gen, Heap_List* heapList, ParseTree* current, Str
 		CaseExpression(gen, heapList, arg, codeList);
 		codeList->add(codeList, "\tPUSH eax");
 	}
-	toLower(current->getChild(current, 0)->token->lexeme);
 	currentRow = assembleRow(currentRow, "\tCALL ");
 	currentRow = assembleRow(currentRow, current->getChild(current, 0)->token->lexeme);
+	codeList->add(codeList, currentRow);
 	return;
 }
 

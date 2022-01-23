@@ -47,13 +47,18 @@ bool convertToPost(Parser* par, ParseTree* current, TokenType EO_Expr) {
             current->addChild(current, child);
         }
         else if (par->current->type == TOKEN_LEFT_PAREN) {
-            if (numNiden > operators) {
-                error(par, par->current, "Unexpected '('");
-                synchronize(par);
-                return false;
+            if (!parseCalls(par, current)) {
+                if (numNiden > operators) {
+                    error(par, par->current, "Unexpected '('");
+                    synchronize(par);
+                    return false;
+                }
+                openParenthesis++;
+                stack[++top] = par->current;
             }
-            openParenthesis++;
-            stack[++top] = par->current;
+            else {
+                //parserAdvance(par);
+            }
         }
         else if (par->current->type == TOKEN_RIGHT_PAREN)
         {
