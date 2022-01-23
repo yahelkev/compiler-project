@@ -185,6 +185,10 @@ void PostToAsmExp(CodeGen* gen, Heap_List* heapList, ParseTree* current, StringL
 					break;
 				}
 				break;
+			case FULL_CALL_PARSE: {
+				CaseFunctionCall(gen, heapList, stack[top], codeList);
+				break;
+			}	
 			}
 			}
 			codeList->add(codeList, currentRow);
