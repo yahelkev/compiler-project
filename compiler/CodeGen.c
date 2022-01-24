@@ -30,10 +30,12 @@ FILE* CreateBlankFile(const char* path) {
 	char* asmPath = (char*)malloc(sizeof(char) * LENGTH(path));
 	strncpy(asmPath, path, LENGTH(path));
 	int pos = 0;
+	// Find the last position of '.' which I will know that further from that will be the file ext
 	for (size_t i = 0; i < strlen(asmPath); i++)
 		if (asmPath[i] == '.') pos = i;
 	asmPath[pos] = '\0';
 	asmPath = (char*)realloc(asmPath, sizeof(char) * LENGTH(asmPath) + LENGTH(ASM_EXTENSION));
+	// Replace said file ext
 	strncat(asmPath, ASM_EXTENSION, LENGTH(ASM_EXTENSION));
 
 	fp = fopen(asmPath, "w");
@@ -43,7 +45,8 @@ FILE* CreateBlankFile(const char* path) {
 }
 
 void emitAsm(CodeGen* gen) {
-	
+
+
 	// Print LC Constants
 	for (size_t i = 0; i < gen->lcList->size; i++)		printLC(gen->lcList->consts[i], i, gen->filePointer);
 	
@@ -64,6 +67,7 @@ void emitAsm(CodeGen* gen) {
 	for (size_t i = 0; i < gen->codeList->amount; i++)
 		writeLine(gen->filePointer, gen->codeList->strings[i]);
 
+	// Create return value
 	fputc('\n', gen->filePointer);
 	writeLine(gen->filePointer, "\tMOV eax, 0");
 	writeLine(gen->filePointer, "\tPOP rbp");
@@ -73,8 +77,8 @@ void emitAsm(CodeGen* gen) {
 
 void Generate(CodeGen* gen, Heap_List* list, ParseTree* current, StringList* codeList) {
 	size_t index = 0;
-	ParseTree* currentChild = current->getChild(current, index);
-	Heap_List* heapList = list ? list : newHeap_List();
+	ParseTree* currentChild = current->getChild(current, index); // Gets current parse tree
+	Heap_List* heapList = list ? list : newHeap_List(); // Checks if a new heap list is a needed if so creates one, if it is not submitted through args
 	int marginSize = 0;
 	for (index = 0; index < current->amountOfChilds; index++, currentChild = current->getChild(current, index)) {
 
@@ -277,14 +281,19 @@ void CaseVariable(CodeGen* gen, Heap_List* heapList , ParseTree* current, String
 			// Parsing the value of the variable
 			CaseExpression(gen, heapList, current->getChild(current, 3), codeList);
 
-			// making the actual row of creating the varialbe
+			// Making the actual row of creating the varialbe
 			char* currentRow = NULL;
 			int newMargin = getLast(heapList, SEARCH_VARIABLE);
 			Heap_ListAdd(heapList, newHeap(HEAP_DWORD, current->getChild(current, 1)->token->lexeme, newMargin));
+
 			currentRow = assembleRow(currentRow, "\tMOV DWORD PTR [rbp");
+
+			// Checking if we are creating an arg or a variable, this uses the margin from heapList
 			if (newMargin > 0) currentRow = assembleRow(currentRow, "+");
+
 			char* marginString = (char*)malloc((int)((ceil(log10(abs((int)newMargin))) + 2) * sizeof(char)));
 			sprintf(marginString, "%d", newMargin);
+
 			currentRow = assembleRow(currentRow, marginString);
 			currentRow = assembleRow(currentRow, "], eax\n");
 			free(marginString);
@@ -298,6 +307,7 @@ void CaseVariable(CodeGen* gen, Heap_List* heapList , ParseTree* current, String
 
 void CaseAssign(CodeGen* gen, Heap_List* heapList, ParseTree* current, StringList* codeList) {
 	/*
+	* Basic variable assign
 	* int
 	    mov     DWORD PTR [rbp-4], 0
 	* string
@@ -457,14 +467,15 @@ void toLower(char* string) {
 void CaseFunctionDef(CodeGen* gen, Heap_List* heapList, ParseTree* current, StringList* codeList) {
 	FunctionDef* def = newFunctionDef(current->getChild(current, 0)->token->lexeme, codeList);
 	// TODO : Generate function parameters code, will add when funciton calls are added, to know how the function argumants are calculated on the stack
-	// getLast(heapList, SEARCH_VARIABLE);
+	// DONE.
 	codeList->add(codeList, "\tPUSH rbp");
 	codeList->add(codeList, "\tMOV rbp, rsp\n");
 	TABLE_VALUE value = getValue(gen->table, current->getChild(current, 0)->token->lexeme);
 	for (size_t i = 0; i < value.function->amount; i++) {
+		// Adding argumants as variables with special margins to the heap listt
 		Heap_ListAdd(heapList, newHeap(HEAP_DWORD, value.function->args[i].name, getLast(heapList, SEARCH_ARG)));
 	}
-	
+	// Generating of all valid cases of a function def tree
 	Generate(gen, heapList, current->getChild(current, 3), def->code); //  Generate code of the function block
 	codeList->add(codeList, "\tPOP rbp");
 	FunctionListAdd(gen->funcList, def);

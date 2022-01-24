@@ -26,35 +26,30 @@
 #define ASCII_SMALL_A 'a'
 #define ASCII_SMALL_Z 'z'
 
-typedef enum {
-	String_C,
-	Code_C,
-	Default_C,
-}Literal;
-
 
 typedef struct CodeGen {
-	char* filePath;
-	FILE* filePointer;
-	Table* table;
-	ParseTree* _main;
+	char* filePath; // Origin file path
+	FILE* filePointer; // New .asm file pointer
+	Table* table; // Symbol table pointer
+	ParseTree* _main; // Main parse tree pointer
 
-	LC_List* lcList;
-	StringList* codeList;
-	FunctionList* funcList;
+	LC_List* lcList; // List of all constants in the code
+	StringList* codeList; // List of the entire asm code
+	FunctionList* funcList; // List of function defentions & codelists for every function
 
-	int loopCounter;
-	int conditionCounter;
+	int loopCounter; // Counter for number of loops in code, entirley for asm purposes
+	int conditionCounter; // Counter for number of loops in code, entirley for asm purposes
 
 } CodeGen;
 
+
 void newCodeGen(CodeGen* gen, char* path, ParseTree* mainTree, Table* table);
 FILE* CreateBlankFile(char* path);
-void Generate(CodeGen* gen, Heap_List* list, ParseTree* current, StringList* codeList);
+void Generate(CodeGen* gen, Heap_List* list, ParseTree* current, StringList* codeList); // Main generation for asm cases
 void freeCodeGen(CodeGen* gen);
-void emitAsm(CodeGen* gen);
+void emitAsm(CodeGen* gen); // Write entire code into file pointer
 
-char* getJmpCondition(ParseTreeType type);
+char* getJmpCondition(ParseTreeType type); // Returns reverse the conditional jmp op needed
 
 // Valid cases
 void CaseVariable(CodeGen* gen, Heap_List* heapList, ParseTree* current, StringList* codeList);
@@ -66,13 +61,13 @@ void CaseFunctionDef(CodeGen* gen, Heap_List* heapList, ParseTree* current, Stri
 void CaseFunctionCall(CodeGen* gen, Heap_List* heapList, ParseTree* current, StringList* codeList);
 
 // Expression Handling
-char* GetOPRow(CodeGen* gen, ParseTree* child, char* currentRow, StringList* codeList);
-void PostToAsmExp(CodeGen* gen, Heap_List* heapList, ParseTree* child, StringList* codeList);
-void ExpressionFirst(CodeGen* gen, Heap_List* heapList, ParseTree* child, StringList* codeList);
+char* GetOPRow(CodeGen* gen, ParseTree* child, char* currentRow, StringList* codeList); // Returns the current math operation needed
+void PostToAsmExp(CodeGen* gen, Heap_List* heapList, ParseTree* child, StringList* codeList); // Post fix to asm infix ish 
+void ExpressionFirst(CodeGen* gen, Heap_List* heapList, ParseTree* child, StringList* codeList); // The first post fix to asm infix ish conversion, setts the first value into eax for further use
 
 // Tooling
-void writeLine(FILE* fp, const char* row);
-char* assembleRow(char* asmRow, char* newRow); // Concats newRow to asmRow
+void writeLine(FILE* fp, const char* row); // Writes a new line to a file pointer given
+char* assembleRow(char* asmRow, char* newRow); // Concats newRow to asmRow, and returns it
 void toLower(char* string);
 #endif // !CODE_GEN_H
 
