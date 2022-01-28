@@ -100,7 +100,7 @@ bool visitVariable(Table* table, ParseTree* tree) {
 		return false;
 	}
 	if (!compareTypes(getValue(table, (tree->getChild(tree, 1)->token->lexeme)).variable->type, getTypeOfExpression(table, tree->getChild(tree, 3)))) {
-		throwError(tree->getChild(tree, 3), "Value type and variable type don't much");
+		throwError(tree->getChild(tree, 3)->getChild(tree->getChild(tree, 3),0)->token, "Value type and variable type don't much");
 		return false;
 	}
 	return true;
