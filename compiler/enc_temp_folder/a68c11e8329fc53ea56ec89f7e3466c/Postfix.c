@@ -43,11 +43,15 @@ bool convertToPost(Parser* par, ParseTree* current, TokenType EO_Expr) {
                 synchronize(par);
                 return 0;
             }
-            child = newTree(getType(par, par->current), par->current);
-            child = foldTerms(current, child, stack, &top);
-            current->addChild(current, child);
+            parserAdvance(par);
+            if (par->current != TOKEN_LEFT_PAREN) {
+                child = newTree(getType(par, par->pre), par->pre);
+                child = foldTerms(current, child, stack, &top);
+                current->addChild(current, child);
+            }
+            
         }
-        else if (par->current->type == TOKEN_LEFT_PAREN) {
+        if (par->current->type == TOKEN_LEFT_PAREN) {
             //line = par->lex->line, column = par->lex->column, index = par->lex->column;
             line = par->current->line, column = par->current->column, index = par->lex->index - strlen(par->current->lexeme), currentChar = par->current->lexeme[0];
             // Setting panic mode on, so no error calls will get printed
@@ -70,8 +74,8 @@ bool convertToPost(Parser* par, ParseTree* current, TokenType EO_Expr) {
                 printf("Got function call\n");
                 //parserAdvance(par);
             }
-            // Unsetting back the panic flag so we get any additional error messages
-            par->panic = false;
+            
+            //par->panic = false;
         }
         else if (par->current->type == TOKEN_RIGHT_PAREN)
         {
@@ -103,7 +107,10 @@ bool convertToPost(Parser* par, ParseTree* current, TokenType EO_Expr) {
             }
             stack[++top] = par->current;
         }
-        parserAdvance(par);
+        if(par->panic)
+            parserAdvance(par);
+        // Unsetting back the panic flag so we get any additional error messages
+        par->panic = false;
     }
 
     if (openParenthesis) {
