@@ -54,6 +54,7 @@ bool convertToPost(Parser* par, ParseTree* current, TokenType EO_Expr) {
             // We only want to know if the case if valid or not
             par->panic = true;
             if (!parseCalls(par, current)) {
+                
                 numNiden = numNiden ? numNiden - 1 : numNiden;
                 if (numNiden > operators) {
                     error(par, par->current, "Unexpected '('");
@@ -68,7 +69,7 @@ bool convertToPost(Parser* par, ParseTree* current, TokenType EO_Expr) {
             }
             else {
                 printf("Got function call\n");
-                //parserAdvance(par);
+                current->delChild(current, current->getChild(current, current->amountOfChilds - 2));
             }
             // Unsetting back the panic flag so we get any additional error messages
             par->panic = false;
