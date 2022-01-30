@@ -99,8 +99,8 @@ bool visitVariable(Table* table, ParseTree* tree) {
 	if (!visitExperssion(table, tree->getChild(tree, 3))) {
 		return false;
 	}
-	if (!compareTypes(getValue(table, (tree->getChild(tree, 1)->token->lexeme)).variable->type, getTypeOfExpression(table, tree->getChild(tree, 3)))) {
-		throwError(tree->getChild(tree, 3), "Value type and variable type don't much");
+	if (!compareTypes(getValue(table, tree->getChild(tree, 1)->token->lexeme).variable->type, getTypeOfExpression(table, tree->getChild(tree, 3)))) {
+		throwError(tree->getChild(tree, 3)->getChild(tree->getChild(tree, 3),0)->token, "Value type and variable type don't much");
 		return false;
 	}
 	return true;
@@ -127,7 +127,7 @@ bool compareTypes(char* type1, char* type2) {
 }
 
 char* getTypeOfExpression(Table* table, ParseTree* tree) {
-	ParseTree* first = tree->getChild(tree, 0);
+	ParseTree* first = tree->type == EXPRESSION_PARSE ? tree->getChild(tree, 0) : tree;
 	switch (first->type) {
 	case IDENTIFIER_PARSE:
 		return getValue(table, first->token->lexeme).variable->type;
@@ -148,10 +148,8 @@ char* getTypeOfExpression(Table* table, ParseTree* tree) {
 	return "void";
 }
 
-char* getTypeAsString(Table* table, ParseTree* child)
-{
-	switch (child->type)
-	{
+char* getTypeAsString(Table* table, ParseTree* child) {
+	switch (child->type) {
 	case PARSE_IDENTIFIER:
 		return getValue(table, child->token->lexeme).variable->type;
 	case ATOMIC_PARSE:

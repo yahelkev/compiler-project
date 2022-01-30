@@ -10,7 +10,7 @@ Token* pop(Token** stack, int* top) {
 }
 
 Token* peekPost(Token** stack, int* top) {
-    if(top == EMPTY_STACK)
+    if (top == EMPTY_STACK)
         return EMPTY_STACK;
     else
         return stack[(*top)];
@@ -19,7 +19,7 @@ Token* peekPost(Token** stack, int* top) {
 int priority(Token* x) {
     if (x->type == TOKEN_LEFT_PAREN)
         return 0;
-    if (x->type == TOKEN_GREATER || x->type == TOKEN_GREATER_EQUAL || x->type == TOKEN_LESS_EQUAL || x->type == TOKEN_LESS || x->type == TOKEN_EQUAL_EQUAL ||  x->type == TOKEN_BANG_EQUAL)
+    if (x->type == TOKEN_GREATER || x->type == TOKEN_GREATER_EQUAL || x->type == TOKEN_LESS_EQUAL || x->type == TOKEN_LESS || x->type == TOKEN_EQUAL_EQUAL || x->type == TOKEN_BANG_EQUAL)
         return CON_PRIORITY;
     if (x->type == TOKEN_PLUS || x->type == TOKEN_MINUS)
         return PLUS_MINUS_PRIORITY;
@@ -30,9 +30,10 @@ int priority(Token* x) {
 
 bool convertToPost(Parser* par, ParseTree* current, TokenType EO_Expr) {
     int openParenthesis = 0, numNiden = 0, operators = 0, top = EMPTY_STACK;
-    Token* token = par->current, *stack[MAX_STACK_SIZE];
-    ParseTree* child = NULL, *lastChild = NULL, *twoLastChild = NULL, *threeLastChild = NULL;
-
+    Token* token = par->current, * stack[MAX_STACK_SIZE];
+    ParseTree* child = NULL, * lastChild = NULL, * twoLastChild = NULL, * threeLastChild = NULL;
+    int line = 0, column = 0, index = 0;
+    char currentChar = 'a';
 
     while (par->current->type != EO_Expr && par->current->type != TOKEN_EOF) {
         if (par->current->type == TOKEN_INT || par->current->type == TOKEN_FLOAT || par->current->type == TOKEN_IDENTIFIER || par->current->type == TOKEN_STRING) {
@@ -47,18 +48,29 @@ bool convertToPost(Parser* par, ParseTree* current, TokenType EO_Expr) {
             current->addChild(current, child);
         }
         else if (par->current->type == TOKEN_LEFT_PAREN) {
+            line = par->current->line, column = par->current->column, index = par->lex->index - strlen(par->current->lexeme), currentChar = par->current->lexeme[0];
+            // Setting panic mode on, so no error calls will get printed
+            // We only want to know if the case if valid or not
+            par->panic = true;
             if (!parseCalls(par, current)) {
+                
+                numNiden = numNiden ? numNiden - 1 : numNiden;
                 if (numNiden > operators) {
                     error(par, par->current, "Unexpected '('");
                     synchronize(par);
                     return false;
                 }
+                par->lex->line = line, par->lex->column = column, par->lex->index = index, par->lex->currentChar = currentChar;
+                
+                parserAdvance(par);
                 openParenthesis++;
                 stack[++top] = par->current;
             }
             else {
-                //parserAdvance(par);
+                current->delChild(current, current->getChild(current, current->amountOfChilds - 2), false);
             }
+            // Unsetting back the panic flag so we get any additional error messages
+            par->panic = false;
         }
         else if (par->current->type == TOKEN_RIGHT_PAREN)
         {
@@ -162,7 +174,7 @@ ParseTree* foldTerms(ParseTree* currentTree, ParseTree* child, Token* stack[], i
         sign = child;
         foldFlag = true;
     }
-    else if (threeLastChild && lastChild->type != ATOMIC_PARSE && child->type == ATOMIC_PARSE && (twoLastChild->type == ATOMIC_PARSE || threeLastChild->type == ATOMIC_PARSE) && priority(peekPost(stack, top)) >= priority(lastChild->token)) {
+    else if (threeLastChild && lastChild->type != ATOMIC_PARSE && child->type == ATOMIC_PARSE && (twoLastChild->type == ATOMIC_PARSE || threeLastChild->type == ATOMIC_PARSE) && priority(peekPost(stack, top)) == priority(lastChild->token)) {
         first = twoLastChild->type == ATOMIC_PARSE ? twoLastChild : threeLastChild;
         second = child;
         sign = lastChild;
@@ -185,44 +197,44 @@ ParseTree* foldTerms(ParseTree* currentTree, ParseTree* child, Token* stack[], i
         switch (sign->type) {
 
             // Arithmetic
-            case PARSE_PLUS:
-                out = firstConst + secondConst;
-                break;
-            case PARSE_MINUS:
-                out = firstConst - secondConst;
-                break;
-            case PARSE_STAR:
-                out = firstConst * secondConst;
-                break;
-            case PARSE_SLASH:
-                out = firstConst / secondConst;
-                break;
+        case PARSE_PLUS:
+            out = firstConst + secondConst;
+            break;
+        case PARSE_MINUS:
+            out = firstConst - secondConst;
+            break;
+        case PARSE_STAR:
+            out = firstConst * secondConst;
+            break;
+        case PARSE_SLASH:
+            out = firstConst / secondConst;
+            break;
 
             // Boolean
-            case PARSE_AND_AND:
-                out = firstConst && secondConst;
-                break;
-            case PARSE_OR_OR:
-                out = firstConst || secondConst;
-                break;
-            case PARSE_GREATER:
-                out = (int)(firstConst - secondConst) > 0;
-                break;
-            case PARSE_GREATER_EQUAL:
-                out = (int)(firstConst - secondConst) >= EPSILON_PRECISION;
-                break;
-            case PARSE_LESS:
-                out = (int)(firstConst - secondConst) < 0;
-                break;
-            case PARSE_LESS_EQUAL:
-                out = (int)(firstConst - secondConst) <= EPSILON_PRECISION;
-                break;
-            case PARSE_EQUAL_EQUAL:
-                out = (int)(firstConst - secondConst) < EPSILON_PRECISION;
-                break;
-            case PARSE_BANG_EQUAL:
-                out = (int)(firstConst - secondConst) > EPSILON_PRECISION;
-                break;
+        case PARSE_AND_AND:
+            out = firstConst && secondConst;
+            break;
+        case PARSE_OR_OR:
+            out = firstConst || secondConst;
+            break;
+        case PARSE_GREATER:
+            out = (int)(firstConst - secondConst) > 0;
+            break;
+        case PARSE_GREATER_EQUAL:
+            out = (int)(firstConst - secondConst) >= EPSILON_PRECISION;
+            break;
+        case PARSE_LESS:
+            out = (int)(firstConst - secondConst) < 0;
+            break;
+        case PARSE_LESS_EQUAL:
+            out = (int)(firstConst - secondConst) <= EPSILON_PRECISION;
+            break;
+        case PARSE_EQUAL_EQUAL:
+            out = (int)(firstConst - secondConst) < EPSILON_PRECISION;
+            break;
+        case PARSE_BANG_EQUAL:
+            out = (int)(firstConst - secondConst) > EPSILON_PRECISION;
+            break;
         }
         Token* foldToken = (Token*)malloc(sizeof(Token));
         foldToken->column = first->token->column;
