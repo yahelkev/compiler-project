@@ -48,7 +48,6 @@ bool convertToPost(Parser* par, ParseTree* current, TokenType EO_Expr) {
             current->addChild(current, child);
         }
         else if (par->current->type == TOKEN_LEFT_PAREN) {
-            //line = par->lex->line, column = par->lex->column, index = par->lex->column;
             line = par->current->line, column = par->current->column, index = par->lex->index - strlen(par->current->lexeme), currentChar = par->current->lexeme[0];
             // Setting panic mode on, so no error calls will get printed
             // We only want to know if the case if valid or not
@@ -103,7 +102,7 @@ bool convertToPost(Parser* par, ParseTree* current, TokenType EO_Expr) {
             }
             stack[++top] = par->current;
         }
-        if(par->current->type != TOKEN_EOF) parserAdvance(par);
+        parserAdvance(par);
     }
 
     if (openParenthesis) {

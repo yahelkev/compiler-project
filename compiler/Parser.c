@@ -456,7 +456,7 @@ bool parseCalls(Parser* par, ParseTree* current) {
 		
 	call->addChild(call, args);
 	current->addChild(current, call);
-	parserAdvance(par);
+	//parserAdvance(par);
 	return true;
 }
 
