@@ -239,6 +239,10 @@ void ExpressionFirst(CodeGen* gen, Heap_List* heapList, ParseTree* child, String
 		}
 		codeList->add(codeList, currentRow);
 		break;
+	case FULL_CALL_PARSE: {
+		CaseFunctionCall(gen, heapList, child, codeList);
+		break;
+	}
 	}
 	}
 }

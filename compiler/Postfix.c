@@ -68,8 +68,7 @@ bool convertToPost(Parser* par, ParseTree* current, TokenType EO_Expr) {
                 stack[++top] = par->current;
             }
             else {
-                printf("Got function call\n");
-                current->delChild(current, current->getChild(current, current->amountOfChilds - 2));
+                current->delChild(current, current->getChild(current, current->amountOfChilds - 2), false);
             }
             // Unsetting back the panic flag so we get any additional error messages
             par->panic = false;

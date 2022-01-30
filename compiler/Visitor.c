@@ -148,10 +148,8 @@ char* getTypeOfExpression(Table* table, ParseTree* tree) {
 	return "void";
 }
 
-char* getTypeAsString(Table* table, ParseTree* child)
-{
-	switch (child->type)
-	{
+char* getTypeAsString(Table* table, ParseTree* child) {
+	switch (child->type) {
 	case PARSE_IDENTIFIER:
 		return getValue(table, child->token->lexeme).variable->type;
 	case ATOMIC_PARSE:
