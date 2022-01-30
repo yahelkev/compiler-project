@@ -3,5 +3,5 @@ fn ADD(int a, int b) int {
 
 	return (a + b) * div
 }
-int i = ADD(1, 2)
 
+int i = ADD(1, 2)

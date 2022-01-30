@@ -104,7 +104,7 @@ bool convertToPost(Parser* par, ParseTree* current, TokenType EO_Expr) {
             }
             stack[++top] = par->current;
         }
-        parserAdvance(par);
+        if(par->current->type != TOKEN_EOF) parserAdvance(par);
     }
 
     if (openParenthesis) {
