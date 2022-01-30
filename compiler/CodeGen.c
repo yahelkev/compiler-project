@@ -146,6 +146,7 @@ void PostToAsmExp(CodeGen* gen, Heap_List* heapList, ParseTree* current, StringL
 		switch (child->type) {
 		case IDENTIFIER_PARSE:
 		case ATOMIC_PARSE:
+		case FULL_CALL_PARSE:
 			stack[++top] = child;
 			break;
 		default:

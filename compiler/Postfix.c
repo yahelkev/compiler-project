@@ -174,7 +174,7 @@ ParseTree* foldTerms(ParseTree* currentTree, ParseTree* child, Token* stack[], i
         sign = child;
         foldFlag = true;
     }
-    else if (threeLastChild && lastChild->type != ATOMIC_PARSE && child->type == ATOMIC_PARSE && (twoLastChild->type == ATOMIC_PARSE || threeLastChild->type == ATOMIC_PARSE) && priority(peekPost(stack, top)) >= priority(lastChild->token)) {
+    else if (threeLastChild && lastChild->type != ATOMIC_PARSE && child->type == ATOMIC_PARSE && (twoLastChild->type == ATOMIC_PARSE || threeLastChild->type == ATOMIC_PARSE) && priority(peekPost(stack, top)) == priority(lastChild->token)) {
         first = twoLastChild->type == ATOMIC_PARSE ? twoLastChild : threeLastChild;
         second = child;
         sign = lastChild;

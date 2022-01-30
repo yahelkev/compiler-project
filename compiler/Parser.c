@@ -427,6 +427,9 @@ bool parseLoop(Parser* par, ParseTree* current) {
 bool parseCalls(Parser* par, ParseTree* current) {
 	
 	ParseTree* call = newTree(FULL_CALL_PARSE, NULL);
+	if (par->pre->type != TOKEN_IDENTIFIER) {
+		return false;
+	}
 	call->addChild(call, newTree(CALL_NAME_PARSE, par->pre));
 	parserAdvance(par);
 	if (par->current->type == TOKEN_RIGHT_PAREN) {
