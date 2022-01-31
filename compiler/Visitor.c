@@ -61,9 +61,9 @@ bool visitAst(Table* table, ParseTree* tree) {
 bool visitCall(Table* table, ParseTree* tree) {
 	// Check wheter call tree is ok or not with args
 	ParseTree* argsTree = tree->getChild(tree, 1);
-	TABLE_VALUE val = getValue(table, tree->getChild(tree, 0)->token->lexeme);
+	TABLE_VALUE* val = getValue(table, tree->getChild(tree, 0)->token->lexeme);
 
-	if (argsTree->amountOfChilds != val.function->amount) {
+	if (argsTree->amountOfChilds != val->function->amount) {
 		// Args amount don't match
 		throwError(tree->getChild(tree, 0)->token, "Function parameters amount mismatched");
 		return false;
@@ -72,7 +72,7 @@ bool visitCall(Table* table, ParseTree* tree) {
 	ParseTree* currentArg = argsTree->getChild(argsTree, 0);
 	bool return_ = true;
 	for (size_t i = 0; i < argsTree->amountOfChilds; i++, currentArg = argsTree->getChild(argsTree, i)) {
-		if (!compareTypes(getTypeOfExpression(table, currentArg), val.function->args[i].type)) {
+		if (!compareTypes(getTypeOfExpression(table, currentArg), val->function->args[i].type)) {
 			throwError(currentArg->getChild(currentArg, 0)->token, "Type mismatch on function call");
 			return_ = false;
 		}
@@ -99,7 +99,7 @@ bool visitVariable(Table* table, ParseTree* tree) {
 	if (!visitExperssion(table, tree->getChild(tree, 3))) {
 		return false;
 	}
-	if (!compareTypes(getValue(table, tree->getChild(tree, 1)->token->lexeme).variable->type, getTypeOfExpression(table, tree->getChild(tree, 3)))) {
+	if (!compareTypes(getValue(table, tree->getChild(tree, 1)->token->lexeme)->variable->type, getTypeOfExpression(table, tree->getChild(tree, 3)))) {
 		throwError(tree->getChild(tree, 3)->getChild(tree->getChild(tree, 3),0)->token, "Value type and variable type don't much");
 		return false;
 	}
@@ -109,7 +109,7 @@ bool visitAssign(Table* table, ParseTree* tree) {
 	if (!visitExperssion(table, tree->getChild(tree, 2))) {
 		return false;
 	}
-	if (!compareTypes(getValue(table, (tree->getChild(tree, 0))->token->lexeme).variable->type, getTypeOfExpression(table, tree->getChild(tree, 2)))) {
+	if (!compareTypes(getValue(table, (tree->getChild(tree, 0))->token->lexeme)->variable->type, getTypeOfExpression(table, tree->getChild(tree, 2)))) {
 		throwError(tree->getChild(tree, 2), "Value type and variable type don't much");
 		return false;
 	}
@@ -130,7 +130,7 @@ char* getTypeOfExpression(Table* table, ParseTree* tree) {
 	ParseTree* first = tree->type == EXPRESSION_PARSE ? tree->getChild(tree, 0) : tree;
 	switch (first->type) {
 	case IDENTIFIER_PARSE:
-		return getValue(table, first->token->lexeme).variable->type;
+		return getValue(table, first->token->lexeme)->variable->type;
 	case ATOMIC_PARSE: {
 		switch (first->token->type) {
 		case TOKEN_INT:
@@ -143,7 +143,7 @@ char* getTypeOfExpression(Table* table, ParseTree* tree) {
 		break;
 	}
 	case FULL_CALL_PARSE:
-		return getValue(table, first->getChild(first, 0)->token->lexeme).function->returnType;
+		return getValue(table, first->getChild(first, 0)->token->lexeme)->function->returnType;
 	}
 	return "void";
 }
@@ -151,7 +151,7 @@ char* getTypeOfExpression(Table* table, ParseTree* tree) {
 char* getTypeAsString(Table* table, ParseTree* child) {
 	switch (child->type) {
 	case PARSE_IDENTIFIER:
-		return getValue(table, child->token->lexeme).variable->type;
+		return getValue(table, child->token->lexeme)->variable->type;
 	case ATOMIC_PARSE:
 		switch (child->token->type) {
 			case TOKEN_INT:
@@ -162,7 +162,7 @@ char* getTypeAsString(Table* table, ParseTree* child) {
 				return "string";
 		}
 	case FULL_CALL_PARSE:
-		return getValue(table, child->getChild(child, 0)->token->lexeme).function->returnType;
+		return getValue(table, child->getChild(child, 0)->token->lexeme)->function->returnType;
 	
 	default:
 		return "\0";

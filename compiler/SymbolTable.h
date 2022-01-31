@@ -54,7 +54,7 @@ typedef struct Table {
 
 void newTable(Table* table);
 bool isDefined(Table* table, char* key);
-TABLE_VALUE getValue(Table* table, char* key);
+TABLE_VALUE* getValue(Table* table, char* key);
 /* Return :
     1 - Insertion succesded
     0 - Insertion Failed
@@ -65,7 +65,7 @@ struct function* makeFunction(struct arg* args, int amount, char* returnType);
 struct variable* makeVariable(char* type, ParseTree* value);
 struct error makeError(char* msg);
 struct arg* makeArg(char* name, char* type);
-void newValue(TABLE_VALUE* value, ValueTag tag, void* structValuePointer, int line, int column);
+TABLE_VALUE* newValue(ValueTag tag, void* structValuePointer, int line, int column);
 
 
 
