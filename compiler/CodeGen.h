@@ -15,6 +15,7 @@
 #include "LCConst.h"
 #include "VariableHeap.h"
 #include "FunctionDef.h"
+#include "LoadBuiltin.h"
 
 #define LENGTH(var) strlen(var) + 1
 #define START_OF_FILE "\t.file "

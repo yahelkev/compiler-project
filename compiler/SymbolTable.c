@@ -19,9 +19,8 @@ TABLE_VALUE* getValue(Table* table, char* key) {
         if (!strcmp(table->keys[i], key))
                 return table->values[i];
     
-    TABLE_VALUE* val = (TABLE_VALUE*)malloc(sizeof(TABLE_VALUE));
     struct error err = makeError("no such key");
-    newValue(val, ERROR_TAG, &err, -1, -1);
+    TABLE_VALUE* val = newValue(ERROR_TAG, &err, -1, -1);
     return val;
     
 }

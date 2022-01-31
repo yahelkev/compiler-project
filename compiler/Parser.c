@@ -8,6 +8,7 @@ void newParser(Parser* par, Lexer* lex) {
 	par->mainTree = newTree(MAIN_PARSE, NULL);
 	par->table = (Table*)malloc(sizeof(Table));
 	newTable(par->table);
+	loadFunctionsToTable(par->table);
 	parserAdvance(par);
 }
 
@@ -174,8 +175,7 @@ bool parseVariableCreation(Parser* par, ParseTree* current) {
 	}
 	current->addChild(current, mainTree);
 	struct variable* var = makeVariable(mainTree->getChild(mainTree, START_TREE)->token->lexeme, mainTree->getChild(mainTree, END_VARIABLE_TREE));
-	TABLE_VALUE* value = (TABLE_VALUE*)malloc(sizeof(TABLE_VALUE));
-	newValue(value, VARIABLE_TAG, var, mainTree->getChild(mainTree, START_TREE)->token->line, mainTree->getChild(mainTree, START_TREE)->token->column);
+	TABLE_VALUE* value = newValue(VARIABLE_TAG, var, mainTree->getChild(mainTree, START_TREE)->token->line, mainTree->getChild(mainTree, START_TREE)->token->column);
 	insertValue(par->table, mainTree->getChild(mainTree, START_TREE + 1)->token->lexeme, value);
 	return true;
 }
@@ -193,8 +193,8 @@ bool parseAssign(Parser * par, ParseTree * current) {
 		synchronize(par);
 		return false;
 	}
-	TABLE_VALUE val = getValue(par->table, par->pre->lexeme);
-	if (val.tag == FUNCTION_TAG) {
+	TABLE_VALUE* val = getValue(par->table, par->pre->lexeme);
+	if (val->tag == FUNCTION_TAG) {
 		if (par->current->type == TOKEN_LEFT_PAREN)
 			return parseCalls(par, current);
 
@@ -336,9 +336,8 @@ bool parseFunction(Parser* par, ParseTree* current) {
 		args_s = (struct arg*)realloc(args_s, sizeof(struct arg) * (i + 1));
 		args_s[i] = *makeArg(argTree->getChild(argTree, START_TREE + 1)->token->lexeme, argTree->getChild(argTree, START_TREE)->token->lexeme);
 	}
-	TABLE_VALUE* value = (TABLE_VALUE*)malloc(sizeof(TABLE_VALUE));
 	struct function* func = makeFunction(args_s, i, type->token->lexeme);
-	newValue(value, FUNCTION_TAG, func, mainTree->getChild(mainTree, START_TREE)->token->line, mainTree->getChild(mainTree, START_TREE)->token->column);
+	TABLE_VALUE* value = newValue(FUNCTION_TAG, func, mainTree->getChild(mainTree, START_TREE)->token->line, mainTree->getChild(mainTree, START_TREE)->token->column);
 	insertValue(par->table, mainTree->getChild(mainTree, START_TREE)->token->lexeme, value);
 	return true;
 }
@@ -441,9 +440,9 @@ bool parseCalls(Parser* par, ParseTree* current) {
 
 	ParseTree* args = newTree(CALL_ARGS_PARSE, NULL);
 	int argCounter = 0;
-	TABLE_VALUE val = getValue(par->table, call->getChild(call, 0)->token->lexeme);
+	TABLE_VALUE* val = getValue(par->table, call->getChild(call, 0)->token->lexeme);
 	ParseTree* exp = newTree(EXPRESSION_PARSE, NULL);
-	while (val.function->amount != ++argCounter) {
+	while (val->function->amount != ++argCounter) {
 		
 		if(!expression(par, exp, TOKEN_COMMA)) 
 			return false;

@@ -12,6 +12,8 @@ void newCodeGen(CodeGen* gen, char* path, ParseTree* mainTree, Table* table) {
 
 	gen->loopCounter = 0;
 	gen->conditionCounter = 0;
+
+	loadFunctionBinaries(gen->funcList);
 	return;
 }
 
@@ -21,7 +23,6 @@ void freeCodeGen(CodeGen* gen) {
 	fclose(gen->filePointer);
 	gen->codeList->free(gen->codeList);
 	freeFunctionList(gen->funcList);
-	//free(gen);
 	return;
 }
 
@@ -317,15 +318,15 @@ void CaseAssign(CodeGen* gen, Heap_List* heapList, ParseTree* current, StringLis
 	
 	ParseTree* firstChild = current->getChild(current, 0);
 	int margin = getHeap(heapList, firstChild->token->lexeme)->margin;
-	if (!strcmp(getValue(gen->table, (firstChild->token->lexeme)).variable->type, "string")){
+	if (!strcmp(getValue(gen->table, (firstChild->token->lexeme))->variable->type, "string")){
 		
 		currentRow = assembleRow(currentRow, "\tMOV	DWORD PTR [rbp");
 	}
-	else if(!strcmp(getValue(gen->table, (firstChild->token->lexeme)).variable->type, "float")){
+	else if(!strcmp(getValue(gen->table, (firstChild->token->lexeme))->variable->type, "float")){
 		
 		currentRow = assembleRow(currentRow, "\tMOVSS	DWORD PTR [rbp");
 	}
-	else if (!strcmp(getValue(gen->table, (firstChild->token->lexeme)).variable->type, "int")){
+	else if (!strcmp(getValue(gen->table, (firstChild->token->lexeme))->variable->type, "int")){
 		
 		currentRow = assembleRow(currentRow, "\tMOV	DWORD PTR [rbp");
 	}
@@ -465,9 +466,9 @@ void CaseFunctionDef(CodeGen* gen, Heap_List* heapList, ParseTree* current, Stri
 	// getLast(heapList, SEARCH_VARIABLE);
 	codeList->add(codeList, "\tPUSH rbp");
 	codeList->add(codeList, "\tMOV rbp, rsp\n");
-	TABLE_VALUE value = getValue(gen->table, current->getChild(current, 0)->token->lexeme);
-	for (size_t i = 0; i < value.function->amount; i++) {
-		Heap_ListAdd(heapList, newHeap(HEAP_DWORD, value.function->args[i].name, getLast(heapList, SEARCH_ARG)));
+	TABLE_VALUE* value = getValue(gen->table, current->getChild(current, 0)->token->lexeme);
+	for (size_t i = 0; i < value->function->amount; i++) {
+		Heap_ListAdd(heapList, newHeap(HEAP_DWORD, value->function->args[i].name, getLast(heapList, SEARCH_ARG)));
 	}
 	
 	Generate(gen, heapList, current->getChild(current, 3), def->code); //  Generate code of the function block
