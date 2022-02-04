@@ -23,11 +23,17 @@ typedef struct sectionHeadrer {
 	unsigned int flags;
 }sectionHeadrer;
 
-typedef struct symbolsTable {
+typedef struct symbolTableSection {
 	unsigned char name[8];
 	unsigned int value;
 	unsigned short sectionNum;
 	unsigned short type;
 	unsigned char storageClass;
 	unsigned char numOfAuxSymbols;
-}sectionHeadrer;
+}symbosTableSection;
+
+typedef struct relocationTableSection {
+	unsigned char RVA[8];
+	unsigned char symbolTableIndex[8];
+	unsigned int type;
+}relocationTableSection;
