@@ -9,5 +9,5 @@ typedef struct Asseembler {
 
 void newAssembler(Assembler* asm, char* path, Table* table);
 void freeAssembler(Assembler* asm);
-
+//function sets the valuse of objectFile and manages the conversion of the assembly code
 void runAssembler(Assembler* asm);

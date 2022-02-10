@@ -5,6 +5,7 @@
 
 #define O_EXTENSION ".o"
 #define COMPUTER 0x1c4
+#define NAME_SIZE 8
 
 
 typedef struct fileHeader {
@@ -18,7 +19,7 @@ typedef struct fileHeader {
 }fileHeader;
 
 typedef struct sectionHeadrer {
-	unsigned char name[8];
+	unsigned char name[NAME_SIZE];
 	unsigned int virtualSize;
 	unsigned int virtualAddress;
 	unsigned int rawDataSize;
@@ -31,7 +32,7 @@ typedef struct sectionHeadrer {
 }sectionHeadrer;
 
 typedef struct symbolTableSection {
-	unsigned char name[8];
+	unsigned char name[NAME_SIZE];
 	unsigned int value;
 	unsigned short sectionNum;
 	unsigned short type;
@@ -66,3 +67,5 @@ void freeObjectFile(ObjectFile* obj);
 FILE* CreateObjFile(const char* path);
 void setHeaders(ObjectFile* obj, int pcType, int numSections, int timeDate, int symbolTableOffset, int numSymbols, int SizeOptionalHeader, int flag);
 void writeFile(ObjectFile* obj);
+void setSectionHeaders(sectionHeadrer* sect, int virtualSize, int virtualAddress,	int rawDataSize,
+	int dataAddress, int ptrToRelocation, int lineNumbrsPtr, short numOfRelocations, short numOfLineNums, int flags);
