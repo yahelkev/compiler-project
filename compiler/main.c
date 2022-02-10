@@ -8,7 +8,7 @@
 #include "interface.h"
 #include "Visitor.h"
 #include "CodeGen.h"
-#include "ObjectFile.h"
+#include "Assembler.h"
 
 
 
@@ -22,7 +22,7 @@ int main( int argc, char** argv ) {
     Parser par;
     Visitor vis;
     CodeGen gen;
-    ObjectFile obj;
+    Assembler asm;
 
     newLexer(&lex, getFileContent(srcFileName));
     newParser(&par, &lex);
@@ -40,12 +40,11 @@ int main( int argc, char** argv ) {
         c(GRAY);
      //   return 0;
     }
-    newCodeGen(&gen, srcFileName, vis.par->mainTree, vis.par->table);
-    gen.filePointer = CreateBlankFile(gen.filePath);
-    Generate(&gen, NULL, gen._main, gen.codeList);
+//    newCodeGen(&gen, srcFileName, vis.par->mainTree, vis.par->table);
+  //  gen.filePointer = CreateBlankFile(gen.filePath);
+   // Generate(&gen, NULL, gen._main, gen.codeList);
   //  emitAsm(&gen);
-    newObjectFile(&obj, srcFileName, vis.par->table);
-    setHeaders(&obj, 0x1c4, 0, 0, 0, 0, 0, 0x0104);
-    freeObjectFile(&obj);
+    newAssembler(&asm, srcFileName, par.table);
+    runAssembler(&asm);
     return 0;
 }

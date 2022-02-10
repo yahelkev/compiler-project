@@ -1,15 +1,18 @@
 #include "ObjectFile.h"
 
-void newObjectFile(ObjectFile* obj, char* path, Table* table) {
+void newObjectFile(ObjectFile* obj, char* path) {
 	obj->filePath = (char*)malloc(sizeof(char) * LENGTH(path));
 	strncpy(obj->filePath, path, LENGTH(path));
-	obj->table = table;
 	obj->filePointer = CreateObjFile(path);
 	obj->fileHeaders = malloc(sizeof(fileHeader));
 	obj->_textHeaders = malloc(sizeof(sectionHeadrer));
+	strncpy(obj->_textHeaders->name, ".text", LENGTH(".text"));
 	obj->_dataHeaders = malloc(sizeof(sectionHeadrer));
+	strncpy(obj->_dataHeaders->name, ".data", LENGTH(".data"));
 	obj->_bssHeaders = malloc(sizeof(sectionHeadrer));
-	obj->_textSection = NULL;
+	strncpy(obj->_bssHeaders->name, ".bss", LENGTH(".bss"));
+	obj->_textSection = malloc(1);
+	*obj->_textSection = '\0';
 	obj->symbolTable = NULL;
 	obj->relocationTable = NULL;
 	obj->symbolTableSize = 0;
@@ -46,7 +49,7 @@ void writeFile(ObjectFile* obj)
 	fwrite(obj->_textHeaders, sizeof(sectionHeadrer), 1, obj->filePointer);
 	fwrite(obj->_dataHeaders, sizeof(sectionHeadrer), 1, obj->filePointer);
 	fwrite(obj->_bssHeaders, sizeof(sectionHeadrer), 1, obj->filePointer);
-	fwrite(obj->_textSection, sizeof(obj->_dataHeaders), 1, obj->filePointer);
+	fwrite(obj->_textSection, sizeof(obj->_textSection), 1, obj->filePointer);
 	for (int i = 0; i < obj->symbolTableSize; i++)
 	{
 		fwrite(obj->symbolTable[i], sizeof(symbosTableSection), 1, obj->filePointer);

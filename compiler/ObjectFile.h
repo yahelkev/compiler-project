@@ -49,7 +49,6 @@ typedef struct ObjectFile
 {
 	char* filePath;
 	FILE* filePointer;
-	Table* table;
 	fileHeader* fileHeaders;
 	sectionHeadrer* _textHeaders;
 	sectionHeadrer* _dataHeaders;
@@ -62,7 +61,7 @@ typedef struct ObjectFile
 
 }ObjectFile;
 
-void newObjectFile(ObjectFile* obj, char* path, Table* table);
+void newObjectFile(ObjectFile* obj, char* path);
 void freeObjectFile(ObjectFile* obj);
 FILE* CreateObjFile(const char* path);
 void setHeaders(ObjectFile* obj, int pcType, int numSections, int timeDate, int symbolTableOffset, int numSymbols, int SizeOptionalHeader, int flag);
