@@ -4,7 +4,7 @@
 #include "SymbolTable.h"
 
 #define O_EXTENSION ".o"
-#define COMPUTER 0x1c4
+#define COMPUTER 0x14c
 #define NAME_SIZE 8
 
 
