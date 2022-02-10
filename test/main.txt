@@ -1,5 +1,9 @@
+<<<<<<< HEAD
 fn ADD(int a, int b) int {
 	return a + b
 }
 
 int i = (ADD(1, 2) + 1)*5
+=======
+int x = 5
+>>>>>>> build/object_file
