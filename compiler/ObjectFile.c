@@ -5,11 +5,24 @@ void newObjectFile(ObjectFile* obj, char* path, Table* table) {
 	strncpy(obj->filePath, path, LENGTH(path));
 	obj->table = table;
 	obj->filePointer = CreateObjFile(path);
+	obj->fileHeaders = malloc(sizeof(fileHeader));
+	obj->_textHeaders = malloc(sizeof(sectionHeadrer));
+	obj->_dataHeaders = malloc(sizeof(sectionHeadrer));
+	obj->_bssHeaders = malloc(sizeof(sectionHeadrer));
+	obj->_textSection = NULL;
+	obj->symbolTable = NULL;
+	obj->relocationTable = NULL;
+	obj->symbolTableSize = 0;
+	obj->relocarionTableSize = 0;
 }
 
 void freeObjectFile(ObjectFile* obj) {
 	free(obj->filePath);
 	fclose(obj->filePointer);
+	free(obj->fileHeaders);
+	free(obj->_textHeaders);
+	free(obj->_dataHeaders);
+	free(obj->_bssHeaders);
 }
 
 FILE* CreateObjFile(const char* path) {
@@ -27,14 +40,32 @@ FILE* CreateObjFile(const char* path) {
 	return fp;
 }
 
-void writeHeaders(ObjectFile* obj, int pcType, int numSections, int timeDate, int symbolTableOffset, int numSymbols, int SizeOptionalHeader, int flag)
+void writeFile(ObjectFile* obj)
 {
-	fwrite((const void*)&pcType, 2, 1, obj->filePointer);
-	fwrite((const void*)&numSections, 2, 1, obj->filePointer);
-	fwrite((const void*)&timeDate, 4, 1, obj->filePointer);
-	fwrite((const void*)&symbolTableOffset, 4, 1, obj->filePointer);
-	fwrite((const void*)&numSymbols, 4, 1, obj->filePointer);
-	fwrite((const void*)&SizeOptionalHeader, 2, 1, obj->filePointer);
-	fwrite((const void*)&flag, 2, 1, obj->filePointer);
+	fwrite(obj->fileHeaders, sizeof(fileHeader), 1, obj->filePointer);
+	fwrite(obj->_textHeaders, sizeof(sectionHeadrer), 1, obj->filePointer);
+	fwrite(obj->_dataHeaders, sizeof(sectionHeadrer), 1, obj->filePointer);
+	fwrite(obj->_bssHeaders, sizeof(sectionHeadrer), 1, obj->filePointer);
+	fwrite(obj->_textSection, sizeof(obj->_dataHeaders), 1, obj->filePointer);
+	for (int i = 0; i < obj->symbolTableSize; i++)
+	{
+		fwrite(obj->symbolTable[i], sizeof(symbosTableSection), 1, obj->filePointer);
+	}
+	for (int i = 0; i < obj->relocationTable; i++)
+	{
+		fwrite(obj->symbolTable[i], sizeof(relocationTableSection), 1, obj->filePointer);
+	}
+
+}
+
+void setHeaders(ObjectFile* obj, int pcType, int numSections, int timeDate, int symbolTableOffset, int numSymbols, int SizeOptionalHeader, int flag)
+{
+	obj->fileHeaders->pcType = pcType;
+	obj->fileHeaders->numSections = numSections;
+	obj->fileHeaders->timedate = timeDate;
+	obj->fileHeaders->symbolTablePtr = symbolTableOffset;
+	obj->fileHeaders->numOfSymbols = numSymbols;
+	obj->fileHeaders->OpHeaderSize = SizeOptionalHeader;
+	obj->fileHeaders->flags = flag;
 }
 

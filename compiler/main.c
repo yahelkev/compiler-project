@@ -45,7 +45,7 @@ int main( int argc, char** argv ) {
     Generate(&gen, NULL, gen._main, gen.codeList);
   //  emitAsm(&gen);
     newObjectFile(&obj, srcFileName, vis.par->table);
-    writeHeaders(&obj, 0x1c4, 0, 0, 0, 0, 0, 0);
+    setHeaders(&obj, 0x1c4, 0, 0, 0, 0, 0, 0x0104);
     freeObjectFile(&obj);
     return 0;
 }
