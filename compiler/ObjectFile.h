@@ -3,8 +3,12 @@
 #include <stdlib.h>
 #include "SymbolTable.h"
 
+#define TEXT_CHARACTERISTICS 0x60300020
+#define DATA_CHARACTERISTICS 0xc0300040
+#define BSS_CHARACTERISTICS 0xc0300080
+
 #define O_EXTENSION ".o"
-#define COMPUTER 0x14c
+#define COMPUTER_TYPE 0x14c
 #define NAME_SIZE 8
 
 
