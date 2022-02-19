@@ -19,6 +19,7 @@ void runAssembler(Assembler* asm) {
         offsetHeadersEnd + strlen(asm->_obj->_textSection), 0, 0, 0, TEXT_CHARACTERISTICS);
     setSectionHeaders(asm->_obj->_dataHeaders, 0, 0, 0, 0, 0, 0, 0, 0, DATA_CHARACTERISTICS);
     setSectionHeaders(asm->_obj->_bssHeaders, 0, 0, 0, 0, 0, 0, 0, 0, BSS_CHARACTERISTICS);
-    
+    addSymbol(asm->_obj, "tryme", 123, 0, 0, 0x0, 0x1);
+    addSymbol(asm->_obj, "secondd", 123, 0, 0, 0x0, 0x0);
     writeFile(asm->_obj);
 }

@@ -29,6 +29,14 @@ void freeObjectFile(ObjectFile* obj) {
 	free(obj->_textHeaders);
 	free(obj->_dataHeaders);
 	free(obj->_bssHeaders);
+	for (int i = 0; i < obj->symbolTableSize; i++)
+	{
+		free(obj->symbolTable[i]);
+	}
+	for (int i = 0; i < obj->relocationTable; i++)
+	{
+		free(obj->symbolTable[i]);
+	}
 }
 
 FILE* CreateObjFile(const char* path) {
@@ -55,13 +63,31 @@ void writeFile(ObjectFile* obj)
 	fwrite(obj->_textSection, strlen(obj->_textSection), 1, obj->filePointer);
 	for (int i = 0; i < obj->symbolTableSize; i++)
 	{
-		fwrite(obj->symbolTable[i], sizeof(symbosTableSection), 1, obj->filePointer);
+		fwrite(obj->symbolTable[i], sizeof(symbolTableSection), 1, obj->filePointer);
 	}
-	for (int i = 0; i < obj->relocationTable; i++)
+	for (int i = 0; i < obj->relocarionTableSize; i++)
 	{
-		fwrite(obj->symbolTable[i], sizeof(relocationTableSection), 1, obj->filePointer);
+		fwrite(obj->relocationTable[i], sizeof(relocationTableSection), 1, obj->filePointer);
 	}
 
+}
+
+void addSymbol(ObjectFile* obj, char name[NAME_SIZE], int value, short sectionNum, short type, char storageClass, char numOfAuxSymbols)
+{
+	symbolTableSection* newSection = malloc(sizeof(symbolTableSection));
+	memset(newSection->name, 0, NAME_SIZE);
+	strncpy(newSection->name, name, strlen(name));
+	newSection->value = value;
+	newSection->sectionNum = sectionNum;
+	newSection->type = type;
+	newSection->storageClass = storageClass;
+	newSection->numOfAuxSymbols = numOfAuxSymbols;
+	if (!obj->symbolTableSize) {
+		obj->symbolTable = (symbolTableSection**)malloc(++obj->symbolTableSize * sizeof(symbolTableSection*));
+	}else{
+		obj->symbolTable = (symbolTableSection**)realloc(obj->symbolTable, ++obj->symbolTableSize * sizeof(symbolTableSection*));
+	}
+	obj->symbolTable[obj->symbolTableSize - 1] = newSection;
 }
 
 void setSectionHeaders(sectionHeadrer* sect, int virtualSize, int virtualAddress, int rawDataSize,

@@ -42,7 +42,7 @@ typedef struct symbolTableSection {
 	unsigned short type;
 	unsigned char storageClass;
 	unsigned char numOfAuxSymbols;
-}symbosTableSection;
+}symbolTableSection;
 
 typedef struct relocationTableSection {
 	unsigned char RVA[8];
@@ -59,7 +59,7 @@ typedef struct ObjectFile
 	sectionHeadrer* _dataHeaders;
 	sectionHeadrer* _bssHeaders;
 	char* _textSection;
-	symbosTableSection** symbolTable;
+	symbolTableSection** symbolTable;
 	relocationTableSection** relocationTable;
 	int symbolTableSize;
 	int relocarionTableSize;
@@ -73,3 +73,4 @@ void setHeaders(ObjectFile* obj, int pcType, int numSections, int timeDate, int 
 void writeFile(ObjectFile* obj);
 void setSectionHeaders(sectionHeadrer* sect, int virtualSize, int virtualAddress,	int rawDataSize,
 	int dataAddress, int ptrToRelocation, int lineNumbrsPtr, short numOfRelocations, short numOfLineNums, int flags);
+void addSymbol(ObjectFile* obj, char name[NAME_SIZE], int value, short sectionNum, short type, char storageClass, char numOfAuxSymbols);
