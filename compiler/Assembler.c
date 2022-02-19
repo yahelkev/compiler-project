@@ -19,7 +19,10 @@ void runAssembler(Assembler* asm) {
         offsetHeadersEnd + strlen(asm->_obj->_textSection), 0, 0, 0, TEXT_CHARACTERISTICS);
     setSectionHeaders(asm->_obj->_dataHeaders, 0, 0, 0, 0, 0, 0, 0, 0, DATA_CHARACTERISTICS);
     setSectionHeaders(asm->_obj->_bssHeaders, 0, 0, 0, 0, 0, 0, 0, 0, BSS_CHARACTERISTICS);
-    addSymbol(asm->_obj, "tryme", 123, 0, 0, 0x0, 0x1);
-    addSymbol(asm->_obj, "secondd", 123, 0, 0, 0x0, 0x0);
+    addSymbol(asm->_obj, ".file", 0, MAGE_SYM_DEBUG, 0, IMAGE_SYM_CLASS_FILE, 0);
+   //TO DO: functions
+    addSymbol(asm->_obj, ".text", 0, TEXT_SECTION_NUM, 0, IMAGE_SYM_CLASS_STATIC, 0);
+    addSymbol(asm->_obj, ".data", 0, DATA_SECTION_NUM, 0, IMAGE_SYM_CLASS_STATIC, 0);
+    addSymbol(asm->_obj, ".bss", 0, BSS_SECTION_NUM, 0, IMAGE_SYM_CLASS_STATIC, 0);
     writeFile(asm->_obj);
 }
