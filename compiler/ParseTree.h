@@ -1,9 +1,10 @@
 #ifndef PARSE_TREE
 #define PARSE_TREE
-#include "Lexer.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include "Lexer.h"
+
 typedef enum {
 	// Capsul
 

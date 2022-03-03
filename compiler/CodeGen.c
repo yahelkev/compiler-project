@@ -1,4 +1,6 @@
 ﻿#include "CodeGen.h"
+#include "Postfix.h"
+#include "SymbolTable.h"
 
 void newCodeGen(CodeGen* gen, char* path, ParseTree* mainTree, Table* table) {
 	gen->filePath = (char*)malloc(sizeof(char) * LENGTH(path));
@@ -56,9 +58,9 @@ void emitAsm(CodeGen* gen) {
 		writeLine(gen->filePointer, "\tRET");
 	}
 
-	writeLine(gen->filePointer, "\nmain:\n");
-	writeLine(gen->filePointer, "\tPUSH rbp");
-	writeLine(gen->filePointer, "\tMOV rbp, rsp\n");
+	writeLine(gen->filePointer, "\n_main:\n");
+	writeLine(gen->filePointer, "\tPUSH ebp");
+	writeLine(gen->filePointer, "\tMOV ebp, esp\n");
 	
 
 	// Print entire code
@@ -67,7 +69,7 @@ void emitAsm(CodeGen* gen) {
 
 	fputc('\n', gen->filePointer);
 	writeLine(gen->filePointer, "\tMOV eax, 0");
-	writeLine(gen->filePointer, "\tPOP rbp");
+	writeLine(gen->filePointer, "\tPOP ebp");
 	writeLine(gen->filePointer, "\tRET");
 	return;
 }
@@ -157,7 +159,7 @@ void PostToAsmExp(CodeGen* gen, Heap_List* heapList, ParseTree* current, StringL
 			case IDENTIFIER_PARSE: {
 				char marginString[MAX_DIGIT_LENGTH] = "";
 				int margin = getHeap(heapList, stack[top]->token->lexeme)->margin;
-				currentRow = assembleRow(currentRow, "DWORD PTR [rbp");
+				currentRow = assembleRow(currentRow, "DWORD PTR [ebp");
 				sprintf(marginString, "%d", margin);
 				if (margin > 0) currentRow = assembleRow(currentRow, "+");
 				currentRow = assembleRow(currentRow, marginString);
@@ -207,7 +209,7 @@ void ExpressionFirst(CodeGen* gen, Heap_List* heapList, ParseTree* child, String
 	case IDENTIFIER_PARSE: {
 		char* currentRow = NULL, marginString[MAX_DIGIT_LENGTH] = "";
 		int margin = getHeap(heapList, child->token->lexeme)->margin;
-		currentRow = assembleRow(currentRow, "\tMOV eax, DWORD PTR [rbp");
+		currentRow = assembleRow(currentRow, "\tMOV eax, DWORD PTR [ebp");
 		sprintf(marginString, "%d", margin);
 		if (margin > 0) currentRow = assembleRow(currentRow, "+");
 		currentRow = assembleRow(currentRow, marginString);
@@ -287,7 +289,7 @@ void CaseVariable(CodeGen* gen, Heap_List* heapList , ParseTree* current, String
 			char* currentRow = NULL;
 			int newMargin = getLast(heapList, SEARCH_VARIABLE);
 			Heap_ListAdd(heapList, newHeap(HEAP_DWORD, current->getChild(current, 1)->token->lexeme, newMargin));
-			currentRow = assembleRow(currentRow, "\tMOV DWORD PTR [rbp");
+			currentRow = assembleRow(currentRow, "\tMOV DWORD PTR [ebp");
 			if (newMargin > 0) currentRow = assembleRow(currentRow, "+");
 			char* marginString = (char*)malloc((int)((ceil(log10(abs((int)newMargin))) + 2) * sizeof(char)));
 			sprintf(marginString, "%d", newMargin);
@@ -305,12 +307,12 @@ void CaseVariable(CodeGen* gen, Heap_List* heapList , ParseTree* current, String
 void CaseAssign(CodeGen* gen, Heap_List* heapList, ParseTree* current, StringList* codeList) {
 	/*
 	* int
-	    mov     DWORD PTR [rbp-4], 0
+	    mov     DWORD PTR [ebp-4], 0
 	* string
-	    mov     DWORD PTR [rbp-16], OFFSET FLAT:.LC0
+	    mov     DWORD PTR [ebp-16], OFFSET FLAT:.LC0
     * float    
 		movss   xmm0, DWORD PTR .LC1[rip]
-        movss   DWORD PTR [rbp-20], xmm0
+        movss   DWORD PTR [ebp-20], xmm0
 	*/
 	char* currentRow = NULL;
 	char numSTR[MAX_DIGIT_LENGTH] = "";
@@ -320,15 +322,15 @@ void CaseAssign(CodeGen* gen, Heap_List* heapList, ParseTree* current, StringLis
 	int margin = getHeap(heapList, firstChild->token->lexeme)->margin;
 	if (!strcmp(getValue(gen->table, (firstChild->token->lexeme))->variable->type, "string")){
 		
-		currentRow = assembleRow(currentRow, "\tMOV	DWORD PTR [rbp");
+		currentRow = assembleRow(currentRow, "\tMOV	DWORD PTR [ebp");
 	}
 	else if(!strcmp(getValue(gen->table, (firstChild->token->lexeme))->variable->type, "float")){
 		
-		currentRow = assembleRow(currentRow, "\tMOVSS	DWORD PTR [rbp");
+		currentRow = assembleRow(currentRow, "\tMOVSS	DWORD PTR [ebp");
 	}
 	else if (!strcmp(getValue(gen->table, (firstChild->token->lexeme))->variable->type, "int")){
 		
-		currentRow = assembleRow(currentRow, "\tMOV	DWORD PTR [rbp");
+		currentRow = assembleRow(currentRow, "\tMOV	DWORD PTR [ebp");
 	}
 	if (margin > 0) currentRow = assembleRow(currentRow, "+");
 	sprintf(numSTR, "%d", margin);
@@ -464,15 +466,15 @@ void CaseFunctionDef(CodeGen* gen, Heap_List* heapList, ParseTree* current, Stri
 	FunctionDef* def = newFunctionDef(current->getChild(current, 0)->token->lexeme, codeList);
 	// TODO : Generate function parameters code, will add when funciton calls are added, to know how the function argumants are calculated on the stack
 	// getLast(heapList, SEARCH_VARIABLE);
-	codeList->add(codeList, "\tPUSH rbp");
-	codeList->add(codeList, "\tMOV rbp, rsp\n");
+	codeList->add(codeList, "\tPUSH ebp");
+	codeList->add(codeList, "\tMOV ebp, esp\n");
 	TABLE_VALUE* value = getValue(gen->table, current->getChild(current, 0)->token->lexeme);
 	for (size_t i = 0; i < value->function->amount; i++) {
 		Heap_ListAdd(heapList, newHeap(HEAP_DWORD, value->function->args[i].name, getLast(heapList, SEARCH_ARG)));
 	}
 	
 	Generate(gen, heapList, current->getChild(current, 3), def->code); //  Generate code of the function block
-	codeList->add(codeList, "\tPOP rbp");
+	codeList->add(codeList, "\tPOP ebp");
 	FunctionListAdd(gen->funcList, def);
 	return;
 }

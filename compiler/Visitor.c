@@ -92,7 +92,6 @@ bool visitExperssion(Table* table, ParseTree* tree) {
 			return false;
 		}
 	}
-	}
 	return true;
 }
 

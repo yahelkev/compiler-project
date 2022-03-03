@@ -1,10 +1,9 @@
+#define _CRT_SECURE_NO_WARNINGS
+
 #include <stdio.h>
-#include "Lexer.h"
-#include "Debug.h"
-#include "SymbolTable.h"
+
 #include "Lexer.h"
 #include "Parser.h"
-#include "ParseTree.h"
 #include "interface.h"
 #include "Visitor.h"
 #include "CodeGen.h"

@@ -1,25 +1,24 @@
 #ifndef CODE_GEN_H
 #define CODE_GEN_H
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <io.h>
-#include <stdio.h>
 #include <stdbool.h>
 #include <math.h>
 
 #include "ParseTree.h"
-#include "SymbolTable.h"
-#include "Postfix.h"
+
 #include "StringList.h"
 #include "LCConst.h"
 #include "VariableHeap.h"
-#include "FunctionDef.h"
+//#include "FunctionDef.h"
 #include "LoadBuiltin.h"
 
 #define LENGTH(var) strlen(var) + 1
 #define START_OF_FILE "\t.file "
-#define ASM_EXTENSION ".asm"
+#define ASM_EXTENSION ".s"
 #define MAX_DIGIT_LENGTH 15
 
 #define ASCII_CAPITAL_A 'A'
