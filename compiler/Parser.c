@@ -8,6 +8,7 @@ void newParser(Parser* par, Lexer* lex) {
 	par->mainTree = newTree(MAIN_PARSE, NULL);
 	par->table = (Table*)malloc(sizeof(Table));
 	newTable(par->table);
+	loadFunctionsToTable(par->table);
 	parserAdvance(par);
 }
 
@@ -24,10 +25,8 @@ bool statement(Parser* par, ParseTree* current) {
 
 	if (par->current->type == TOKEN_IDENTIFIER) {
 		parserAdvance(par);
-		return parseAssign(par, current);
+		return par->current->type == TOKEN_LEFT_PAREN ? parseCalls(par, current) : parseAssign(par, current);
 	}
-
-
 	// Grammer rules and possiblities
 	switch (par->current->type) {
 	case TOKEN_INT_V:
@@ -44,6 +43,12 @@ bool statement(Parser* par, ParseTree* current) {
 	case TOKEN_LOOP:
 		parserAdvance(par);
 		return parseLoop(par, current);
+	case TOKEN_RETURN:
+		parserAdvance(par);
+		return parseReturn(par, current);
+	case TOKEN_ELSE:
+		parserAdvance(par);
+		return parseElse(par, current);
 	default:
 		error(par, par->current, "Invalid Syntax");
 		synchronize(par);
@@ -68,6 +73,7 @@ void synchronize(Parser* parser) {
 		case TOKEN_STRING_V:
 		case TOKEN_LOOP:
 		case TOKEN_FUNCTION:
+		case TOKEN_ELSE:
 		case TOKEN_IDENTIFIER:
 			parser->panic = 0;
 			return;
@@ -168,9 +174,8 @@ bool parseVariableCreation(Parser* par, ParseTree* current) {
 		return false;
 	}
 	current->addChild(current, mainTree);
-	struct variable var = makeVariable(mainTree->getChild(mainTree, START_TREE)->token->lexeme, mainTree->getChild(mainTree, END_VARIABLE_TREE));
-	TABLE_VALUE* value = (TABLE_VALUE*)malloc(sizeof(TABLE_VALUE));
-	newValue(value, VARIABLE_TAG, &var, mainTree->getChild(mainTree, START_TREE)->token->line, mainTree->getChild(mainTree, START_TREE)->token->column);
+	struct variable* var = makeVariable(mainTree->getChild(mainTree, START_TREE)->token->lexeme, mainTree->getChild(mainTree, END_VARIABLE_TREE));
+	TABLE_VALUE* value = newValue(VARIABLE_TAG, var, mainTree->getChild(mainTree, START_TREE)->token->line, mainTree->getChild(mainTree, START_TREE)->token->column);
 	insertValue(par->table, mainTree->getChild(mainTree, START_TREE + 1)->token->lexeme, value);
 	return true;
 }
@@ -188,8 +193,8 @@ bool parseAssign(Parser * par, ParseTree * current) {
 		synchronize(par);
 		return false;
 	}
-	TABLE_VALUE val = getValue(par->table, par->pre->lexeme);
-	if (val.tag == FUNCTION_TAG) {
+	TABLE_VALUE* val = getValue(par->table, par->pre->lexeme);
+	if (val->tag == FUNCTION_TAG) {
 		if (par->current->type == TOKEN_LEFT_PAREN)
 			return parseCalls(par, current);
 
@@ -252,6 +257,7 @@ bool parseBody(Parser* par, ParseTree* current) {
 		while (par->current->type == TOKEN_END_LINE) parserAdvance(par);
 		if (!statement(par, current)) return false;
 	}
+	return true;
 }
 
 bool parseConditional(Parser* par, ParseTree* current) {
@@ -330,9 +336,8 @@ bool parseFunction(Parser* par, ParseTree* current) {
 		args_s = (struct arg*)realloc(args_s, sizeof(struct arg) * (i + 1));
 		args_s[i] = *makeArg(argTree->getChild(argTree, START_TREE + 1)->token->lexeme, argTree->getChild(argTree, START_TREE)->token->lexeme);
 	}
-	TABLE_VALUE* value = (TABLE_VALUE*)malloc(sizeof(TABLE_VALUE));
 	struct function* func = makeFunction(args_s, i, type->token->lexeme);
-	newValue(value, FUNCTION_TAG, func, mainTree->getChild(mainTree, START_TREE)->token->line, mainTree->getChild(mainTree, START_TREE)->token->column);
+	TABLE_VALUE* value = newValue(FUNCTION_TAG, func, mainTree->getChild(mainTree, START_TREE)->token->line, mainTree->getChild(mainTree, START_TREE)->token->column);
 	insertValue(par->table, mainTree->getChild(mainTree, START_TREE)->token->lexeme, value);
 	return true;
 }
@@ -421,6 +426,9 @@ bool parseLoop(Parser* par, ParseTree* current) {
 bool parseCalls(Parser* par, ParseTree* current) {
 	
 	ParseTree* call = newTree(FULL_CALL_PARSE, NULL);
+	if (par->pre->type != TOKEN_IDENTIFIER) {
+		return false;
+	}
 	call->addChild(call, newTree(CALL_NAME_PARSE, par->pre));
 	parserAdvance(par);
 	if (par->current->type == TOKEN_RIGHT_PAREN) {
@@ -432,9 +440,9 @@ bool parseCalls(Parser* par, ParseTree* current) {
 
 	ParseTree* args = newTree(CALL_ARGS_PARSE, NULL);
 	int argCounter = 0;
-	TABLE_VALUE val = getValue(par->table, call->getChild(call, 0)->token->lexeme);
+	TABLE_VALUE* val = getValue(par->table, call->getChild(call, 0)->token->lexeme);
 	ParseTree* exp = newTree(EXPRESSION_PARSE, NULL);
-	while (val.function->amount != ++argCounter) {
+	while (val->function->amount != ++argCounter) {
 		
 		if(!expression(par, exp, TOKEN_COMMA)) 
 			return false;
@@ -450,7 +458,29 @@ bool parseCalls(Parser* par, ParseTree* current) {
 		
 	call->addChild(call, args);
 	current->addChild(current, call);
-	parserAdvance(par);
+	//parserAdvance(par);
 	return true;
+}
+
+
+bool parseReturn(Parser* par, ParseTree* current) {
+	ParseTree* returnTree = newTree(PARSE_RETURN_FULL, NULL);
+	returnTree->addChild(returnTree, newTree(PARSE_RETURN, par->pre));
+	ParseTree* exp = newTree(EXPRESSION_PARSE, NULL);
+	if (!expression(par, exp, TOKEN_END_LINE)) return false;
+	returnTree->addChild(returnTree, exp);
+	current->addChild(current, returnTree);
+	return true;
+}
+
+
+bool parseElse(Parser* par, ParseTree* current) {
+	Token* elseToken = par->pre;
+	ParseTree* elseBody = newTree(ELSE_PARSE, NULL);
+	parserAdvance(par);
+	if (!parseBody(par, elseBody)) return false;
+	error(par, elseToken, "Detached Else Block is not allowed");
+	synchronize(par);
+	return false;
 }
 

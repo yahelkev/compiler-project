@@ -1,14 +1,18 @@
 #ifndef PARSER_H
 #define PARSER_H
 
+#include <stdbool.h>
+
 #include "Lexer.h"
 #include "ParseTree.h"
-
 #include "SymbolTable.h"
-#include <stdbool.h>
+#include "LoadBuiltin.h"
 
 #define START_TREE 0
 #define END_VARIABLE_TREE 3
+
+
+
 typedef struct Parser {
 	Lexer* lex;
 	Token* current;
@@ -64,5 +68,8 @@ bool parseBody(Parser* par, ParseTree* current);
 bool parseFunction(Parser* par, ParseTree* current);
 bool parseArgs(Parser* par, ParseTree* current);
 bool parseCalls(Parser* par, ParseTree* current);
+bool parseReturn(Parser* par, ParseTree* current);
+bool parseElse(Parser* par, ParseTree* current);
+
 
 #endif // !PARSER_H

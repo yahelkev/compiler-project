@@ -48,6 +48,13 @@
 *.user
 *.userosscache
 *.sln.docstates
+*.sln
+*.vs/*
+*.Browse.VC.db
+*.ipch
+*.vcxproj
+*.vcxproj.filters
+
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs

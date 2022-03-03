@@ -1,0 +1,5 @@
+fn ADD(int a, int b) int {
+	return a + b
+}
+
+int i = (ADD(1, 2) + 1)*5

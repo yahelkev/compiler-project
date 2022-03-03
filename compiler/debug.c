@@ -30,19 +30,19 @@ void printToken(Token* token) {
 
 void printTableValue(TABLE_VALUE* val) {
 	switch (val->tag) {
-		case FUNCTION_TAG:
-			printf("FN << %s >>\t", val->function->returnType);
-			for (size_t i = 0; i < val->function->amount; i++) {
-				printf("%s (%s), ", val->function->args[i].type, val->function->args[i].name);
-			}
-			break;
-		case VARIABLE_TAG:
-			printf("VAR << %s >> [ %s ]\t", val->variable->type, val->variable->value);
-			break;
-		case ERROR_TAG:
-			printf("error << %s >>\t", val->error->msg);
-		default:
-			return;
+	case FUNCTION_TAG:
+		printf("FN << %s >>\t", val->function->returnType);
+		for (size_t i = 0; i < val->function->amount; i++) {
+			printf("%s (%s), ", val->function->args[i].type, val->function->args[i].name);
+		}
+		break;
+	case VARIABLE_TAG:
+		printf("VAR << %s >> [ %s ]\t", val->variable->type, val->variable->value);
+		break;
+	case ERROR_TAG:
+		printf("error << %s >>\t", val->error->msg);
+	default:
+		return;
 	}
 
 	printf("%d-%d\n", val->line, val->column);
@@ -51,7 +51,7 @@ void printTableValue(TABLE_VALUE* val) {
 
 void printParseTree(ParseTree* tree) {
 	if (!tree) return;
-	
+
 	printf("Type: %d\n", tree->type);
 	if (tree->token) printToken(tree->token);
 	printf("=> ");
@@ -76,7 +76,7 @@ void printAllChildrenData(ParseTree* s) {
 void printBFS(ParseTree* s) {
 	putchar('\n');
 	printAllChildrenData(s);
-	
+
 	for (int i = 0; i < s->amountOfChilds; i++) {
 		ParseTree* childCurr = s->getChild(s, i);
 		printBFS(childCurr);
