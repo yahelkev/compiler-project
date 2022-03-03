@@ -23,7 +23,6 @@ void runAssembler(Assembler* asm) {
 
     for (size_t i = 0; i < asm->table->size; i++) {
         if (FUNCTION_TAG == asm->table->values[i]->tag) {
-            printf("%s\n", asm->table->keys[i]);
             addSymbol(asm->_obj, asm->table->keys[i], 0, TEXT_SECTION_NUM, DT_FUNCTION, IMAGE_SYM_CLASS_EXTERNAL, 0);
         }
     }
