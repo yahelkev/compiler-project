@@ -33,6 +33,7 @@ void visitAll(Visitor* vis) {
 
 bool visitAst(Table* table, ParseTree* tree) {
 	// Works close to how the statement funciton worked in the parser, as checking current tree and going down in levels if necessary
+	if (!tree) { return false; };
 	switch (tree->type) {
 	case FULL_CALL_PARSE:
 		return visitCall(table, tree);

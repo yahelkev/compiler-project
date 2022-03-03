@@ -10,7 +10,7 @@ void newCodeGen(CodeGen* gen, char* path, ParseTree* mainTree, Table* table) {
 
 	gen->codeList = newStringList();
 	gen->lcList = newLC_List();
-	gen->funcList = newFunctionList();
+	//gen->funcList = newFunctionList();
 
 	gen->loopCounter = 0;
 	gen->conditionCounter = 0;

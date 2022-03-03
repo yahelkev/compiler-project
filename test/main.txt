@@ -3,3 +3,4 @@ fn ADD(int a, int b) int {
 }
 
 int i = (ADD(1, 2) + 1)*5
+int x = 5
