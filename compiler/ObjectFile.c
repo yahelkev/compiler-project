@@ -90,6 +90,18 @@ void addSymbol(ObjectFile* obj, char name[NAME_SIZE], int value, short sectionNu
 	obj->symbolTable[obj->symbolTableSize - 1] = newSection;
 }
 
+char* extractTextSegment(FILE* fp)
+{
+	sectionHeadrer textHeaders;
+	fseek(fp, sizeof(fileHeader), SEEK_SET);
+	fread(&textHeaders, sizeof(sectionHeadrer), 1, fp);
+	char* textSegment = malloc(textHeaders.rawDataSize);
+	fseek(fp, textHeaders.dataAddress, SEEK_SET);
+	fread(textSegment, textHeaders.rawDataSize, 1, fp);
+	fclose(fp);
+	return textSegment;
+}
+
 void setSectionHeaders(sectionHeadrer* sect, int virtualSize, int virtualAddress, int rawDataSize,
 	int dataAddress, int ptrToRelocation, int lineNumbrsPtr, short numOfRelocations, short numOfLineNums, int flag)
 {
