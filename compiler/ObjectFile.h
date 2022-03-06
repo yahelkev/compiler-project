@@ -83,3 +83,4 @@ void writeFile(ObjectFile* obj);
 void setSectionHeaders(sectionHeadrer* sect, int virtualSize, int virtualAddress,	int rawDataSize,
 	int dataAddress, int ptrToRelocation, int lineNumbrsPtr, short numOfRelocations, short numOfLineNums, int flags);
 void addSymbol(ObjectFile* obj, char name[NAME_SIZE], int value, short sectionNum, short type, char storageClass, char numOfAuxSymbols);
+char* extractTextSegment(FILE* fp);
