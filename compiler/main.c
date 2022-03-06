@@ -30,19 +30,19 @@ int main( int argc, char** argv ) {
         c(RED);
         fprintf(stderr, "Error while parsing trees\n");
         c(GRAY);
-        return 0;
+        return 1;
     }
     visitAll(&vis);
     if (vis.error) {
         c(RED);
         fprintf(stderr, "Error while visiting trees\n");
         c(GRAY);
-     //   return 0;
+        return 1;
     }
-//    newCodeGen(&gen, srcFileName, vis.par->mainTree, vis.par->table);
-  //  gen.filePointer = CreateBlankFile(gen.filePath);
-   // Generate(&gen, NULL, gen._main, gen.codeList);
-  //  emitAsm(&gen);
+    newCodeGen(&gen, srcFileName, vis.par->mainTree, vis.par->table);
+    gen.filePointer = CreateBlankFile(gen.filePath);
+    Generate(&gen, NULL, gen._main, gen.codeList);
+    emitAsm(&gen);
     newAssembler(&asm, srcFileName, par.table);
     runAssembler(&asm);
     return 0;

@@ -45,7 +45,7 @@ void runAssembler(Assembler* asm) {
 void execGCC(Assembler* asm) {
     char* cmdLine = (char*)malloc(CMD_COMMAND_LIMIT * sizeof(char));
     sprintf(cmdLine, "gcc -m32 -c \"%s.s\" -o \"%s.o\" 2>&1", asm->asmCodeFilePath, asm->binaryCodeFilePath);
-    printf("Command : %s", cmdLine);
+    //printf("Command : %s", cmdLine); DEBUG
     system(cmdLine);
     return;
 }
@@ -65,7 +65,7 @@ char* GenerateRandomBinFile(char* path) {
     binaryFileFullName[pos] = '\0';
     strcat(binaryFileFullName, "\\");
     strncat(binaryFileFullName, binaryFileName, LENGTH(binaryFileName));
-    printf("Name : %s", binaryFileFullName);
+    //printf("Name : %s", binaryFileFullName); File Path Name
     return binaryFileFullName;
 }
 
