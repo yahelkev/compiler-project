@@ -5,21 +5,13 @@ void newAssembler(Assembler* asm, char* path, Table* table) {
     asm->table = table;
     newObjectFile(asm->_obj, path);
     setHeaders(asm->_obj, COMPUTER_TYPE, 3, 0, 0, 0, 0, 0x0104);
-    int binaryFileNumber = randInt(BINARY_FILE_LIMIT_INT);
-    char binaryFileName[BINARY_FILE_LIMIT_STRING + 3] = { 0 }; // Only the file name itself
-    char* binaryFileFullName = NULL; // Includes the dir
-    sprintf(binaryFileName, "%d", binaryFileNumber);
-    int pos = strlen(path);
-    for (size_t i = 0; i < strlen(path); i++)
-        if (path[i] == '\\') 
-            pos = i;
-    binaryFileFullName = (char*)realloc(binaryFileFullName, sizeof(char) * ( pos + 1 ) + LENGTH(binaryFileName));
-    strncpy(binaryFileFullName, path, pos);
-    binaryFileFullName[pos] = '\0';
-    strcat(binaryFileFullName, "\\");
-    strncat(binaryFileFullName, binaryFileName, LENGTH(binaryFileName));
-    printf("Name : %s", binaryFileFullName);
-    asm->binaryCodeFilePointer = CreateObjFile(binaryFileFullName);
+    
+    asm->binaryCodeFilePath = GenerateRandomBinFile(path);
+    asm->asmCodeFilePath = (char*)malloc(sizeof(char) * LENGTH(path));
+    strcpy(asm->asmCodeFilePath, path);
+    asm->asmCodeFilePath[FindFileExtPos(path)] = '\0';
+    asm->binaryCodeFilePointer = CreateObjFile(asm->binaryCodeFilePath);
+    execGCC(asm);
     return;
 }
 
@@ -50,9 +42,42 @@ void runAssembler(Assembler* asm) {
     writeFile(asm->_obj);
 }
 
+void execGCC(Assembler* asm) {
+    char* cmdLine = (char*)malloc(CMD_COMMAND_LIMIT * sizeof(char));
+    sprintf(cmdLine, "gcc -m32 -c \"%s.s\" -o \"%s.o\" 2>&1", asm->asmCodeFilePath, asm->binaryCodeFilePath);
+    printf("Command : %s", cmdLine);
+    system(cmdLine);
+    return;
+}
 
 
-int randInt(int n) {
+char* GenerateRandomBinFile(char* path) {
+    int binaryFileNumber = RandInt(BINARY_FILE_LIMIT_INT);
+    char binaryFileName[BINARY_FILE_LIMIT_STRING + 3] = { 0 }; // Only the file name itself
+    char* binaryFileFullName = NULL; // Includes the dir
+    sprintf(binaryFileName, "%d", binaryFileNumber);
+    int pos = strlen(path);
+    for (size_t i = 0; i < strlen(path); i++)
+        if (path[i] == '\\')
+            pos = i;
+    binaryFileFullName = (char*)realloc(binaryFileFullName, sizeof(char) * (pos + 1) + LENGTH(binaryFileName));
+    strncpy(binaryFileFullName, path, pos);
+    binaryFileFullName[pos] = '\0';
+    strcat(binaryFileFullName, "\\");
+    strncat(binaryFileFullName, binaryFileName, LENGTH(binaryFileName));
+    printf("Name : %s", binaryFileFullName);
+    return binaryFileFullName;
+}
+
+int FindFileExtPos(char* path) {
+    int length = strlen(path);
+    for (size_t i = length - 1; i >= 0; i--)
+        if (path[i] == '.')
+            return i;
+    return length;
+}
+
+int RandInt(int n) {
     srand(time(NULL));
     if ((n - 1) == RAND_MAX) {
         return rand();
