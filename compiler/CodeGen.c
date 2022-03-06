@@ -63,7 +63,7 @@ void emitAsm(CodeGen* gen) {
 	writeLine(gen->filePointer, "\tMOV ebp, esp\n");
 	
 
-	// Print entire code
+	// Print entire main function code
 	for (size_t i = 0; i < gen->codeList->amount; i++)
 		writeLine(gen->filePointer, gen->codeList->strings[i]);
 
@@ -321,17 +321,13 @@ void CaseAssign(CodeGen* gen, Heap_List* heapList, ParseTree* current, StringLis
 	
 	ParseTree* firstChild = current->getChild(current, 0);
 	int margin = getHeap(heapList, firstChild->token->lexeme)->margin;
-	if (!strcmp(getValue(gen->table, (firstChild->token->lexeme))->variable->type, "string")){
+	if (!strcmp(getValue(gen->table, (firstChild->token->lexeme))->variable->type, "string") || !strcmp(getValue(gen->table, (firstChild->token->lexeme))->variable->type, "int"){
 		
 		currentRow = assembleRow(currentRow, "\tMOV	DWORD PTR [ebp");
 	}
 	else if(!strcmp(getValue(gen->table, (firstChild->token->lexeme))->variable->type, "float")){
 		
 		currentRow = assembleRow(currentRow, "\tMOVSS	DWORD PTR [ebp");
-	}
-	else if (!strcmp(getValue(gen->table, (firstChild->token->lexeme))->variable->type, "int")){
-		
-		currentRow = assembleRow(currentRow, "\tMOV	DWORD PTR [ebp");
 	}
 	if (margin > 0) currentRow = assembleRow(currentRow, "+");
 	sprintf(numSTR, "%d", margin);
