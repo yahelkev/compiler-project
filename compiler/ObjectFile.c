@@ -43,7 +43,7 @@ FILE* CreateObjFile(const char* path) {
 	FILE* fp;
 	char* objPath = (char*)malloc(sizeof(char) * LENGTH(path));
 	strncpy(objPath, path, LENGTH(path));
-	int pos = 0;
+	int pos = strlen(objPath);
 	for (size_t i = 0; i < strlen(objPath); i++)
 		if (objPath[i] == '.') pos = i;
 	objPath[pos] = '\0';

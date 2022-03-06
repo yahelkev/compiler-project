@@ -1,16 +1,33 @@
 #include "Assembler.h"
 
-void newAssembler(Assembler* asm, char* path, Table* table)
-{
+void newAssembler(Assembler* asm, char* path, Table* table) {
     asm->_obj = malloc(sizeof(ObjectFile));
     asm->table = table;
     newObjectFile(asm->_obj, path);
     setHeaders(asm->_obj, COMPUTER_TYPE, 3, 0, 0, 0, 0, 0x0104);
+    int binaryFileNumber = randInt(BINARY_FILE_LIMIT_INT);
+    char binaryFileName[BINARY_FILE_LIMIT_STRING + 3] = { 0 }; // Only the file name itself
+    char* binaryFileFullName = NULL; // Includes the dir
+    sprintf(binaryFileName, "%d", binaryFileNumber);
+    int pos = strlen(path);
+    for (size_t i = 0; i < strlen(path); i++)
+        if (path[i] == '\\') 
+            pos = i;
+    binaryFileFullName = (char*)realloc(binaryFileFullName, sizeof(char) * ( pos + 1 ) + LENGTH(binaryFileName));
+    strncpy(binaryFileFullName, path, pos);
+    binaryFileFullName[pos] = '\0';
+    strcat(binaryFileFullName, "\\");
+    strncat(binaryFileFullName, binaryFileName, LENGTH(binaryFileName));
+    printf("Name : %s", binaryFileFullName);
+    asm->binaryCodeFilePointer = CreateObjFile(binaryFileFullName);
+    return;
 }
+
 void freeAssembler(Assembler* asm) {
     freeObjectFile(asm->_obj);
     free(asm->_obj);
 }
+
 void runAssembler(Assembler* asm) {
     int offsetHeadersEnd = sizeof(fileHeader) + 3 * sizeof(sectionHeadrer);
     asm->_obj->fileHeaders->symbolTablePtr =
@@ -31,4 +48,31 @@ void runAssembler(Assembler* asm) {
     addSymbol(asm->_obj, ".data", 0, DATA_SECTION_NUM, 0, IMAGE_SYM_CLASS_STATIC, 0);
     addSymbol(asm->_obj, ".bss", 0, BSS_SECTION_NUM, 0, IMAGE_SYM_CLASS_STATIC, 0);
     writeFile(asm->_obj);
+}
+
+
+
+int randInt(int n) {
+    srand(time(NULL));
+    if ((n - 1) == RAND_MAX) {
+        return rand();
+    }
+    else {
+        // Supporting larger values for n would requires an even more
+        // elaborate implementation that combines multiple calls to rand()
+        assert(n <= RAND_MAX);
+
+        // Chop off all of the values that would cause skew...
+        int end = RAND_MAX / n; // truncate skew
+        assert(end > 0);
+        end *= n;
+
+        // ... and ignore results from rand() that fall above that limit.
+        // (Worst case the loop condition should succeed 50% of the time,
+        // so we can expect to bail out of this loop pretty quickly.)
+        int r;
+        while ((r = rand()) >= end);
+
+        return r % n;
+    }
 }

@@ -32,7 +32,7 @@ FILE* CreateBlankFile(const char* path) {
 	FILE* fp;
 	char* asmPath = (char*)malloc(sizeof(char) * LENGTH(path));
 	strncpy(asmPath, path, LENGTH(path));
-	int pos = 0;
+	int pos = strlen(asmPath);
 	for (size_t i = 0; i < strlen(asmPath); i++)
 		if (asmPath[i] == '.') pos = i;
 	asmPath[pos] = '\0';
@@ -321,7 +321,7 @@ void CaseAssign(CodeGen* gen, Heap_List* heapList, ParseTree* current, StringLis
 	
 	ParseTree* firstChild = current->getChild(current, 0);
 	int margin = getHeap(heapList, firstChild->token->lexeme)->margin;
-	if (!strcmp(getValue(gen->table, (firstChild->token->lexeme))->variable->type, "string") || !strcmp(getValue(gen->table, (firstChild->token->lexeme))->variable->type, "int"){
+	if (!strcmp(getValue(gen->table, (firstChild->token->lexeme))->variable->type, "string") || !strcmp(getValue(gen->table, (firstChild->token->lexeme))->variable->type, "int")){
 		
 		currentRow = assembleRow(currentRow, "\tMOV	DWORD PTR [ebp");
 	}
