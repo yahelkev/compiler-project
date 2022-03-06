@@ -34,14 +34,15 @@ typedef enum {
 
 
 typedef struct CodeGen {
-	char* filePath;
-	FILE* filePointer;
-	Table* table;
-	ParseTree* _main;
 
-	LC_List* lcList;
-	StringList* codeList;
-	FunctionList* funcList;
+	char* filePath; // Origin file path
+	FILE* filePointer; // New .asm file pointer
+	Table* table; // Symbol table pointer
+	ParseTree* _main; // Main parse tree pointer
+
+	FunctionList* funcList; // List of all functions ( not including main ) asm code
+	LC_List* lcList; // List of all constants in the code
+	StringList* codeList; // List of the main function asm code
 
 	int loopCounter;
 	int conditionCounter;

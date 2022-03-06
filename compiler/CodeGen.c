@@ -10,7 +10,7 @@ void newCodeGen(CodeGen* gen, char* path, ParseTree* mainTree, Table* table) {
 
 	gen->codeList = newStringList();
 	gen->lcList = newLC_List();
-	//gen->funcList = newFunctionList();
+	gen->funcList = newFunctionList();
 
 	gen->loopCounter = 0;
 	gen->conditionCounter = 0;
@@ -133,6 +133,7 @@ char* GetOPRow(CodeGen* gen, ParseTree* child, char* currentRow, StringList* cod
 		}
 
 		// Boolean
+		// If not any arithmetic symbols are present it means that we had a boolean operation a step before
 		default:
 			currentRow = assembleRow(currentRow, "\tCMP eax, ");
 			break;
@@ -435,7 +436,7 @@ void CaseConditions(CodeGen* gen, Heap_List* heapList, ParseTree* current, Strin
 	}
 		
 
-	// TODO : Reduce the extra variables that were created insize of the if/else block
+	// TODO : Reduce the extra variables that were created inside of the if/else block
 	gen->conditionCounter++;
 }
 
