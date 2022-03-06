@@ -72,8 +72,7 @@ void writeFile(ObjectFile* obj)
 
 }
 
-void addSymbol(ObjectFile* obj, char name[NAME_SIZE], int value, short sectionNum, short type, char storageClass, char numOfAuxSymbols)
-{
+void addSymbol(ObjectFile* obj, char name[NAME_SIZE], int value, short sectionNum, short type, char storageClass, char numOfAuxSymbols) {
 	symbolTableSection* newSection = malloc(sizeof(symbolTableSection));
 	memset(newSection->name, 0, NAME_SIZE);
 	strncpy(newSection->name, name, strlen(name));
@@ -90,21 +89,20 @@ void addSymbol(ObjectFile* obj, char name[NAME_SIZE], int value, short sectionNu
 	obj->symbolTable[obj->symbolTableSize - 1] = newSection;
 }
 
-char* extractTextSegment(FILE* fp)
-{
+void extractTextSegment(ObjectFile* obj, FILE* fp) {
 	sectionHeadrer textHeaders;
 	fseek(fp, sizeof(fileHeader), SEEK_SET);
 	fread(&textHeaders, sizeof(sectionHeadrer), 1, fp);
-	char* textSegment = malloc(textHeaders.rawDataSize);
+	obj->_textSection = malloc(textHeaders.rawDataSize);
+	obj->_textHeaders->rawDataSize = textHeaders.rawDataSize;
 	fseek(fp, textHeaders.dataAddress, SEEK_SET);
-	fread(textSegment, textHeaders.rawDataSize, 1, fp);
+	fread(obj->_textSection, textHeaders.rawDataSize, 1, fp);
 	fclose(fp);
-	return textSegment;
+	return;
 }
 
 void setSectionHeaders(sectionHeadrer* sect, int virtualSize, int virtualAddress, int rawDataSize,
-	int dataAddress, int ptrToRelocation, int lineNumbrsPtr, short numOfRelocations, short numOfLineNums, int flag)
-{
+	int dataAddress, int ptrToRelocation, int lineNumbrsPtr, short numOfRelocations, short numOfLineNums, int flag) {
 	sect->virtualSize = virtualSize;
 	sect->virtualAddress = virtualAddress;
 	sect->rawDataSize = rawDataSize;

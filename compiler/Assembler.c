@@ -39,6 +39,7 @@ void runAssembler(Assembler* asm) {
     addSymbol(asm->_obj, ".text", 0, TEXT_SECTION_NUM, 0, IMAGE_SYM_CLASS_STATIC, 0);
     addSymbol(asm->_obj, ".data", 0, DATA_SECTION_NUM, 0, IMAGE_SYM_CLASS_STATIC, 0);
     addSymbol(asm->_obj, ".bss", 0, BSS_SECTION_NUM, 0, IMAGE_SYM_CLASS_STATIC, 0);
+    extractTextSegment(asm->_obj, asm->binaryCodeFilePointer);
     writeFile(asm->_obj);
 }
 
