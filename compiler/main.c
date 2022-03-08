@@ -43,6 +43,7 @@ int main( int argc, char** argv ) {
     gen.filePointer = CreateBlankFile(gen.filePath);
     Generate(&gen, NULL, gen._main, gen.codeList);
     emitAsm(&gen);
+    freeCodeGen(&gen);
     newAssembler(&asm, srcFileName, par.table);
     runAssembler(&asm);
     return 0;

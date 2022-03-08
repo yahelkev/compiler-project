@@ -30,7 +30,7 @@ void FunctionListAdd(FunctionList* list, FunctionDef* def) {
 }
 void freeFunctionList(FunctionList* list) {
 	for (size_t i = 0; i < list->size; i++)
-		freeFunctionDef(list->funcs[list->size]);
+		freeFunctionDef(list->funcs[i]);
 	free(list->funcs);
 	free(list);
 	return;
