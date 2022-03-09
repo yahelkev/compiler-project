@@ -17,6 +17,7 @@ void newAssembler(Assembler* asm, char* path, Table* table) {
 
 void freeAssembler(Assembler* asm) {
     freeObjectFile(asm->_obj);
+    fclose(asm->binaryCodeFilePointer);
     free(asm->_obj);
 }
 

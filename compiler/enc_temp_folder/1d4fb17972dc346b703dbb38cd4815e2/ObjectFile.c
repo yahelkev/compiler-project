@@ -91,8 +91,16 @@ void addSymbol(ObjectFile* obj, char name[NAME_SIZE], int value, short sectionNu
 
 void extractTextSegment(ObjectFile* obj, FILE* fp) {
 	sectionHeadrer textHeaders;
-
+	//unsigned char byteArray[40] = { 0 };
+	
+	/*fwrite("01101", sizeof(char*), 3, fp);
+	//fclose(fp);*/
+	////fread(byteArray, sizeof(unsigned char), 40, fp);
 	fseek(fp, sizeof(fileHeader), SEEK_SET);
+	////fseek(fp, 0, SEEK_SET);
+	//char string[10] = { 0 };
+	//fgets(string, sizeof(string) / sizeof(*string), fp);
+	////fread(string, sizeof(char), 5, fp);
 	fread(&textHeaders, sizeof(textHeaders), 1, fp);
 	obj->_textSection = malloc(textHeaders.rawDataSize);
 	obj->_textHeaders->rawDataSize = textHeaders.rawDataSize;
