@@ -23,13 +23,9 @@ void freeAssembler(Assembler* asm) {
 
 void runAssembler(Assembler* asm) {
     int offsetHeadersEnd = sizeof(fileHeader) + 3 * sizeof(sectionHeadrer);
-    asm->_obj->fileHeaders->symbolTablePtr =
-     offsetHeadersEnd + asm->_obj->relocarionTableSize * sizeof(relocationTableSection);
-    setSectionHeaders(asm->_obj->_textHeaders, 0, 0, strlen(asm->_obj->_textSection), offsetHeadersEnd,
-        offsetHeadersEnd + strlen(asm->_obj->_textSection), 0, 0, 0, TEXT_CHARACTERISTICS);
+    setSectionHeaders(asm->_obj->_textHeaders, 0, 0, 0, offsetHeadersEnd, 0, 0, 0, 0, TEXT_CHARACTERISTICS);
     setSectionHeaders(asm->_obj->_dataHeaders, 0, 0, 0, 0, 0, 0, 0, 0, DATA_CHARACTERISTICS);
     setSectionHeaders(asm->_obj->_bssHeaders, 0, 0, 0, 0, 0, 0, 0, 0, BSS_CHARACTERISTICS);
-    addSymbol(asm->_obj, ".file", 0, MAGE_SYM_DEBUG, 0, IMAGE_SYM_CLASS_FILE, 0);
 
     for (size_t i = 0; i < asm->table->size; i++) {
         if (FUNCTION_TAG == asm->table->values[i]->tag) {
@@ -40,7 +36,11 @@ void runAssembler(Assembler* asm) {
     addSymbol(asm->_obj, ".text", 0, TEXT_SECTION_NUM, 0, IMAGE_SYM_CLASS_STATIC, 0);
     addSymbol(asm->_obj, ".data", 0, DATA_SECTION_NUM, 0, IMAGE_SYM_CLASS_STATIC, 0);
     addSymbol(asm->_obj, ".bss", 0, BSS_SECTION_NUM, 0, IMAGE_SYM_CLASS_STATIC, 0);
+    addSymbol(asm->_obj, "___main", 0, 0, DT_FUNCTION, IMAGE_SYM_CLASS_EXTERNAL, 0);
     extractTextSegment(asm->_obj, asm->binaryCodeFilePointer);
+    asm->_obj->fileHeaders->symbolTablePtr =
+        offsetHeadersEnd + asm->_obj->_textHeaders->rawDataSize
+        + asm->_obj->relocarionTableSize * sizeof(relocationTableSection);
     writeFile(asm->_obj);
 }
 
