@@ -41,7 +41,7 @@ FILE* CreateBlankFile(const char* path) {
 
 	fp = fopen(asmPath, "w");
 	fprintf(fp, "\t.file \"%s\"", path);
-	fprintf(fp, "\n\t.intel_syntax noprefix\n\t.text\n\t.def\t___main;\t.scl  2;\t.type  32;\t.endef\n\t.section .rdata,\"dr\"");
+	fprintf(fp, "\n\t.intel_syntax noprefix\n\t.text\n\t.def\t___main;\t.scl  2;\t.type  32;\t.endef\n\t.section .rdata,\"dr\"\n\n.section .text");
 	return fp;
 }
 

@@ -54,16 +54,15 @@ FILE* CreateObjFile(const char* path) {
 	return fp;
 }
 
-void writeFile(ObjectFile* obj)
-{
+void writeFile(ObjectFile* obj) {
 	fwrite(obj->fileHeaders, sizeof(fileHeader), 1, obj->filePointer);
 	fwrite(obj->_textHeaders, sizeof(sectionHeadrer), 1, obj->filePointer);
 	fwrite(obj->_dataHeaders, sizeof(sectionHeadrer), 1, obj->filePointer);
 	fwrite(obj->_bssHeaders, sizeof(sectionHeadrer), 1, obj->filePointer);
-	fwrite(obj->_textSection, strlen(obj->_textSection), 1, obj->filePointer);
+	fwrite(obj->_textSection, obj->_textHeaders->rawDataSize, 1, obj->filePointer);
 	for (int i = 0; i < obj->symbolTableSize; i++)
 	{
-		fwrite(obj->symbolTable[i], sizeof(symbolTableSection), 1, obj->filePointer);
+		fwrite(obj->symbolTable[i], sizeof(symbolTableSection)-2, 1, obj->filePointer);
 	}
 	for (int i = 0; i < obj->relocarionTableSize; i++)
 	{
@@ -97,7 +96,7 @@ void extractTextSegment(ObjectFile* obj, FILE* fp) {
 	obj->_textSection = malloc(textHeaders.rawDataSize);
 	obj->_textHeaders->rawDataSize = textHeaders.rawDataSize;
 	fseek(fp, textHeaders.dataAddress, SEEK_SET);
-	fread(obj->_textSection, textHeaders.rawDataSize, 1, fp);
+	fread(obj->_textSection, sizeof(unsigned char), textHeaders.rawDataSize, fp);
 	fclose(fp);
 	return;
 }

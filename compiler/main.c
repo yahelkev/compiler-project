@@ -46,5 +46,6 @@ int main( int argc, char** argv ) {
     freeCodeGen(&gen);
     newAssembler(&asm, srcFileName, par.table);
     runAssembler(&asm);
+    freeAssembler(&asm);
     return 0;
 }
