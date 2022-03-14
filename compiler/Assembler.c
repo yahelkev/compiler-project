@@ -19,6 +19,7 @@ void freeAssembler(Assembler* asm) {
     freeObjectFile(asm->_obj);
     fclose(asm->binaryCodeFilePointer);
     free(asm->_obj);
+    return;
 }
 
 void runAssembler(Assembler* asm) {
