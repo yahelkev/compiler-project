@@ -3,7 +3,7 @@
 The Official Repo For The `Cliff` Programming Language.
 
 ## Description
-Our compiler converts our made-up programming language into assembley and then to machine-code inside an object file so it can be read and executed by a computer.
+Our compiler converts our made-up programming language into assembley and then to machine-code inside an object file so it can be read and executed by a computer. 
 presentation of the project:
 https://docs.google.com/presentation/d/1yNcAF6LPkxNdPQJhfiqa_8iv01KLzV7mdZElovjEuy0/edit?usp=sharing
 
