@@ -3,7 +3,9 @@
 The Official Repo For The `Cliff` Programming Language.
 
 ## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+Our compiler converts our made-up programming language into assembley and then to machine-code inside an object file so it can be read and executed by a computer.
+presentation of the project:
+https://docs.google.com/presentation/d/1yNcAF6LPkxNdPQJhfiqa_8iv01KLzV7mdZElovjEuy0/edit?usp=sharing
 
 ## TODO
 ### Code Related
